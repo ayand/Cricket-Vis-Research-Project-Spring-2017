@@ -211,22 +211,19 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           $scope.normalStyling = {
               "color": "black",
-              "background-color": "#aaaaaa",
-              "opacity": 0.5
+              "background-color": "#aaaaaa"
           };
 
           $scope.batsmanStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.battingTeam],
-              "font-weight": "bold",
-              "opacity": 1
+              "font-weight": "bold"
           }
 
           $scope.bowlerStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.bowlingTeam],
-              "font-weight": "bold",
-              "opacity": 1
+              "font-weight": "bold"
           }
 
           $scope.currentBatsmen = [];

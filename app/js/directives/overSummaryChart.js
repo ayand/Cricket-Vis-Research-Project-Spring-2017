@@ -41,7 +41,7 @@ angular.module('myApp').directive('overSummaryChart', function() {
       teamColors["Sri Lanka"] = "#000099";
 
       var barHeight = function(d) {
-          console.log(d);
+          //console.log(d);
           if (d.key == "wicket") {
               return 7;
           } else {
@@ -66,7 +66,7 @@ angular.module('myApp').directive('overSummaryChart', function() {
                   .offset(d3.stackOffsetNone);
 
               var series = stack(newVal);
-              console.log(series);
+              //console.log(series);
 
               var bars = vis.selectAll('g')
                   .data(series)
@@ -106,12 +106,12 @@ angular.module('myApp').directive('overSummaryChart', function() {
 
       scope.$watch('min', function(newMin, oldMin) {
           scope.$watch('max', function(newMax, oldMax) {
-              console.log("min: " + newMin);
-              console.log("max: " + newMax);
+              /*console.log("min: " + newMin);
+              console.log("max: " + newMax);*/
               vis.selectAll('.summary-bar')
                   .selectAll('rect')
                   .style("opacity", function(d, i) {
-                      console.log('i: ' + i);
+                      //console.log('i: ' + i);
                       //console.log('changing');
                       var over = i + 1;
                       if (over >= newMin && over <= newMax) {
