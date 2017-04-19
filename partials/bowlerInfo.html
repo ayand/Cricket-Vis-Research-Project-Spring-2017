@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <img align="center" class="center-block" ng-src="{{ imageURL }}" height="100" alt="displayedBowler"/><br>
+  <h3 align="center" class="modal-title" id="modal-title">{{ displayedPlayer.name }}</h3>
+</div>
+<div align="center" class="modal-body" id="modal-body">
+  <table class="table table-striped">
+    <tr>
+      <td align="center">
+        Balls Bowled
+      </td>
+      <td align="center">
+        {{ statistics["balls_bowled"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Runs Conceded
+      </td>
+      <td align="center">
+        {{ statistics["runs_conceded"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Dot Balls Bowled
+      </td>
+      <td align="center">
+        {{ statistics["dot_balls_bowled"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Fours Conceded
+      </td>
+      <td align="center">
+        {{ statistics["4s_conceded"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Sixes Conceded
+      </td>
+      <td align="center">
+        {{ statistics["6s_conceded"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Wickets Taken
+      </td>
+      <td align="center">
+        {{ statistics["wickets_taken"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        No Balls Bowled
+      </td>
+      <td align="center">
+        {{ statistics["no_balls_bowled"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Wides Bowled
+      </td>
+      <td align="center">
+        {{ statistics["wides_bowled"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Extras Conceded
+      </td>
+      <td align="center">
+        {{ statistics["extras_conceded"] }}
+      </td>
+    </tr>
+  </table>
+  <label class="btn btn-danger" ng-click="close()">Close</label>
+</div>

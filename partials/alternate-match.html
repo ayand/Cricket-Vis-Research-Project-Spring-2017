@@ -1,0 +1,45 @@
+<div style="background-color: #cccccc; color: black">
+<div align="center">
+  <h2>{{ $parent.date + " - (" + $parent.ground + ")" }}</h2>
+  <h2>{{ $parent.team1 + " vs " + $parent.team2 }}</h2>
+  <h3>Skyline of Overs</h3>
+  <label class="btn btn-success" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
+  <label class="btn btn-info" ng-click="seeOvers()">Over Summary</label>
+</div>
+<div class="row">
+  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <img align="center" class="center-block" ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
+    <div class="row">
+      <h4 ng-click="seeInning(1)">{{ "1st Innings: " + firstBattingTeam}}</h5>
+      <h5>{{ firstTotalRuns + "-" + firstWickets}}</h5>
+    </div>
+    <div ng-show="showBalls">
+      <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-chart>
+    </div>
+    <div ng-show="!showBalls">
+      <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
+    </div>
+    <div style="width:610px" ng-show="showSlider1">
+        <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
+    </div>
+  </div>
+  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <img align="center" class="center-block" ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
+    <div class="row">
+      <h4 ng-click="seeInning(2)">{{ "2nd Innings: " + secondBattingTeam}}</h5>
+      <h5>{{ secondTotalRuns + "-" + secondWickets}}</h5>
+    </div>
+    <div ng-show="showBalls">
+      <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-chart>
+    </div>
+    <div ng-show="!showBalls">
+      <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
+    </div>
+    <div style="width:610px" ng-show="showSlider2">
+        <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid" autoscroll="true" ui-view></div>
+</div>

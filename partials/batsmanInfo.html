@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <img align="center" class="center-block" ng-src="{{ imageURL }}" height="100" alt="displayedBatsman"/><br>
+  <h3 align="center" class="modal-title" id="modal-title">{{ displayedPlayer.name }}</h3>
+</div>
+<div align="center" class="modal-body" id="modal-body">
+  <table class="table table-striped">
+    <tr>
+      <td align="center">
+        Runs Scored
+      </td>
+      <td align="center">
+        {{ statistics["runs_scored"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Balls Faced
+      </td>
+      <td align="center">
+        {{ statistics["balls_faced"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Fours Scored
+      </td>
+      <td align="center">
+        {{ statistics["4s_scored"] }}
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        Sixes Scored
+      </td>
+      <td align="center">
+        {{ statistics["6s_scored"] }}
+      </td>
+    </tr>
+  </table>
+  <label class="btn btn-danger" ng-click="close()">Close</label>
+</div>

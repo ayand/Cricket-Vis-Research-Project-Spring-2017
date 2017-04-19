@@ -1,0 +1,86 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <h3>{{ "Inning " + inning}}</h3>
+    <br>
+    <h4>{{ battingTeam + " Batsmen" }}</h4>
+    <div class="player-table">
+      <table class="table table-striped">
+          <tbody>
+            <tr>
+              <td align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling" ng-click="changeBatsmen(batsmen[$index])">
+                <img class="center-block" ng-src="{{ imageDict[batsman.name] }}" height="75" alt="batsmanImage"/><br>
+                {{ batsman.name.split(" ")[0] }}<br>
+                {{ batsman.name.split(" ").length == 2 ? batsman.name.split(" ")[1] : batsman.name.split(" ")[1] + " " + batsman.name.split(" ")[2] }}<br>
+                <hr>
+                Runs Scored:<br>
+                {{ $parent.playerDict[batsman.id.toString()]["games"][matchID.toString()]["batting_inning"]["runs_scored"] }}<br>
+                <hr>
+                Balls Faced:<br>
+                {{ $parent.playerDict[batsman.id.toString()]["games"][matchID.toString()]["batting_inning"]["balls_faced"] }}<br>
+                <hr>
+                4's Scored:<br>
+                {{ $parent.playerDict[batsman.id.toString()]["games"][matchID.toString()]["batting_inning"]["4s_scored"] }}<br>
+                <hr>
+                6's Scored:<br>
+                {{ $parent.playerDict[batsman.id.toString()]["games"][matchID.toString()]["batting_inning"]["6s_scored"] }}<br>
+              </td>
+            </tr>
+          </tbody>
+      </table>
+    </div>
+    <br>
+    <!--<div>
+      <svg width="560px" height="560px" style="background-color: #ccffcc">
+        <rect x="249.5" y= "78.8" width="61" height="402.4"/>
+      </svg>
+    </div>-->
+    <ball-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers"></ball-chart>
+    <br>
+    <h4>{{ bowlingTeam + " Bowlers" }}</h4>
+    <div class="player-table">
+      <table class="table table-striped">
+          <tbody>
+            <tr align="center">
+              <td align="center" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling" ng-click="changeBowlers(bowlers[$index])">
+                <img class="center-block" ng-src="{{ imageDict[bowler.name] }}" height="75" alt="bowlerImage"/><br>
+                {{ bowler.name.split(" ")[0] }}<br>
+                {{ bowler.name.split(" ").length == 2 ? bowler.name.split(" ")[1] : bowler.name.split(" ")[1] + " " + bowler.name.split(" ")[2] }}
+                <hr>
+                Balls Bowled:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["balls_bowled"] }}<br>
+                <hr>
+                Runs Conceded:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["runs_conceded"] }}<br>
+                <hr>
+                Dot Balls Bowled:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["dot_balls_bowled"] }}<br>
+                <hr>
+                Four's Conceded:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["4s_conceded"] }}<br>
+                <hr>
+                Six's Conceded:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["6s_conceded"] }}<br>
+                <hr>
+                Wickets Taken:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["wickets_taken"] }}<br>
+                <hr>
+                No Balls Bowled:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["no_balls_bowled"] }}<br>
+                <hr>
+                Wides Bowled:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["wides_bowled"] }}<br>
+                <hr>
+                Extras Conceded:<br>
+                {{ $parent.playerDict[bowler.id.toString()]["games"][matchID.toString()]["bowling_inning"]["extras_conceded"] }}<br>
+              </td>
+            </tr>
+          </tbody>
+      </table>
+      <br>
+      <br>
+      <br>
+    </div>
+  </div>
+  <!--<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  </div>-->
+</div>

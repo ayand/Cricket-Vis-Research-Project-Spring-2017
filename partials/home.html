@@ -1,0 +1,27 @@
+<div align="center"  style="background-color: #222222; color: white">
+  <h1>A Deeper Look into the 2015 Cricket World Cup</h1>
+</div>
+<div class="row">
+  <!--<div class="col-xs-4 col sm-4 col-md-4 col-lg-4">
+    <h3 align="center">Matches</h3>
+    <div class="btn-group-vertical" role="group" style="height: 606px; weight: 300px; overflow:auto">
+      <label ng-repeat="game in games" class="btn btn-success" ng-click="selectMatch(game)">{{ game.date.split(" ")[0] + "          " +  game.team1_name + " vs " + game.team2_name}}</label>
+    </div>
+  </div>
+  <div align="center" class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+    <div ui-view></div>
+  </div>-->
+  <div class="col-xs-4 col sm-4 col-md-4 col-lg-4 dropdown">
+    <div class="btn-group" uib-dropdown uib-keyboard-nav>
+        <button id="simple-btn-keyboard-nav" type="button" class="btn btn-success" uib-dropdown-toggle>
+            Select A Match Here <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
+            <li role="menuitem" ng-repeat="game in games"><a ng-click="selectMatch(game)">{{ game.date.split(" ")[0] + " " +  game.team1_name + " vs " + game.team2_name}}</a></li>
+        </ul>
+    </div>
+  </div>
+  <div class="col-xs-8 col sm-8 col-md-8 col-lg-8">
+  </div>
+</div>
+<div ui-view></div>

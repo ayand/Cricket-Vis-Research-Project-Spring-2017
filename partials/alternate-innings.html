@@ -1,0 +1,37 @@
+<div class="row" style="background-color: #cccccc">
+  <h3 align="center">{{ "Inning " + inning}}</h3>
+  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <br>
+    <h4>{{ battingTeam + " Batsmen" }}</h4>
+    <br>
+    <table>
+        <tbody>
+          <tr>
+            <td align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
+              <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="60" alt="batsmanImage"/><br>
+              <button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBatsman(batsmen[$index], $parent.playerDict, imageDict, matchID)">Stats</button>
+            </td>
+          </tr>
+        </tbody>
+    </table>
+    <br>
+    <h4>{{ bowlingTeam + " Bowlers" }}</h4>
+    <br>
+    <table>
+        <tbody>
+          <tr align="center">
+            <td ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
+              <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index], $parent.playerDict, imageDict, matchID)" height="60" alt="bowlerImage"/><br>
+              <button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBowler(bowlers[$index], $parent.playerDict, imageDict, matchID)">Stats</button>
+            </td>
+          </tr>
+        </tbody>
+    </table>
+  </div>
+  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <h3>Pitch Map</h3>
+    <h4>Overs Displayed</h4>
+    <!--<rzslider rz-slider-model="rangeSlider.minimumOver" rz-slider-high="rangeSlider.maximumOver" rz-slider-options="rangeSlider.options"></rzslider>-->
+    <ball-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver"></ball-chart>
+  </div>
+</div>

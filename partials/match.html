@@ -1,0 +1,41 @@
+<h2 align="center">{{ $parent.date + " " + $parent.team1 + " vs " + $parent.team2 }}</h2>
+<div class="row">
+  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+    <h3>Skyline of Overs</h3>
+    <label class="btn btn-success" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
+    <label class="btn btn-info" ng-click="seeOvers()">Over Summary</label>
+    <div class="row">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <h5 ng-click="seeInning(1)">{{ "1st Innings: " + firstBattingTeam}}</h5>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h5>{{ firstTotalRuns + "-" + firstWickets}}</h5>
+      </div>
+    </div>
+    <div ng-show="showBalls">
+      <over-chart val="firstInning" dictionary="playerDict"></over-chart>
+    </div>
+    <div ng-show="!showBalls">
+      <over-summary-chart val="firstDivision" team="firstBattingTeam"></over-summary-chart>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <h5 ng-click="seeInning(2)">{{ "2nd Innings: " + secondBattingTeam}}</h5>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h5>{{ secondTotalRuns + "-" + secondWickets}}</h5>
+      </div>
+    </div>
+    <div ng-show="showBalls">
+      <over-chart val="secondInning" dictionary="playerDict"></over-chart>
+    </div>
+    <div ng-show="!showBalls">
+      <over-summary-chart val="secondDivision" team="secondBattingTeam"></over-summary-chart>
+    </div>
+    <br>
+  </div>
+  <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+    <div ui-view></div>
+  </div>
+</div>
