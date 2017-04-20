@@ -3,7 +3,7 @@
 angular.module('myApp')
 .directive('overChart', function() {
   var margin = 20;
-  var height = 300;
+  var height = 450;
   var width = 610;
   var ballBuffer = 2;
 
@@ -76,17 +76,17 @@ angular.module('myApp')
 
       var barHeight = function(d) {
         if (d.runs_batter <= 1) {
-            return 8;
+            return 10;
         } else if (d.runs_batter == 2) {
-            return 16;
+            return 20;
         } else if (d.runs_batter == 3) {
-            return 24;
+            return 30;
         } else if (d.runs_batter == 4) {
-            return 32;
-        } else if (d.runs_batter == 5) {
             return 40;
+        } else if (d.runs_batter == 5) {
+            return 50;
         } else {
-            return 48;
+            return 60;
         }
       }
 

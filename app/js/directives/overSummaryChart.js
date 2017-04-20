@@ -1,6 +1,6 @@
 angular.module('myApp').directive('overSummaryChart', function() {
   var margin = 20;
-  var height = 300;
+  var height = 450;
   var width = 610;
 
   return {
@@ -86,10 +86,10 @@ angular.module('myApp').directive('overSummaryChart', function() {
                           return overs(i + 1);
                       })
                       .attr("y", function(d) {
-                          return height - margin - (8 * d[1])
+                          return height - margin - (10 * d[1])
                       })
                       .attr("height", function(d) {
-                          return (8 * (d[1] - d[0]))
+                          return (10 * (d[1] - d[0]))
                       })
                       .attr("width", overs.bandwidth())
 
