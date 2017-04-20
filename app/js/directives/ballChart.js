@@ -208,35 +208,66 @@ angular.module('myApp').directive('ballChart', function() {
                   })
                   .on("mouseover", function(d) {
                       console.log(d.z);
-                      if (d.z != 0) {
-                        d3.selectAll(".zone-path")
-                            .transition()
-                            .duration(1000)
-                            .attr("fill", function(path, i) {
-                                if (d.z == path.data.zone) {
-                                    return "gold";
-                                } else {
-                                    return "black";
-                                }
-                            })
-                      }
+                      // if (d.z != 0) {
+                      //   d3.selectAll(".zone-path")
+                      //       .transition()
+                      //       .duration(1000)
+                      //       .attr("fill", function(path, i) {
+                      //           if (d.z == path.data.zone) {
+                      //               return "gold";
+                      //           } else {
+                      //               return "black";
+                      //           }
+                      //       })
+                      // }
+                      ballMouseover(d);
                   })
                   .on("mouseout", function() {
+                      // d3.selectAll(".zone-path")
+                      //     .transition()
+                      //     .duration(1000)
+                      //     .attr("fill", function(path, i) {
+                      //         if (selectedZone == 0) {
+                      //             return colors[i];
+                      //         } else {
+                      //             if (path.data.zone == selectedZone) {
+                      //                 return "gold";
+                      //             } else {
+                      //                 return "black";
+                      //             }
+                      //         }
+                      //     })
+                      ballMouseout();
+                  });
+
+                  var ballMouseover = function(curBall){
+                    // console.log(curBall)
+                    d3.selectAll('.dot').style('opacity',function(d){
+                        if(d==curBall){
+                            return 1;
+                        }else{
+                            return 0.2;
+                        }
+                    });
+
+                    if (curBall.z != 0) {
                       d3.selectAll(".zone-path")
-                          .transition()
-                          .duration(1000)
                           .attr("fill", function(path, i) {
-                              if (selectedZone == 0) {
+                              if (curBall.z == path.data.zone) {
                                   return colors[i];
                               } else {
-                                  if (path.data.zone == selectedZone) {
-                                      return "gold";
-                                  } else {
-                                      return "black";
-                                  }
+                                  return 'gray';
                               }
                           })
-                  });
+                    }
+
+                  };
+
+                  var ballMouseout = function(){
+                    d3.selectAll('.dot').style('opacity',1);
+
+                    d3.selectAll(".zone-path").attr("fill", function(path, i) { return colors[i];});
+                  };
 
 
 
@@ -257,7 +288,25 @@ angular.module('myApp').directive('ballChart', function() {
                               });*/
 
                               d3.selectAll(".dot")
-                                  .style("opacity", function(d) {
+                                  // .style("opacity", function(d) { 
+                                  //     var batsmanCondition = true;
+                                  //     if (newBatsmen.length != 0) {
+                                  //         batsmanCondition = newBatsmen.includes(d.batsman);
+                                  //     }
+                                  //     var bowlerCondition = true;
+                                  //     if (newBowlers.length != 0) {
+                                  //         bowlerCondition = newBowlers.includes(d.bowler);
+                                  //     }
+                                  //     var over = Math.floor(d.ovr) + 1;
+                                  //     var overCondition = ((over >= newMin) && (over <= newMax));
+                                  //     var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                                  //     if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                  //         return 1;
+                                  //     } else {
+                                  //         return 0;
+                                  //     }
+                                  // });
+                                  .style("display",function(d){
                                       var batsmanCondition = true;
                                       if (newBatsmen.length != 0) {
                                           batsmanCondition = newBatsmen.includes(d.batsman);
@@ -270,9 +319,9 @@ angular.module('myApp').directive('ballChart', function() {
                                       var overCondition = ((over >= newMin) && (over <= newMax));
                                       var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
                                       if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                          return 1;
+                                          return 'block';
                                       } else {
-                                          return 0;
+                                          return 'none';
                                       }
                                   });
 

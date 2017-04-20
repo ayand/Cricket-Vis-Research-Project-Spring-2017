@@ -137,11 +137,11 @@ angular.module('myApp')
             var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d, newValue); });
             vis.call(tip);
 
-            var bars = vis.selectAll('.bar')
+            var bars = vis.selectAll('.ballBar')
                 .data(newVal);
 
             bars.enter().append("rect")
-                .attr("class", "bar")
+                .attr("class", "ballBar")
                 .attr("fill", function(d) {
                   return decideColor(d);
                 })
@@ -183,7 +183,7 @@ angular.module('myApp')
           scope.$watch('max', function(newMax, oldMax) {
               /*console.log("min: " + newMin);
               console.log("max: " + newMax);*/
-              vis.selectAll('.bar')
+              vis.selectAll('.ballBar')
                   .style("opacity", function(d, i) {
                       //console.log('i: ' + i);
                       //console.log('changing');
