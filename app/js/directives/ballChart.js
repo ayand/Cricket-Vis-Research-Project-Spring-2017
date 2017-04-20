@@ -169,6 +169,7 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("d", arc2);
 
           scope.$watch('balls', function(newVal, oldVal) {
+              var selectedZone = 0;
 
               if (!newVal) {
                   return;
@@ -225,166 +226,144 @@ angular.module('myApp').directive('ballChart', function() {
                           .transition()
                           .duration(1000)
                           .attr("fill", function(path, i) {
-                              return colors[i];
+                              if (selectedZone == 0) {
+                                  return colors[i];
+                              } else {
+                                  if (path.data.zone == selectedZone) {
+                                      return "gold";
+                                  } else {
+                                      return "black";
+                                  }
+                              }
                           })
                   });
 
-              /*balls.transition()
-                  .duration(1000)
-                  .attr("cx", function(d) {
-                      return ballX(d["landing_x"]);
-                  })
-                  .attr("cy", function(d) {
-                    if (d["landing_y"] < 0) {
-                        return ballY(-0.5);
-                    } else {
-                        return ballY(d["landing_y"]);
-                    }
-                  })
-                  .attr("r", idealRadius) //Previous value: 3.5
-                  .attr("fill", function(d) {
-                      if (isWicketBall(d)) {
-                          return "black";
-                      } else if (d.runs_batter == 0) {
-                          return "#AAAAAA";
-                      } else if (d.runs_batter < 4) {
-                          return "#00CCCC";
-                      } else {
-                          return "#FF8000";
-                      }
-                  })
-                  ;
 
-              balls.exit()
-                  .transition()
-                  .duration(1000)
-                  .attr("r", 0)
-                  .remove();*/
-          });
 
-          var selectedZone = 0;
-
-          scope.$watch('batsmen', function(newBatsmen, oldBatsmen) {
-              scope.$watch('bowlers', function(newBowlers, oldBowlers) {
-                scope.$watch('min', function(newMin, oldMin) {
-                    scope.$watch('max', function(newMax, oldMax) {
-                      var filteredBalls = validBalls.filter(function(d) {
-                        var over = Math.floor(d.ovr) + 1;
-                        var overCondition = ((over >= newMin) && (over <= newMax));
-                        return overCondition;
-                      });
-                      var activeBatsmen = filteredBalls.map(function(d) {
-                          return d.batsman;
-                      });
-                      var activeBowlers = filteredBalls.map(function(d) {
-                          return d.bowler;
-                      });
-
-                      d3.selectAll(".dot")
-                          .style("opacity", function(d) {
-                              var batsmanCondition = true;
-                              if (newBatsmen.length != 0) {
-                                  batsmanCondition = newBatsmen.includes(d.batsman);
-                              }
-                              var bowlerCondition = true;
-                              if (newBowlers.length != 0) {
-                                  bowlerCondition = newBowlers.includes(d.bowler);
-                              }
-                              var over = Math.floor(d.ovr) + 1;
-                              var overCondition = ((over >= newMin) && (over <= newMax));
-                              var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                              if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                  return 1;
-                              } else {
-                                  return 0;
-                              }
-                          });
-
-                          d3.selectAll(".batsman-column")
-                              .style("opacity", function(d, i) {
-                                  var batsman = newBatsmen[i];
-                                  if (activeBatsmen.includes(batsman)) {
-                                      return 1;
-                                  } else {
-                                      return 0.5;
-                                  }
+                  scope.$watch('batsmen', function(newBatsmen, oldBatsmen) {
+                      scope.$watch('bowlers', function(newBowlers, oldBowlers) {
+                        scope.$watch('min', function(newMin, oldMin) {
+                            scope.$watch('max', function(newMax, oldMax) {
+                              /*var filteredBalls = validBalls.filter(function(d) {
+                                var over = Math.floor(d.ovr) + 1;
+                                var overCondition = ((over >= newMin) && (over <= newMax));
+                                return overCondition;
                               });
+                              var activeBatsmen = filteredBalls.map(function(d) {
+                                  return d.batsman;
+                              });
+                              var activeBowlers = filteredBalls.map(function(d) {
+                                  return d.bowler;
+                              });*/
 
-                          d3.selectAll(".bowler-column")
-                              .style("opacity", function(d, i) {
-                                  var bowler = newBowlers[i];
-                                  if (activeBowlers.includes(bowler)) {
-                                      return 1;
-                                  } else {
-                                      return 0.5;
-                                  }
-                              })
-
-                          arcs1.on("click", function(d) {
-                              if (selectedZone == d.data.zone) {
-                                  selectedZone = 0;
-                                  d3.selectAll(".zone-path")
-                                      .transition()
-                                      .duration(1000)
-                                      .attr("fill", function(path, i) {
-                                          return colors[i];
+                              d3.selectAll(".dot")
+                                  .style("opacity", function(d) {
+                                      var batsmanCondition = true;
+                                      if (newBatsmen.length != 0) {
+                                          batsmanCondition = newBatsmen.includes(d.batsman);
+                                      }
+                                      var bowlerCondition = true;
+                                      if (newBowlers.length != 0) {
+                                          bowlerCondition = newBowlers.includes(d.bowler);
+                                      }
+                                      var over = Math.floor(d.ovr) + 1;
+                                      var overCondition = ((over >= newMin) && (over <= newMax));
+                                      var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                          return 1;
+                                      } else {
+                                          return 0;
+                                      }
                                   });
-                                  d3.selectAll(".dot")
-                                      .style("opacity", function(dot) {
-                                          var batsmanCondition = true;
-                                          if (newBatsmen.length != 0) {
-                                              batsmanCondition = newBatsmen.includes(dot.batsman);
-                                          }
-                                          var bowlerCondition = true;
-                                          if (newBowlers.length != 0) {
-                                              bowlerCondition = newBowlers.includes(dot.bowler);
-                                          }
-                                          var over = Math.floor(dot.ovr) + 1;
-                                          var overCondition = ((over >= newMin) && (over <= newMax));
-                                          //var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                                          if (batsmanCondition && bowlerCondition && overCondition) {
+
+                                  /*d3.selectAll(".batsman-column")
+                                      .style("opacity", function(d, i) {
+                                          var batsman = newBatsmen[i];
+                                          if (activeBatsmen.includes(batsman)) {
                                               return 1;
                                           } else {
-                                              return 0;
+                                              return 0.5;
                                           }
-                                  });
-                              } else {
-                                  selectedZone = d.data.zone;
-                                  d3.selectAll(".zone-path")
-                                      .transition()
-                                      .duration(1000)
-                                      .attr("fill", function(path) {
-                                          if (d.data.zone == path.data.zone) {
-                                              return "gold";
-                                          } else {
-                                              return "black";
-                                          }
-                                  });
-                                  d3.selectAll(".dot")
-                                      .style("opacity", function(dot) {
-                                          var batsmanCondition = true;
-                                          if (newBatsmen.length != 0) {
-                                              batsmanCondition = newBatsmen.includes(dot.batsman);
-                                          }
-                                          var bowlerCondition = true;
-                                          if (newBowlers.length != 0) {
-                                              bowlerCondition = newBowlers.includes(dot.bowler);
-                                          }
-                                          var over = Math.floor(dot.ovr) + 1;
-                                          var overCondition = ((over >= newMin) && (over <= newMax));
-                                          var zoneCondition = (selectedZone == dot.z);
-                                          if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      });
+
+                                  d3.selectAll(".bowler-column")
+                                      .style("opacity", function(d, i) {
+                                          var bowler = newBowlers[i];
+                                          if (activeBowlers.includes(bowler)) {
                                               return 1;
                                           } else {
-                                              return 0;
+                                              return 0.5;
                                           }
+                                      })*/
+
+                                  arcs1.on("click", function(d) {
+                                      if (selectedZone == d.data.zone) {
+                                          selectedZone = 0;
+                                          d3.selectAll(".zone-path")
+                                              .transition()
+                                              .duration(1000)
+                                              .attr("fill", function(path, i) {
+                                                  return colors[i];
+                                          });
+                                          d3.selectAll(".dot")
+                                              .style("opacity", function(dot) {
+                                                  var batsmanCondition = true;
+                                                  if (newBatsmen.length != 0) {
+                                                      batsmanCondition = newBatsmen.includes(dot.batsman);
+                                                  }
+                                                  var bowlerCondition = true;
+                                                  if (newBowlers.length != 0) {
+                                                      bowlerCondition = newBowlers.includes(dot.bowler);
+                                                  }
+                                                  var over = Math.floor(dot.ovr) + 1;
+                                                  var overCondition = ((over >= newMin) && (over <= newMax));
+                                                  //var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                                                  if (batsmanCondition && bowlerCondition && overCondition) {
+                                                      return 1;
+                                                  } else {
+                                                      return 0;
+                                                  }
+                                          });
+                                      } else {
+                                          selectedZone = d.data.zone;
+                                          d3.selectAll(".zone-path")
+                                              .transition()
+                                              .duration(1000)
+                                              .attr("fill", function(path) {
+                                                  if (d.data.zone == path.data.zone) {
+                                                      return "gold";
+                                                  } else {
+                                                      return "black";
+                                                  }
+                                          });
+                                          d3.selectAll(".dot")
+                                              .style("opacity", function(dot) {
+                                                  var batsmanCondition = true;
+                                                  if (newBatsmen.length != 0) {
+                                                      batsmanCondition = newBatsmen.includes(dot.batsman);
+                                                  }
+                                                  var bowlerCondition = true;
+                                                  if (newBowlers.length != 0) {
+                                                      bowlerCondition = newBowlers.includes(dot.bowler);
+                                                  }
+                                                  var over = Math.floor(dot.ovr) + 1;
+                                                  var overCondition = ((over >= newMin) && (over <= newMax));
+                                                  var zoneCondition = (selectedZone == dot.z);
+                                                  if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                                      return 1;
+                                                  } else {
+                                                      return 0;
+                                                  }
+                                          });
+                                      }
                                   });
-                              }
+                              });
                           });
                       });
                   });
-              });
           });
+
+
 
 
         }
