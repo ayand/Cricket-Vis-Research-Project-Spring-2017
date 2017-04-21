@@ -49,6 +49,18 @@ angular.module('myApp').directive('overSummaryChart', function() {
           }
       }
 
+      var tip = d3.tip().attr('class', 'd3-tip');
+      vis.call(tip);
+
+      var tooltipText = function(d) {
+          var runsScored = (d.runs == 0) ? "" : ("Runs Scored: " + d.runs + "</br>");
+          var wicketsTaken = (d.wickets == 0) ? "" : ("Wickets Taken: " + d.wickets);
+          return (runsScored + wicketsTaken);
+      }
+
+      var min = 1;
+      var max = 50;
+
       scope.$watch('team', function(newTeam, oldTeam) {
           if (!newTeam) {
               return;
@@ -73,6 +85,7 @@ angular.module('myApp').directive('overSummaryChart', function() {
                   .enter().append("g")
                       .attr('class', 'summary-bar')
                       .attr("fill", function(d, i) {
+                        //console.log(i);
                         if (d.key == "runs") {
                             return teamColors[newTeam];
                         } else {
@@ -92,6 +105,40 @@ angular.module('myApp').directive('overSummaryChart', function() {
                           return (10 * (d[1] - d[0]))
                       })
                       .attr("width", overs.bandwidth())
+                      .on("mouseover", function(d, i) {
+                        vis.selectAll('.summary-bar')
+                            .selectAll('rect')
+                            .style("opacity", function(bar, j) {
+                                //console.log('i: ' + i);
+                                //console.log('changing');
+
+                                if (i == j) {
+                                    //console.log('not fading');
+                                    return 1;
+                                } else {
+                                    //console.log('fading');
+                                    return 0.2;
+                                }
+                            });
+                          tip.html(tooltipText(newVal[i])).show();
+                      })
+                      .on("mouseout", function() {
+                        vis.selectAll('.summary-bar')
+                            .selectAll('rect')
+                            .style("opacity", function(d, i) {
+                                //console.log('i: ' + i);
+                                //console.log('changing');
+                                var over = i + 1;
+                                if (over >= min && over <= max) {
+                                    //console.log('not fading');
+                                    return 1;
+                                } else {
+                                    //console.log('fading');
+                                    return 0.2;
+                                }
+                            });
+                        tip.hide();
+                      });
 
 
               var overAxis = d3.axisBottom(overs);
@@ -108,6 +155,8 @@ angular.module('myApp').directive('overSummaryChart', function() {
           scope.$watch('max', function(newMax, oldMax) {
               /*console.log("min: " + newMin);
               console.log("max: " + newMax);*/
+              min = newMin;
+              max = newMax;
               vis.selectAll('.summary-bar')
                   .selectAll('rect')
                   .style("opacity", function(d, i) {

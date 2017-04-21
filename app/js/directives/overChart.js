@@ -24,11 +24,7 @@ angular.module('myApp')
       //var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
 
-      var bottomBoundaries = {};
 
-      for (var i = 1; i <= 50; i += 1) {
-          bottomBoundaries[i.toString()] = (height - margin - ballBuffer);
-      }
 
       var overNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
           21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,
@@ -122,69 +118,121 @@ angular.module('myApp')
         if (!newValue) {
             return;
         }
-
-
         scope.$watch('val', function(newVal, oldVal) {
+            scope.$watch('min', function(newMin, oldMin) {
+                scope.$watch('max', function(newMax, oldMax) {
+                  vis.selectAll("*").remove();
+                  //console.log(newVal);
 
-            vis.selectAll("*").remove();
-            //console.log(newVal);
+                  if (!newVal) {
+                      //console.log('val is null');
+                      return;
+                  }
 
-            if (!newVal) {
-                //console.log('val is null');
-                return;
-            }
+                  var className = (newVal[0].inning == 1) ? "ballBar1" : "ballBar2";
 
-            var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d, newValue); });
-            vis.call(tip);
+                  var bottomBoundaries = {};
 
-            var bars = vis.selectAll('.ballBar')
-                .data(newVal);
+                  for (var i = 1; i <= 50; i += 1) {
+                      bottomBoundaries[i.toString()] = (height - margin - ballBuffer);
+                  }
 
-            bars.enter().append("rect")
-                .attr("class", "ballBar")
-                .attr("fill", function(d) {
-                  return decideColor(d);
-                })
-                .attr("x", function(d) {
-                    return overs(Math.floor(d.ovr) + 1);
-                })
-                .attr("rx", function(d) {
-                    return 4;
-                })
-                .attr("ry", function(d) {
-                    return 4;
-                })
-                .attr("width", overs.bandwidth())
-                .attr("y", function(d) {
-                    var overNumber = Math.floor(d.ovr) + 1;
-                    var bottomBoundary = bottomBoundaries[overNumber.toString()];
-                    var height = barHeight(d);
-                    var startingPoint = bottomBoundary - height + ballBuffer;
-                    bottomBoundaries[overNumber.toString()] -= (height + ballBuffer);
-                    return startingPoint;
-                })
-                .attr("height", function(d) {
-                    return barHeight(d);
-                })
-                .attr("stroke", "#cccccc")
-                .on("mouseover", tip.show)
-                .on("mouseout", tip.hide);
+                  var tip = d3.tip().attr('class', 'd3-tip');
+                  vis.call(tip);
 
-                var overAxis = d3.axisBottom(overs);
-                overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
-                vis.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0, " + (height - margin) + ")")
-                    .call(overAxis)
+                  var bars = vis.selectAll('.' + className)
+                      .data(newVal);
+
+                  bars.enter().append("rect")
+                      .attr("class", className)
+                      .attr("fill", function(d) {
+                        return decideColor(d);
+                      })
+                      .attr("x", function(d) {
+                          return overs(Math.floor(d.ovr) + 1);
+                      })
+                      .attr("rx", function(d) {
+                          return 4;
+                      })
+                      .attr("ry", function(d) {
+                          return 4;
+                      })
+                      .attr("width", overs.bandwidth())
+                      .attr("y", function(d) {
+                          var overNumber = Math.floor(d.ovr) + 1;
+                          var bottomBoundary = bottomBoundaries[overNumber.toString()];
+                          var height = barHeight(d);
+                          var startingPoint = bottomBoundary - height + ballBuffer;
+                          bottomBoundaries[overNumber.toString()] -= (height + ballBuffer);
+                          return startingPoint;
+                      })
+                      .attr("height", function(d) {
+                          return barHeight(d);
+                      })
+                      .style("opacity", function(d) {
+                          //console.log('i: ' + i);
+                          //console.log('changing');
+                          var over = Math.floor(d.ovr) + 1;
+                          if (over >= newMin && over <= newMax) {
+                              //console.log('not fading');
+                              return 1;
+                          } else {
+                              //console.log('fading');
+                              return 0.2;
+                          }
+                      })
+                      .attr("stroke", "#cccccc")
+                      .on("mouseover", function(d) {
+                          d3.selectAll('.' + className)
+                              .style("opacity", function(ball) {
+                                  if (d == ball) {
+                                      return 1;
+                                  } else {
+                                      return 0.2;
+                                  }
+                              });
+
+                          d3.selectAll('.dot').style('opacity',function(dot){
+                              if(d==dot){
+                                  return 1;
+                              }else{
+                                  return 0.2;
+                              }
+                          });
+                          tip.html(tooltipText(d, newValue)).show();
+                      })
+                      .on("mouseout", function() {
+                          d3.selectAll('.' + className)
+                            .style("opacity", function(ball) {
+                              var over = Math.floor(ball.ovr) + 1;
+                              if (over >= newMin && over <= newMax) {
+                                  //console.log('not fading');
+                                  return 1;
+                              } else {
+                                  //console.log('fading');
+                                  return 0.2;
+                              }
+                            });
+
+                          d3.selectAll(".dot").style("opacity", 1);
+                          tip.hide();
+                      });
+
+                      var overAxis = d3.axisBottom(overs);
+                      overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+                      vis.append("g")
+                          .attr("class", "x axis")
+                          .attr("transform", "translate(0, " + (height - margin) + ")")
+                          .call(overAxis)
+                })
+            })
         });
       });
 
-      scope.$watch('min', function(newMin, oldMin) {
+      /*scope.$watch('min', function(newMin, oldMin) {
           scope.$watch('max', function(newMax, oldMax) {
-              /*console.log("min: " + newMin);
-              console.log("max: " + newMax);*/
-              vis.selectAll('.ballBar')
-                  .style("opacity", function(d, i) {
+              vis.selectAll('.' + className)
+                  .style("opacity", function(d) {
                       //console.log('i: ' + i);
                       //console.log('changing');
                       var over = Math.floor(d.ovr) + 1;
@@ -197,7 +245,7 @@ angular.module('myApp')
                       }
                   })
           })
-      })
+      })*/
     }
   }
 })
