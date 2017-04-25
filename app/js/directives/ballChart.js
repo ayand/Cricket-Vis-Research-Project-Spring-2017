@@ -174,7 +174,7 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("cx", (svgDimension / 2) + 10)
               .attr("cy", (trueY + 426.8))
               .attr("r", 3)
-              .attr("fill", "#683F16");          
+              .attr("fill", "#683F16");
 
           /*ground.append("rect")
               .attr("class", "pitch")
@@ -185,9 +185,9 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("fill", "#F2D1B0");*/
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 120, ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 10, ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
-          ballY.domain([-6, 20.12]);
+          ballY.domain([-0.5, 20.12]);
 
           /*vis.append("circle")
               .attr("class", "black-dot")
@@ -467,6 +467,7 @@ angular.module('myApp').directive('ballChart', function() {
                                   //     }
                                   // });
                                   .on("mouseover", function(d) {
+                                      console.log(d.landing_y);
                                       ballMouseover(d);
                                   })
                                   .on("mouseout", function() {
