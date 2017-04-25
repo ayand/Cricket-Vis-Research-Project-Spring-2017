@@ -229,19 +229,23 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.currentBatsmen = [];
           $scope.currentBowlers = [];
 
-          $scope.changeBatsmen = function(batsman/*, dictionary, imageDict, gameID*/) {
-              if ($scope.currentBatsmen.includes(batsman.id)) {
-                  var index = $scope.currentBatsmen.indexOf(batsman.id);
-                  $scope.currentBatsmen.splice(index, 1);
-              } else {
-                  $scope.currentBatsmen.push(batsman.id);
-              }
-              $scope.currentBatsmen = $scope.currentBatsmen.slice();
-              console.log("Current batsmen: ", $scope.currentBatsmen.length);
+          $scope.activeBatsmen = $scope.batsmanIDs;
+          $scope.activeBowlers = $scope.bowlerIDs;
 
+          $scope.changeBatsmen = function(batsman/*, dictionary, imageDict, gameID*/) {
+              if ($scope.activeBatsmen.includes(batsman.id)) {
+                if ($scope.currentBatsmen.includes(batsman.id)) {
+                    var index = $scope.currentBatsmen.indexOf(batsman.id);
+                    $scope.currentBatsmen.splice(index, 1);
+                } else {
+                    $scope.currentBatsmen.push(batsman.id);
+                }
+                $scope.currentBatsmen = $scope.currentBatsmen.slice();
+                console.log("Current batsmen: ", $scope.currentBatsmen.length);
+              }
           }
 
-          $scope.showBatsman = function(batsman, dictionary, imageDict, gameID) {
+          /*$scope.showBatsman = function(batsman, dictionary, imageDict, gameID) {
             $uibModal.open({
                 "animation": true,
                 "ariaLabelledBy": "modal-title-bottom",
@@ -257,20 +261,22 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                     }
                 }
             });
-          }
+          }*/
 
           $scope.changeBowlers = function(bowler/*, dictionary, imageDict, gameID*/) {
-              if ($scope.currentBowlers.includes(bowler.id)) {
-                  var index = $scope.currentBowlers.indexOf(bowler.id);
-                  $scope.currentBowlers.splice(index, 1);
-              } else {
-                  $scope.currentBowlers.push(bowler.id);
+              if ($scope.activeBowlers.includes(bowler.id)) {
+                if ($scope.currentBowlers.includes(bowler.id)) {
+                    var index = $scope.currentBowlers.indexOf(bowler.id);
+                    $scope.currentBowlers.splice(index, 1);
+                } else {
+                    $scope.currentBowlers.push(bowler.id);
+                }
+                $scope.currentBowlers = $scope.currentBowlers.slice();
+                console.log("Current bowlers: ", $scope.currentBowlers.length);
               }
-              $scope.currentBowlers = $scope.currentBowlers.slice();
-              console.log("Current bowlers: ", $scope.currentBowlers.length);
           }
 
-          $scope.showBowler = function(bowler, dictionary, imageDict, gameID) {
+          /*$scope.showBowler = function(bowler, dictionary, imageDict, gameID) {
               $uibModal.open({
                   "animation": true,
                   "ariaLabelledBy": "modal-title-bottom",
@@ -286,15 +292,26 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                       }
                   }
               });
-          }
+          }*/
 
-          $scope.decideSlider = function() {
-              if ($scope.inning == 1) {
-                  return $scope.$parent.rangeSlider1;
-              } else {
-                  return $scope.$parent.rangeSlider2;
-              }
-          }
+          $scope.$watchGroup(['slider.minimumOver', 'slider.maximumOver'], function(newValues, oldValues, scope) {
+              var newMax = newValues[1];
+              var newMin = newValues[0];
+              var activeBalls = $scope.inningBalls.filter(function(d) {
+                  var over = Math.floor(d.ovr) + 1;
+                  return over >= newMin && over <= newMax;
+              });
+              $scope.activeBatsmen = Array.from(new Set(activeBalls.map(function(d) {
+                  return d.batsman;
+              })));
+
+              $scope.activeBowlers = Array.from(new Set(activeBalls.map(function(d) {
+                  return d.bowler;
+              })));
+
+              /*$scope.currentBatsmen = [];
+              $scope.currentBowlers = [];*/
+          });
 
         }
     });

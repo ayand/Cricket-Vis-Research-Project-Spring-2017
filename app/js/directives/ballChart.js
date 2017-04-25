@@ -176,6 +176,45 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("r", 3)
               .attr("fill", "#683F16");
 
+          var leftBat = ground.append("g")
+              .attr("class", "left-bat");
+
+          leftBat.append("rect")
+              .attr("x", (trueX - 5))
+              .attr("y", (trueY - 20))
+              .attr("width", 10)
+              .attr("height", 40)
+              .attr("rx", 4)
+              .attr("ry", 4);
+
+          leftBat.append("rect")
+              .attr("x", (trueX - 2.5))
+              .attr("y", (trueY - 30))
+              .attr("width", 5)
+              .attr("height", 10)
+              .attr("fill", "blue");
+
+          var rightBat = ground.append("g")
+              .attr("class", "right-bat");
+
+          rightBat.append("rect")
+              .attr("x", (trueX - 5 + trueWidth))
+              .attr("y", (trueY - 20))
+              .attr("width", 10)
+              .attr("height", 40)
+              .attr("rx", 4)
+              .attr("ry", 4);
+
+          rightBat.append("rect")
+              .attr("x", (trueX - 2.5 + trueWidth))
+              .attr("y", (trueY - 30))
+              .attr("width", 5)
+              .attr("height", 10)
+              .attr("fill", "blue");
+
+          /*leftBat.style("opacity", 0);
+          rightBat.style("opacity", 0);*/
+
           /*ground.append("rect")
               .attr("class", "pitch")
               .attr("x", pitchStartX)
@@ -185,9 +224,9 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("fill", "#F2D1B0");*/
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 10, ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 20, ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
-          ballY.domain([-0.5, 20.12]);
+          ballY.domain([-1, 20.12]);
 
           /*vis.append("circle")
               .attr("class", "black-dot")
@@ -260,7 +299,6 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("fill", "white")
               .text(function(d) { return d.data.zone; });
 
-
           var singleThing = [{ "amount": 1 }]
 
           var pie = d3.pie()
@@ -269,7 +307,7 @@ angular.module('myApp').directive('ballChart', function() {
               })
 
           var arc2 = d3.arc()
-              .outerRadius((svgDimension / 2) + 125)
+              .outerRadius((svgDimension / 2) + 175)
               .innerRadius((svgDimension / 2));
 
           var arcs2 = vis.selectAll("g.arc")
@@ -291,7 +329,7 @@ angular.module('myApp').directive('ballChart', function() {
                   return;
               }
 
-              var className = (newVal[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+              var className = (newVal[0].inning == 1) ? ".ballBar1-active" : ".ballBar2-active";
 
               var tip = d3.tip().attr('class', 'd3-tip');
               vis.call(tip);
@@ -372,7 +410,7 @@ angular.module('myApp').directive('ballChart', function() {
                   })
                   .attr("cy", function(d) {
                     if (d["landing_y"] < 0) {
-                        return ballY(-0.25);
+                        return ballY(-0.5);
                     } else {
                         return ballY(d["landing_y"]);
                     }
@@ -435,6 +473,7 @@ angular.module('myApp').directive('ballChart', function() {
                       scope.$watch('bowlers', function(newBowlers, oldBowlers) {
                         scope.$watch('min', function(newMin, oldMin) {
                             scope.$watch('max', function(newMax, oldMax) {
+                              //var filteredBalls = validBalls
                               /*var filteredBalls = validBalls.filter(function(d) {
                                 var over = Math.floor(d.ovr) + 1;
                                 var overCondition = ((over >= newMin) && (over <= newMax));
@@ -446,6 +485,30 @@ angular.module('myApp').directive('ballChart', function() {
                               var activeBowlers = filteredBalls.map(function(d) {
                                   return d.bowler;
                               });*/
+
+                              /*var hands = Array.from(new Set(newBatsmen.map(function(d) {
+                                  console.log(d.bat_right_handed);
+                                  if (d.bat_right_handed == "y") {
+                                      return "right";
+                                  } else {
+                                      return "left";
+                                  }
+                              })));
+
+                              console.log(hands);
+
+                              if (hands.length == 1) {
+                                  if (hands[0] == "left") {
+                                      leftBat.style("opacity", 1)
+                                      rightBat.style("opacity", 0);
+                                  } else {
+                                      leftBat.style("opacity", 0)
+                                      rightBat.style("opacity", 1);
+                                  }
+                              } else {
+                                  leftBat.style("opacity", 0)
+                                  rightBat.style("opacity", 0);
+                              }*/
 
                               d3.selectAll(".dot")
                                   // .style("opacity", function(d) {

@@ -134,6 +134,7 @@ angular.module('myApp')
                   }
 
                   var className = (newVal[0].inning == 1) ? "ballBar1" : "ballBar2";
+                  var activeClassName = (newVal[0].inning == 1) ? "ballBar1-active" : "ballBar2-active";
 
                   var bottomBoundaries = {};
 
@@ -148,7 +149,10 @@ angular.module('myApp')
                       .data(newVal);
 
                   bars.enter().append("rect")
-                      .attr("class", className)
+                      .attr("class", function(d) {
+                          var over = Math.floor(d.ovr) + 1;
+                          return (over >= newMin && over <= newMax) ? activeClassName : className;
+                      })
                       .attr("fill", function(d) {
                         return decideColor(d);
                       })
@@ -187,39 +191,45 @@ angular.module('myApp')
                       })
                       .attr("stroke", "#cccccc")
                       .on("mouseover", function(d) {
-                          d3.selectAll('.' + className)
-                              .style("opacity", function(ball) {
-                                  if (d == ball) {
-                                      return 1;
-                                  } else {
-                                      return 0.2;
-                                  }
-                              });
+                          /*var over = Math.floor(d.ovr) + 1;
+                          var name = (over >= newMin && over <= newMax) ? activeClassName : className;*/
+                          if (d3.select(this).attr("class") == activeClassName) {
+                            d3.selectAll('.' + activeClassName)
+                                .style("opacity", function(ball) {
+                                    if (d == ball) {
+                                        return 1;
+                                    } else {
+                                        return 0.2;
+                                    }
+                                });
 
-                          d3.selectAll('.dot').style('opacity',function(dot){
-                              if(d==dot){
-                                  return 1;
-                              }else{
-                                  return 0.2;
-                              }
-                          });
-                          tip.html(tooltipText(d, newValue)).show();
+                            d3.selectAll('.dot').style('opacity',function(dot){
+                                if(d==dot){
+                                    return 1;
+                                }else{
+                                    return 0.1;
+                                }
+                            });
+                            tip.html(tooltipText(d, newValue)).show();
+                          }
                       })
                       .on("mouseout", function() {
-                          d3.selectAll('.' + className)
-                            .style("opacity", function(ball) {
-                              var over = Math.floor(ball.ovr) + 1;
-                              if (over >= newMin && over <= newMax) {
-                                  //console.log('not fading');
-                                  return 1;
-                              } else {
-                                  //console.log('fading');
-                                  return 0.2;
-                              }
-                            });
+                          if (d3.select(this).attr("class") == activeClassName) {
+                            d3.selectAll('.' + activeClassName)
+                              .style("opacity", function(ball) {
+                                var over = Math.floor(ball.ovr) + 1;
+                                if (over >= newMin && over <= newMax) {
+                                    //console.log('not fading');
+                                    return 1;
+                                } else {
+                                    //console.log('fading');
+                                    return 0.2;
+                                }
+                              });
 
-                          d3.selectAll(".dot").style("opacity", 1);
-                          tip.hide();
+                            d3.selectAll(".dot").style("opacity", 1);
+                            tip.hide();
+                          }
                       });
 
                       var overAxis = d3.axisBottom(overs);

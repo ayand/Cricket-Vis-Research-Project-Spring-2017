@@ -7,9 +7,9 @@
     <table>
         <tbody>
           <tr align="center">
-            <td class="batsman-column" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
+            <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="60" alt="batsmanImage"/><br>
-              <button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBatsman(batsmen[$index], $parent.playerDict, imageDict, matchID)">Stats</button>
+              <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBatsman(batsmen[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
             </td>
           </tr>
         </tbody>
@@ -20,9 +20,9 @@
     <table>
         <tbody>
           <tr align="center">
-            <td class="bowler-column" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
+            <td ng-class="activeBowlers.includes(bowlers[$index].id) ? '' : 'active'" align="center" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index], $parent.playerDict, imageDict, matchID)" height="60" alt="bowlerImage"/><br>
-              <button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBowler(bowlers[$index], $parent.playerDict, imageDict, matchID)">Stats</button>
+              <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBowler(bowlers[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
             </td>
           </tr>
         </tbody>

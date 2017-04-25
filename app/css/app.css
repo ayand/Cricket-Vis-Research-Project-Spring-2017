@@ -123,6 +123,10 @@ table tr {
       padding: 0 -100px;
 }
 
+.active {
+    opacity: 0.2
+}
+
 td {
   padding: 8px
 }
