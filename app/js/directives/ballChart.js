@@ -1,9 +1,15 @@
 angular.module('myApp').directive('ballChart', function() {
-    var height = 362.16; // 442.64
-    var width = 54.9; // 67.1
-    var svgDimension = 520;
+    /*var height = 406.08;
+    var width = 65.88;*/
+    var trueHeight = 451.2;
+    var trueWidth = 73.2;
+    var height = 402.4; // 442.64
+    var width = 61; // 67.1
+    var svgDimension = 640;
     var pitchStartX = (svgDimension / 2) - (width / 2);
-    var pitchStartY = (svgDimension / 2) - (height / 2)
+    var pitchStartY = (svgDimension / 2) - (height / 2);
+    var trueX = (svgDimension / 2) - (trueWidth / 2);
+    var trueY = (svgDimension / 2) - (trueHeight / 2);
 
     return {
         restrict: 'EA',
@@ -77,16 +83,109 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("r", (svgDimension / 2) - 60)
               .attr("fill", "#1DA542");*/
 
+
           ground.append("rect")
+              .attr("class", "pitch")
+              .attr("x", trueX)
+              .attr("y", trueY)
+              .attr("width", trueWidth)
+              .attr("height", trueHeight)
+              .attr("fill", "#B07942");
+
+          ground.append("rect")
+              .attr("x", trueX)
+              .attr("y", trueY)
+              .attr("width", trueWidth)
+              .attr("height", 48.8)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("x", trueX)
+              .attr("y", trueY + 402.4)
+              .attr("width", trueWidth)
+              .attr("height", 48.8)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("x", trueX + 10.2)
+              .attr("y", trueY)
+              .attr("width", 52.8)
+              .attr("height", 24.4)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("x", trueX + 10.2)
+              .attr("y", trueY + 24.4)
+              .attr("width", 52.8)
+              .attr("height", 24.4)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("x", trueX + 10.2)
+              .attr("y", trueY + 402.4)
+              .attr("width", 52.8)
+              .attr("height", 24.4)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("x", trueX + 10.2)
+              .attr("y", trueY + 426.8)
+              .attr("width", 52.8)
+              .attr("height", 24.4)
+              .style("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2))
+              .attr("cy", (trueY + 24.4))
+              .attr("r", 3)
+              .attr("fill", "#683F16");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) - 10)
+              .attr("cy", (trueY + 24.4))
+              .attr("r", 3)
+              .attr("fill", "#683F16");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) + 10)
+              .attr("cy", (trueY + 24.4))
+              .attr("r", 3)
+              .attr("fill", "#683F16");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2))
+              .attr("cy", (trueY + 426.8))
+              .attr("r", 3)
+              .attr("fill", "#683F16");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) - 10)
+              .attr("cy", (trueY + 426.8))
+              .attr("r", 3)
+              .attr("fill", "#683F16");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) + 10)
+              .attr("cy", (trueY + 426.8))
+              .attr("r", 3)
+              .attr("fill", "#683F16");          
+
+          /*ground.append("rect")
               .attr("class", "pitch")
               .attr("x", pitchStartX)
               .attr("y", pitchStartY)
               .attr("width", width)
               .attr("height", height)
-              .attr("fill", "#F2D1B0");
+              .attr("fill", "#F2D1B0");*/
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 108, ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 120, ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
           ballY.domain([-6, 20.12]);
 
@@ -273,7 +372,7 @@ angular.module('myApp').directive('ballChart', function() {
                   })
                   .attr("cy", function(d) {
                     if (d["landing_y"] < 0) {
-                        return ballY(-0.5);
+                        return ballY(-0.25);
                     } else {
                         return ballY(d["landing_y"]);
                     }
@@ -282,12 +381,20 @@ angular.module('myApp').directive('ballChart', function() {
                   .attr("fill", function(d) {
                     if (isWicketBall(d)) {
                         return "black";
-                    } else if (d.runs_batter == 0) {
-                        return "#AAAAAA";
-                    } else if (d.runs_batter < 4) {
-                        return "#00CCCC";
                     } else {
-                        return "#FF8000";
+                        if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
+                            return "#AAAAAA";
+                        } else {
+                            if (d.extras_type != "") {
+                                return "#FF8000";
+                            } else {
+                                if (d.runs_batter < 4) {
+                                  return "#00CCCC";
+                                } else {
+                                    return "#000099";
+                                }
+                            }
+                        }
                     }
                   })
                   /*.on("mouseover", function(d) {

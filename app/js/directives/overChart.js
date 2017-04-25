@@ -56,15 +56,19 @@ angular.module('myApp')
 
       var decideColor = function(d) {
         if (isWicketBall(d)) {
-            return "#FF6600";
+            return "black";
         } else {
-            if (d.runs_w_extras == 0) {
-                return "#888888";
+            if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
+                return "#AAAAAA";
             } else {
                 if (d.extras_type != "") {
-                    return "#A56606";
+                    return "#FF8000";
                 } else {
-                    return teamColors[d.batting_team];
+                    if (d.runs_batter < 4) {
+                      return "#00CCCC";
+                    } else {
+                        return "#000099";
+                    }
                 }
             }
         }
