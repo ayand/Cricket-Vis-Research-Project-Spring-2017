@@ -90,7 +90,7 @@ angular.module('myApp')
         }
       }
 
-      var tooltipText = function(d, theDict) {
+      var tooltipText = function(d) {
           var overNumber = Math.floor(d.ovr) + 1;
           var ballNumber = (d.ovr * 10) % 10;
           var batsman = d.batsman_name;
@@ -111,69 +111,64 @@ angular.module('myApp')
           var line1 = "<strong>Over " + overNumber + ", Ball " + ballNumber + "</strong><br/>";
           var line2 = batsman + ": " + runs + " " + score + "<br/>"
           var line3 = "Bowled by " + bowler + "<br/>";
-          var line4 = !isWicketBall(d) ? "" : ("Wicket- " + theDict[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
+          var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
           var tooltipText = (line1 + line2 + line3 + line4);
           return tooltipText;
       }
 
+      var className = (scope.val[0].inning == 1) ? "ballBar1" : "ballBar2";
 
+      var bottomBoundaries = {};
 
-      scope.$watch('dictionary', function(newValue, oldValue) {
-        if (!newValue) {
-            return;
-        }
-        scope.$watch('val', function(newVal, oldVal) {
+      for (var i = 1; i <= 50; i += 1) {
+          bottomBoundaries[i.toString()] = (height - margin - ballBuffer);
+      }
+
+      var tip = d3.tip().attr('class', 'd3-tip');
+      vis.call(tip);
+
+      var bars = vis.selectAll('.' + className)
+          .data(scope.val);
+
+      bars.enter().append("rect")
+          .attr("class", className)
+          .attr("fill", function(d) {
+            return decideColor(d);
+          })
+          .attr("x", function(d) {
+              return overs(Math.floor(d.ovr) + 1);
+          })
+          .attr("rx", function(d) {
+              return 4;
+          })
+          .attr("ry", function(d) {
+              return 4;
+          })
+          .attr("width", overs.bandwidth())
+          .attr("y", function(d) {
+              var overNumber = Math.floor(d.ovr) + 1;
+              var bottomBoundary = bottomBoundaries[overNumber.toString()];
+              var height = barHeight(d);
+              var startingPoint = bottomBoundary - height + ballBuffer;
+              bottomBoundaries[overNumber.toString()] -= (height + ballBuffer);
+              return startingPoint;
+          })
+          .attr("height", function(d) {
+              return barHeight(d);
+          })
+          .attr("stroke", "#cccccc")
+
+      var overAxis = d3.axisBottom(overs);
+      overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+      vis.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + (height - margin) + ")")
+          .call(overAxis)
+
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
-                  vis.selectAll("*").remove();
-                  //console.log(newVal);
 
-                  if (!newVal) {
-                      //console.log('val is null');
-                      return;
-                  }
-
-                  var className = (newVal[0].inning == 1) ? "ballBar1" : "ballBar2";
-
-                  var bottomBoundaries = {};
-
-                  for (var i = 1; i <= 50; i += 1) {
-                      bottomBoundaries[i.toString()] = (height - margin - ballBuffer);
-                  }
-
-                  var tip = d3.tip().attr('class', 'd3-tip');
-                  vis.call(tip);
-
-                  var bars = vis.selectAll('.' + className)
-                      .data(newVal);
-
-                  bars.enter().append("rect")
-                      .attr("class", className)
-                      .attr("fill", function(d) {
-                        return decideColor(d);
-                      })
-                      .attr("x", function(d) {
-                          return overs(Math.floor(d.ovr) + 1);
-                      })
-                      .attr("rx", function(d) {
-                          return 4;
-                      })
-                      .attr("ry", function(d) {
-                          return 4;
-                      })
-                      .attr("width", overs.bandwidth())
-                      .attr("y", function(d) {
-                          var overNumber = Math.floor(d.ovr) + 1;
-                          var bottomBoundary = bottomBoundaries[overNumber.toString()];
-                          var height = barHeight(d);
-                          var startingPoint = bottomBoundary - height + ballBuffer;
-                          bottomBoundaries[overNumber.toString()] -= (height + ballBuffer);
-                          return startingPoint;
-                      })
-                      .attr("height", function(d) {
-                          return barHeight(d);
-                      })
-                      .style("opacity", function(d) {
+                  d3.selectAll('.' + className).style("opacity", function(d) {
                           //console.log('i: ' + i);
                           //console.log('changing');
                           var over = Math.floor(d.ovr) + 1;
@@ -185,25 +180,27 @@ angular.module('myApp')
                               return 0.2;
                           }
                       })
-                      .attr("stroke", "#cccccc")
                       .on("mouseover", function(d) {
-                          d3.selectAll('.' + className)
-                              .style("opacity", function(ball) {
-                                  if (d == ball) {
-                                      return 1;
-                                  } else {
-                                      return 0.2;
-                                  }
-                              });
+                          var over = Math.floor(d.ovr) + 1;
+                          if (over >= newMin && over <= newMax) {
+                            d3.selectAll('.' + className)
+                                .style("opacity", function(ball) {
+                                    if (d == ball) {
+                                        return 1;
+                                    } else {
+                                        return 0.2;
+                                    }
+                                });
 
-                          d3.selectAll('.dot').style('opacity',function(dot){
-                              if(d==dot){
-                                  return 1;
-                              }else{
-                                  return 0.2;
-                              }
-                          });
-                          tip.html(tooltipText(d, newValue)).show();
+                            d3.selectAll('.dot').style('opacity',function(dot){
+                                if(d==dot || d.inning != dot.inning){
+                                    return 1;
+                                }else{
+                                    return 0.2;
+                                }
+                            });
+                            tip.html(tooltipText(d)).show();
+                          }
                       })
                       .on("mouseout", function() {
                           d3.selectAll('.' + className)
@@ -217,39 +214,11 @@ angular.module('myApp')
                                   return 0.2;
                               }
                             });
-
                           d3.selectAll(".dot").style("opacity", 1);
                           tip.hide();
                       });
-
-                      var overAxis = d3.axisBottom(overs);
-                      overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
-                      vis.append("g")
-                          .attr("class", "x axis")
-                          .attr("transform", "translate(0, " + (height - margin) + ")")
-                          .call(overAxis)
                 })
             })
-        });
-      });
-
-      /*scope.$watch('min', function(newMin, oldMin) {
-          scope.$watch('max', function(newMax, oldMax) {
-              vis.selectAll('.' + className)
-                  .style("opacity", function(d) {
-                      //console.log('i: ' + i);
-                      //console.log('changing');
-                      var over = Math.floor(d.ovr) + 1;
-                      if (over >= newMin && over <= newMax) {
-                          //console.log('not fading');
-                          return 1;
-                      } else {
-                          //console.log('fading');
-                          return 0.2;
-                      }
-                  })
-          })
-      })*/
     }
   }
 })

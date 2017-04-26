@@ -61,95 +61,84 @@ angular.module('myApp').directive('overSummaryChart', function() {
       var min = 1;
       var max = 50;
 
-      scope.$watch('team', function(newTeam, oldTeam) {
-          if (!newTeam) {
-              return;
-          }
-          scope.$watch('val', function(newVal, oldVal) {
-              vis.selectAll("*").remove();
+      var stack = d3.stack()
+          .keys(["runs", "wickets"])
+          .order(d3.stackOrderNone)
+          .offset(d3.stackOffsetNone);
 
-              if (!newVal) {
-                  return;
-              }
+      var series = stack(scope.val);
+      //console.log(series);
 
-              var stack = d3.stack()
-                  .keys(["runs", "wickets"])
-                  .order(d3.stackOrderNone)
-                  .offset(d3.stackOffsetNone);
+      var bars = vis.selectAll('g')
+          .data(series)
+          .enter().append("g")
+              .attr('class', 'summary-bar')
+              .attr("fill", function(d, i) {
+                //console.log(i);
+                if (d.key == "runs") {
+                    return teamColors[scope.team];
+                } else {
+                    return "#FF6600"
+                }
+              })
+          .selectAll("rect")
+          .data(function(d) { return d; })
+          .enter().append("rect")
+              .attr("x", function(d, i) {
+                  return overs(i + 1);
+              })
+              .attr("y", function(d) {
+                  return height - margin - (10 * d[1])
+              })
+              .attr("height", function(d) {
+                  return (10 * (d[1] - d[0]))
+              })
+              .attr("width", overs.bandwidth())
+              .on("mouseover", function(d, i) {
+                var over = i + 1;
+                if (over >= scope.min && over <= scope.max) {
+                  vis.selectAll('.summary-bar')
+                      .selectAll('rect')
+                      .style("opacity", function(bar, j) {
+                          //console.log('i: ' + i);
+                          //console.log('changing');
 
-              var series = stack(newVal);
-              //console.log(series);
-
-              var bars = vis.selectAll('g')
-                  .data(series)
-                  .enter().append("g")
-                      .attr('class', 'summary-bar')
-                      .attr("fill", function(d, i) {
-                        //console.log(i);
-                        if (d.key == "runs") {
-                            return teamColors[newTeam];
-                        } else {
-                            return "#FF6600"
-                        }
-                      })
-                  .selectAll("rect")
-                  .data(function(d) { return d; })
-                  .enter().append("rect")
-                      .attr("x", function(d, i) {
-                          return overs(i + 1);
-                      })
-                      .attr("y", function(d) {
-                          return height - margin - (10 * d[1])
-                      })
-                      .attr("height", function(d) {
-                          return (10 * (d[1] - d[0]))
-                      })
-                      .attr("width", overs.bandwidth())
-                      .on("mouseover", function(d, i) {
-                        vis.selectAll('.summary-bar')
-                            .selectAll('rect')
-                            .style("opacity", function(bar, j) {
-                                //console.log('i: ' + i);
-                                //console.log('changing');
-
-                                if (i == j) {
-                                    //console.log('not fading');
-                                    return 1;
-                                } else {
-                                    //console.log('fading');
-                                    return 0.2;
-                                }
-                            });
-                          tip.html(tooltipText(newVal[i])).show();
-                      })
-                      .on("mouseout", function() {
-                        vis.selectAll('.summary-bar')
-                            .selectAll('rect')
-                            .style("opacity", function(d, i) {
-                                //console.log('i: ' + i);
-                                //console.log('changing');
-                                var over = i + 1;
-                                if (over >= min && over <= max) {
-                                    //console.log('not fading');
-                                    return 1;
-                                } else {
-                                    //console.log('fading');
-                                    return 0.2;
-                                }
-                            });
-                        tip.hide();
+                          if (i == j) {
+                              //console.log('not fading');
+                              return 1;
+                          } else {
+                              //console.log('fading');
+                              return 0.2;
+                          }
                       });
+                    tip.html(tooltipText(scope.val[i])).show();
+                }
+              })
+              .on("mouseout", function() {
+                vis.selectAll('.summary-bar')
+                    .selectAll('rect')
+                    .style("opacity", function(d, i) {
+                        //console.log('i: ' + i);
+                        //console.log('changing');
+                        var over = i + 1;
+                        if (over >= scope.min && over <= scope.max) {
+                            //console.log('not fading');
+                            return 1;
+                        } else {
+                            //console.log('fading');
+                            return 0.2;
+                        }
+                    });
+                tip.hide();
+              });
 
 
-              var overAxis = d3.axisBottom(overs);
-              overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
-              vis.append("g")
-                  .attr("class", "x axis")
-                  .attr("transform", "translate(0, " + (height - margin) + ")")
-                  .call(overAxis)
-          });
-
-      });
+      var overAxis = d3.axisBottom(overs);
+      overAxis.tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+      vis.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0, " + (height - margin) + ")")
+          .call(overAxis)
 
       scope.$watch('min', function(newMin, oldMin) {
           scope.$watch('max', function(newMax, oldMax) {
