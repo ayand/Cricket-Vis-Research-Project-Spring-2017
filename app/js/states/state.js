@@ -172,6 +172,29 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               return d.batsman;
           })));
 
+          $scope.sortKeyMap = {}
+          $scope.sortKeyMap["Batting Order"] = "batting_order";
+          $scope.sortKeyMap["Runs Scored"] = "runs_scored";
+          $scope.sortKeyMap["Balls Faced"] = "balls_faced";
+          $scope.sortKeyMap["Strike Rate"] = "strike_rate";
+          $scope.sortKeyMap["Form"] = "form";
+          $scope.sortKeyMap["Bowling Order"] = "bowling_order";
+          $scope.sortKeyMap["Runs Conceded"] = "runs_conceded";
+          $scope.sortKeyMap["Wickets Taken"] = "wickets_taken";
+          $scope.sortKeyMap["Overs Bowled"] = "overs_bowled";
+          $scope.sortKeyMap["Extras Conceded"] = "extras_conceded";
+
+          $scope.sortPlayers = function(key, playerList) {
+              var sortField = $scope.sortKeyMap[key];
+              playerList.sort(function(a, b) {
+                  if (key == "Batting Order" || key == "Bowling Order") {
+                      return a[sortField] - b[sortField];
+                  } else {
+                      return b[sortField] - a[sortField];
+                  }
+              })
+          }
+
           var batOrder = 1;
           $scope.batsmen = $scope.batsmanIDs.map(function(d) {
               return {
@@ -186,10 +209,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 }).length) / $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"]
               };
           });
-
-          $scope.batsmen.forEach(function(d) {
-              console.log(d);
-          })
 
           $scope.bowlerIDs = Array.from(new Set($scope.inningBalls.map(function(d) {
               return d.bowler;
@@ -213,11 +232,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 extras_conceded: extrasNum
               };
           });
-
-          console.log("");
-          $scope.bowlers.forEach(function(d) {
-              console.log(d);
-          })
 
           $scope.battingTeam = $scope.inningBalls[0].batting_team;
           $scope.bowlingTeam = $scope.inningBalls[1].bowling_team;
@@ -261,7 +275,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.activeBatsmen = $scope.batsmanIDs;
           $scope.activeBowlers = $scope.bowlerIDs;
 
-          $scope.changeBatsmen = function(batsman/*, dictionary, imageDict, gameID*/) {
+          $scope.changeBatsmen = function(batsman) {
               if ($scope.activeBatsmen.includes(batsman.id)) {
                 if ($scope.currentBatsmen.includes(batsman.id)) {
                     var index = $scope.currentBatsmen.indexOf(batsman.id);
@@ -269,7 +283,11 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 } else {
                     $scope.currentBatsmen.push(batsman.id);
                 }
-                $scope.currentBatsmen = $scope.currentBatsmen.slice();
+                //$scope.currentBatsmen = $scope.currentBatsmen.slice();
+                /*console.log("Batsmen:")
+                console.log($scope.currentBatsmen)
+                console.log("Bowlers:")
+                console.log($scope.currentBowlers)*/
                 //console.log("Current batsmen: ", $scope.currentBatsmen.length);
               }
           }
@@ -292,7 +310,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             });
           }*/
 
-          $scope.changeBowlers = function(bowler/*, dictionary, imageDict, gameID*/) {
+          $scope.changeBowlers = function(bowler) {
               if ($scope.activeBowlers.includes(bowler.id)) {
                 if ($scope.currentBowlers.includes(bowler.id)) {
                     var index = $scope.currentBowlers.indexOf(bowler.id);
@@ -300,7 +318,11 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 } else {
                     $scope.currentBowlers.push(bowler.id);
                 }
-                $scope.currentBowlers = $scope.currentBowlers.slice();
+                //$scope.currentBowlers = $scope.currentBowlers.slice();
+                /*console.log("Batsmen:")
+                console.log($scope.currentBatsmen)
+                console.log("Bowlers:")
+                console.log($scope.currentBowlers)*/
                 //console.log("Current bowlers: ", $scope.currentBowlers.length);
               }
           }
@@ -338,6 +360,9 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   return d.bowler;
               })));
 
+              $scope.currentBatsmen.length = 0;
+              $scope.currentBowlers.length = 0;
+
               /*$scope.currentBatsmen = $scope.currentBatsmen.filter(function(d) {
                   return $scope.activeBatsmen.includes(d);
               });
@@ -355,13 +380,29 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               //$scope.currentBowlers = $scope.currentBowlers.slice();
           });
 
-          $scope.$watch('activeBatsmen', function(newVal, oldVal, scope) {
-              $scope.currentBatsmen = new Array()
-          })
+          /*$scope.$watch('activeBatsmen', function(newVal, oldVal, scope) {
+
+          });
 
           $scope.$watch('activeBowlers', function(newVal, oldVal, scope) {
-              $scope.currentBowlers = new Array()
-          })
+
+          });*/
+
+          $scope.$watch('selectedBatsmanKey', function(newVal, oldVal, scope) {
+              if (newVal == "") {
+                  $scope.sortPlayers("Batting Order", $scope.batsmen);
+              } else {
+                  $scope.sortPlayers(newVal, $scope.batsmen);
+              }
+          });
+
+          $scope.$watch('selectedBowlerKey', function(newVal, oldVal, scope) {
+              if (newVal == "") {
+                  $scope.sortPlayers("Bowling Order", $scope.bowlers);
+              } else {
+                  $scope.sortPlayers(newVal, $scope.bowlers);
+              }
+          });
 
         }
     });

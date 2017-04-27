@@ -434,13 +434,16 @@ angular.module('myApp').directive('ballChart', function() {
 
           //console.log("Ball drawing done");
 
-          scope.$watch('batsmen', function(newBatsmen, oldBatsmen) {
-              scope.$watch('bowlers', function(newBowlers, oldBowlers) {
+          scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+              scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
                 scope.$watch('min', function(newMin, oldMin) {
                     scope.$watch('max', function(newMax, oldMax) {
-                      /*console.log("Current Batsmen: " + newBatsmen)
-                      console.log("Current Batsmen: " + newBatsmen.length);*/
-                      //console.log("Current Bowlers: " + newBowlers.length);
+                      /*console.log("Current Batsmen: " + newBatsmen)*/
+                      console.log("Current Batsmen: " + newBatsmen.length);
+                      newBatsmen.forEach(function(d) {
+                          //console.log(scope.dictionary[d.toString()]["name"])
+                      })
+                      console.log("Current Bowlers: " + newBowlers.length);
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {
                               //console.log(d.landing_y);
@@ -461,6 +464,7 @@ angular.module('myApp').directive('ballChart', function() {
                               var over = Math.floor(d.ovr) + 1;
                               var overCondition = ((over >= newMin) && (over <= newMax));
                               var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                              //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
                               if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
                                   return 'block';
                               } else {
