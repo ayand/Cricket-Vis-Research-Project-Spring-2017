@@ -172,23 +172,52 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               return d.batsman;
           })));
 
+          var batOrder = 1;
           $scope.batsmen = $scope.batsmanIDs.map(function(d) {
               return {
                 id: d,
-                name: $scope.$parent.playerDict[d.toString()]["name"]
+                name: $scope.$parent.playerDict[d.toString()]["name"],
+                batting_order: batOrder++,
+                runs_scored: $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["runs_scored"],
+                balls_faced: $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"],
+                strike_rate: ($scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["runs_scored"] * 100) / $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"],
+                form: ($scope.inningBalls.filter(function(ball) {
+                    return ball.batsman == d && ball.control == 1;
+                }).length) / $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"]
               };
           });
+
+          $scope.batsmen.forEach(function(d) {
+              console.log(d);
+          })
 
           $scope.bowlerIDs = Array.from(new Set($scope.inningBalls.map(function(d) {
               return d.bowler;
           })));
 
+          var bowlOrder = 1;
           $scope.bowlers = $scope.bowlerIDs.map(function(d) {
+
+              var overs = Math.floor(($scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["bowling_inning"]["balls_bowled"] / 6)) + (($scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["bowling_inning"]["balls_bowled"] % 6) * 0.1);
+
+              var extrasNum = $scope.inningBalls.filter(function(ball) {
+                  return ball.bowler == d && ball.extras_type != "";
+              }).length;
               return {
                 id: d,
-                name: $scope.$parent.playerDict[d.toString()]["name"]
+                name: $scope.$parent.playerDict[d.toString()]["name"],
+                bowling_order: bowlOrder++,
+                runs_conceded: $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["bowling_inning"]["runs_conceded"],
+                wickets_taken: $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["bowling_inning"]["wickets_taken"],
+                overs_bowled: overs,
+                extras_conceded: extrasNum
               };
           });
+
+          console.log("");
+          $scope.bowlers.forEach(function(d) {
+              console.log(d);
+          })
 
           $scope.battingTeam = $scope.inningBalls[0].batting_team;
           $scope.bowlingTeam = $scope.inningBalls[1].bowling_team;
@@ -241,7 +270,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                     $scope.currentBatsmen.push(batsman.id);
                 }
                 $scope.currentBatsmen = $scope.currentBatsmen.slice();
-                console.log("Current batsmen: ", $scope.currentBatsmen.length);
+                //console.log("Current batsmen: ", $scope.currentBatsmen.length);
               }
           }
 
@@ -272,7 +301,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                     $scope.currentBowlers.push(bowler.id);
                 }
                 $scope.currentBowlers = $scope.currentBowlers.slice();
-                console.log("Current bowlers: ", $scope.currentBowlers.length);
+                //console.log("Current bowlers: ", $scope.currentBowlers.length);
               }
           }
 
@@ -320,14 +349,18 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $scope.currentBowlers = null;*/
               /*$scope.currentBatsmen = new Array();
               $scope.currentBowlers = new Array();*/
+              //$scope.currentBatsmen = new Array();
+              //$scope.currentBatsmen = $scope.currentBatsmen.slice();
+              //$scope.currentBowlers = new Array();
+              //$scope.currentBowlers = $scope.currentBowlers.slice();
           });
 
           $scope.$watch('activeBatsmen', function(newVal, oldVal, scope) {
-              $scope.currentBatsmen = [];
+              $scope.currentBatsmen = new Array()
           })
 
           $scope.$watch('activeBowlers', function(newVal, oldVal, scope) {
-              $scope.currentBowlers = [];
+              $scope.currentBowlers = new Array()
           })
 
         }

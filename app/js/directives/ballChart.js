@@ -305,7 +305,7 @@ angular.module('myApp').directive('ballChart', function() {
               })
 
           var arc2 = d3.arc()
-              .outerRadius((svgDimension / 2) + 125)
+              .outerRadius((svgDimension / 2) + 160)
               .innerRadius((svgDimension / 2));
 
           var arcs2 = vis.selectAll("g.arc")
@@ -438,26 +438,10 @@ angular.module('myApp').directive('ballChart', function() {
               scope.$watch('bowlers', function(newBowlers, oldBowlers) {
                 scope.$watch('min', function(newMin, oldMin) {
                     scope.$watch('max', function(newMax, oldMax) {
-
+                      /*console.log("Current Batsmen: " + newBatsmen)
+                      console.log("Current Batsmen: " + newBatsmen.length);*/
+                      //console.log("Current Bowlers: " + newBowlers.length);
                       d3.selectAll(".dot")
-                          // .style("opacity", function(d) {
-                          //     var batsmanCondition = true;
-                          //     if (newBatsmen.length != 0) {
-                          //         batsmanCondition = newBatsmen.includes(d.batsman);
-                          //     }
-                          //     var bowlerCondition = true;
-                          //     if (newBowlers.length != 0) {
-                          //         bowlerCondition = newBowlers.includes(d.bowler);
-                          //     }
-                          //     var over = Math.floor(d.ovr) + 1;
-                          //     var overCondition = ((over >= newMin) && (over <= newMax));
-                          //     var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                          //     if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                          //         return 1;
-                          //     } else {
-                          //         return 0;
-                          //     }
-                          // });
                           .on("mouseover", function(d) {
                               //console.log(d.landing_y);
                               ballMouseover(d);

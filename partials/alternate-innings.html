@@ -10,6 +10,10 @@
             <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="60" alt="batsmanImage"/><br>
               <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBatsman(batsmen[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
+              <p uib-tooltip="'Runs Scored'">RS: {{ batsman.runs_scored }}</p>
+              <p uib-tooltip="'Balls Faced'">BF: {{ batsman.balls_faced }}</p>
+              <p uib-tooltip="'Strike Rate'">SR: {{ batsman.strike_rate.toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</p>
+              <p uib-tooltip="'Form'">F:  {{ batsman.form.toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</p>
             </td>
           </tr>
         </tbody>
@@ -23,6 +27,10 @@
             <td ng-class="activeBowlers.includes(bowlers[$index].id) ? '' : 'active'" align="center" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index], $parent.playerDict, imageDict, matchID)" height="60" alt="bowlerImage"/><br>
               <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBowler(bowlers[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
+              <p uib-tooltip="'Overs Bowled'">OB: {{ bowler.overs_bowled }}</p>
+              <p uib-tooltip="'Runs Conceded'">RC: {{ bowler.runs_conceded }}</p>
+              <p uib-tooltip="'Wickets Taken'">W:  {{ bowler.wickets_taken }}</p>
+              <p uib-tooltip="'Extras Conceded'">EC: {{ bowler.extras_conceded }}</p>
             </td>
           </tr>
         </tbody>

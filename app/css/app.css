@@ -95,6 +95,7 @@ table {
   border-collapse: collapse;
   width: 100%;
   border-spacing: 5px;
+  border: 1px;
   /*max-width: 650px;*/
   background-color: #dddddd
 }
