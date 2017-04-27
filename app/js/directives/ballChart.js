@@ -440,9 +440,29 @@ angular.module('myApp').directive('ballChart', function() {
                     scope.$watch('max', function(newMax, oldMax) {
                       /*console.log("Current Batsmen: " + newBatsmen)*/
                       console.log("Current Batsmen: " + newBatsmen.length);
-                      newBatsmen.forEach(function(d) {
-                          //console.log(scope.dictionary[d.toString()]["name"])
-                      })
+                      var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                          var over = Math.floor(d.ovr) + 1;
+                          return over >= newMin && over <= newMax;
+                      }).map(function(d) {
+                          return d.batsman;
+                      })))
+                      if (newBatsmen.length != 0) {
+                          batsmen = batsmen.filter(function(d) {
+                              return newBatsmen.includes(d);
+                          });
+                      }
+                      var hands = Array.from(new Set(batsmen.map(function(d) {
+                          return scope.dictionary[d.toString()]["hand"];
+                      })));
+                      leftBat.style("opacity", 0);
+                      rightBat.style("opacity", 0);
+                      if (hands.length == 1) {
+                          if (hands[0] == "Left") {
+                              leftBat.style("opacity", 1);
+                          } else {
+                              rightBat.style("opacity", 1);
+                          }
+                      }
                       console.log("Current Bowlers: " + newBowlers.length);
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {

@@ -3,8 +3,8 @@
 angular.module('myApp')
 .directive('overChart', function() {
   var margin = 20;
-  var height = 450;
-  var width = 610;
+  var height = 380;
+  var width = 750;
   var ballBuffer = 2;
 
   return {
@@ -196,7 +196,7 @@ angular.module('myApp')
                                 if(d==dot || d.inning != dot.inning){
                                     return 1;
                                 }else{
-                                    return 0.2;
+                                    return 0;
                                 }
                             });
                             tip.html(tooltipText(d)).show();

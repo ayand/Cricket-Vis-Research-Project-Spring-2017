@@ -1,7 +1,7 @@
 angular.module('myApp').directive('overSummaryChart', function() {
   var margin = 20;
-  var height = 450;
-  var width = 610;
+  var height = 380;
+  var width = 750;
 
   return {
     restrict: 'E',
