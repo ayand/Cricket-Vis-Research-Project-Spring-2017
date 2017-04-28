@@ -14,7 +14,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $http.get('/data/cleaned_info/games.json')
               .then(function(result) {
                   $scope.games = result.data;
-                  //console.log($scope.games);
               });
 
           $scope.selectMatch = function(match) {
@@ -23,7 +22,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $scope.date = match.date.split(" ")[0];
               $scope.ground = match.ground_name;
               $state.go('home.match', { id: match.match_id });
-              //$state.go('home.tabs.match')
           }
       }
     })
@@ -205,7 +203,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 balls_faced: $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"],
                 strike_rate: ($scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["runs_scored"] * 100) / $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"],
                 form: ($scope.inningBalls.filter(function(ball) {
-                    return ball.batsman == d && ball.control == 1;
+                    return ball.batsman == d && ball.control == 1 && ball.extras_type != "Wd" && ball.extras_type != "Nb";
                 }).length) / $scope.$parent.playerDict[d.toString()]["games"][$scope.matchID.toString()]["batting_inning"]["balls_faced"]
               };
           });
@@ -283,12 +281,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 } else {
                     $scope.currentBatsmen.push(batsman.id);
                 }
-                //$scope.currentBatsmen = $scope.currentBatsmen.slice();
-                /*console.log("Batsmen:")
-                console.log($scope.currentBatsmen)
-                console.log("Bowlers:")
-                console.log($scope.currentBowlers)*/
-                //console.log("Current batsmen: ", $scope.currentBatsmen.length);
               }
           }
 
@@ -310,6 +302,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             });
           }*/
 
+
+
           $scope.changeBowlers = function(bowler) {
               if ($scope.activeBowlers.includes(bowler.id)) {
                 if ($scope.currentBowlers.includes(bowler.id)) {
@@ -318,12 +312,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 } else {
                     $scope.currentBowlers.push(bowler.id);
                 }
-                //$scope.currentBowlers = $scope.currentBowlers.slice();
-                /*console.log("Batsmen:")
-                console.log($scope.currentBatsmen)
-                console.log("Bowlers:")
-                console.log($scope.currentBowlers)*/
-                //console.log("Current bowlers: ", $scope.currentBowlers.length);
               }
           }
 
@@ -345,6 +333,13 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               });
           }*/
 
+          $scope.selectedBatsmanKey = "";
+          $scope.selectedBowlerKey = "";
+
+          $scope.isWicket = function(d) {
+              return d.wicket == true && d.extras_type != "Nb" && d.wicket_method != "run out";
+          };
+
           $scope.$watchGroup(['slider.minimumOver', 'slider.maximumOver'], function(newValues, oldValues, scope) {
               var newMax = newValues[1];
               var newMin = newValues[0];
@@ -363,30 +358,78 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $scope.currentBatsmen.length = 0;
               $scope.currentBowlers.length = 0;
 
-              /*$scope.currentBatsmen = $scope.currentBatsmen.filter(function(d) {
-                  return $scope.activeBatsmen.includes(d);
-              });
+              for (var i = 0; i < $scope.batsmen.length; i++) {
+                  if ($scope.activeBatsmen.includes($scope.batsmen[i].id)) {
+                    var batsmanBalls = activeBalls.filter(function(d) {
+                        return d.batsman == $scope.batsmen[i].id;
+                    });
 
-              $scope.currentBowlers = $scope.currentBowlers.filter(function(d) {
-                  return $scope.activeBowlers.includes(d);
-              })*/
-              /*$scope.currentBatsmen = null;
-              $scope.currentBowlers = null;*/
-              /*$scope.currentBatsmen = new Array();
-              $scope.currentBowlers = new Array();*/
-              //$scope.currentBatsmen = new Array();
-              //$scope.currentBatsmen = $scope.currentBatsmen.slice();
-              //$scope.currentBowlers = new Array();
-              //$scope.currentBowlers = $scope.currentBowlers.slice();
+                    var runsScored = batsmanBalls.map(function(d) {
+                        return d.runs_batter;
+                    }).reduce((a, b) => a + b, 0);
+                    $scope.batsmen[i].runs_scored = runsScored;
+
+                    var ballsFaced = batsmanBalls.filter(function(d) {
+                        return d.extras_type != "Wd" && d.extras_type != "Nb";
+                    })
+                    var bf = ballsFaced.length;
+                    $scope.batsmen[i].balls_faced = bf;
+
+                    var strikeRate = (runsScored * 100) / bf;
+                    $scope.batsmen[i].strike_rate = strikeRate;
+
+                    var form = ballsFaced.filter(function(d) { return d.control == 1 }).length / bf;
+                    $scope.batsmen[i].form = form;
+                  } else {
+                      $scope.batsmen[i].runs_scored = 0;
+                      $scope.batsmen[i].balls_faced = 0;
+                      $scope.batsmen[i].strike_rate = 0;
+                      $scope.batsmen[i].form = 0;
+                  }
+
+              }
+
+
+
+              for (var i = 0; i < $scope.bowlers.length; i++) {
+                  if ($scope.activeBowlers.includes($scope.bowlers[i].id)) {
+                      var bowlerBalls = activeBalls.filter(function(d) {
+                          return d.bowler == $scope.bowlers[i].id;
+                      });
+
+                      var runsConceded = bowlerBalls.map(function(d) {
+                          var considered = d.extras_type != "Lb" && d.extras_type == "B";
+                          return (considered ? d.runs_w_extras : d.runs_batter);
+                      }).reduce((a, b) => a + b, 0);
+                      $scope.bowlers[i].runs_conceded = runsConceded;
+
+                      var ballsFaced = bowlerBalls.filter(function(d) {
+                          return d.extras_type != "Wd" && d.extras_type != "Nb";
+                      }).length;
+
+                      var oversBowled = Math.floor(ballsFaced / 6) + ((ballsFaced % 6) * 0.1);
+                      $scope.bowlers[i].overs_bowled = oversBowled;
+
+                      var extrasConceded = bowlerBalls.filter(function(d) {
+                          return d.extras_type != "";
+                      }).length;
+                      $scope.bowlers[i].extras_conceded = extrasConceded;
+
+                      var wicketsTaken = bowlerBalls.filter(function(d) {
+                          return $scope.isWicket(d);
+                      }).length;
+                      $scope.bowlers[i].wickets_taken = wicketsTaken;
+                  } else {
+                      $scope.bowlers[i].runs_conceded = 0;
+                      $scope.bowlers[i].wickets_taken = 0;
+                      $scope.bowlers[i].overs_bowled = 0;
+                      $scope.extras_conceded = 0;
+                  }
+              }
+
+              $scope.sortPlayers($scope.selectedBatsmanKey, $scope.batsmen);
+              $scope.sortPlayers($scope.selectedBowlerKey, $scope.bowlers);
           });
-
-          /*$scope.$watch('activeBatsmen', function(newVal, oldVal, scope) {
-
-          });
-
-          $scope.$watch('activeBowlers', function(newVal, oldVal, scope) {
-
-          });*/
 
           $scope.$watch('selectedBatsmanKey', function(newVal, oldVal, scope) {
               if (newVal == "") {

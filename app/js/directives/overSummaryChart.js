@@ -1,7 +1,7 @@
 angular.module('myApp').directive('overSummaryChart', function() {
   var margin = 20;
-  var height = 380;
-  var width = 750;
+  var height = 450;
+  var width = 720;
 
   return {
     restrict: 'E',
@@ -39,15 +39,6 @@ angular.module('myApp').directive('overSummaryChart', function() {
       teamColors["Pakistan"] = "#00CC00";
       teamColors["Zimbabwe"] = "#CC0000";
       teamColors["Sri Lanka"] = "#000099";
-
-      var barHeight = function(d) {
-          //console.log(d);
-          if (d.key == "wicket") {
-              return 7;
-          } else {
-              return 12;
-          }
-      }
 
       var tip = d3.tip().attr('class', 'd3-tip');
       vis.call(tip);
@@ -88,10 +79,10 @@ angular.module('myApp').directive('overSummaryChart', function() {
                   return overs(i + 1);
               })
               .attr("y", function(d) {
-                  return height - margin - (10 * d[1])
+                  return height - margin - (12 * d[1])
               })
               .attr("height", function(d) {
-                  return (10 * (d[1] - d[0]))
+                  return (12 * (d[1] - d[0]))
               })
               .attr("width", overs.bandwidth())
               .on("mouseover", function(d, i) {
