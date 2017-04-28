@@ -19,7 +19,19 @@
     <div ng-show="!showBalls">
       <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
     </div>
-    <div style="width:750px" ng-show="showSlider1">
+    <div align="center" ng-show="showLeftComparison">
+      <table style="width:720px" align="center" class="table">
+        <tr style="font-weight:bold" align="center">
+          <td>Before Over {{ rangeSlider1.minimumOver }}</th>
+          <td>After Over {{ finalOver1 }}</th>
+        </tr>
+        <tr align="center">
+          <td>{{ leftRuns1 + "-" + leftWickets1 }}</td>
+          <td>{{ rightRuns1 + "-" + rightWickets1 }}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="width:720px" ng-show="showSlider1">
         <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
     </div>
   </div>
@@ -35,7 +47,19 @@
     <div ng-show="!showBalls">
       <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
     </div>
-    <div style="width:750px" ng-show="showSlider2">
+    <div align="center" ng-show="showRightComparison">
+      <table style="width:720px" align="center" class="table">
+        <tr style="font-weight:bold" align="center">
+          <td>Before Over {{ rangeSlider2.minimumOver }}</th>
+          <td>After Over {{ finalOver2 }}</th>
+        </tr>
+        <tr align="center">
+          <td>{{ leftRuns2 + "-" + leftWickets2 }}</td>
+          <td>{{ rightRuns2 + "-" + rightWickets2 }}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="width:720px" ng-show="showSlider2">
         <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
     </div>
   </div>

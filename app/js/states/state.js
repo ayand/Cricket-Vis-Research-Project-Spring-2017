@@ -97,6 +97,25 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           })
           $scope.secondWickets = $scope.sWickets.length;
 
+          $scope.maxOvers1 = Math.floor($scope.firstInning[$scope.firstInning.length - 1].ovr) + 1;
+          $scope.maxOvers2 = Math.floor($scope.secondInning[$scope.secondInning.length - 1].ovr) + 1;
+
+          $scope.finalOver1 = $scope.maxOvers1;
+          $scope.finalOver2 = $scope.maxOvers2;
+
+          $scope.leftRuns1 = 0;
+          $scope.leftWickets1 = 0;
+          $scope.rightRuns1 = $scope.firstTotalRuns;
+          $scope.rightWickets1 = $scope.firstWickets;
+
+          $scope.leftRuns2 = 0;
+          $scope.leftWickets2 = 0;
+          $scope.rightRuns2 = $scope.secondTotalRuns;
+          $scope.rightWickets2 = $scope.secondWickets;
+
+          $scope.showLeftComparison = false;
+          $scope.showRightComparison = false;
+
           $scope.showSlider1 = false;
           $scope.showSlider2 = false;
 
@@ -119,6 +138,74 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   step: 1
               }
           }
+
+          $scope.$watch('rangeSlider1.minimumOver', function(newMin, oldMin, scope) {
+              $scope.$watch('rangeSlider1.maximumOver', function(newMax, oldMax, scope) {
+                  if (newMin == 1 && newMax >= $scope.maxOvers1) {
+                      $scope.showLeftComparison = false;
+                  } else {
+                      $scope.showLeftComparison = true;
+                  }
+                  var beforeBalls = $scope.firstInning.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over < newMin;
+                  });
+
+                  var afterBalls = $scope.firstInning.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over <= newMax;
+                  });
+
+                  if (beforeBalls.length == 0) {
+                      $scope.leftRuns1 = 0;
+                      $scope.leftWickets1 = 0;
+                  } else {
+                      $scope.leftRuns1 = beforeBalls[beforeBalls.length - 1].cumul_runs;
+                      $scope.leftWickets1 = beforeBalls.filter(function(d) {
+                          return d.wicket == true && d.extras_type != "Nb";
+                      }).length;
+                  }
+                  $scope.rightRuns1 = afterBalls[afterBalls.length - 1].cumul_runs;
+                  $scope.rightWickets1 = afterBalls.filter(function(d) {
+                      return d.wicket == true && d.extras_type != "Nb";
+                  }).length;
+                  $scope.finalOver1 = Math.floor(afterBalls[afterBalls.length - 1].ovr) + 1;
+              });
+          });
+
+          $scope.$watch('rangeSlider2.minimumOver', function(newMin, oldMin, scope) {
+              $scope.$watch('rangeSlider2.maximumOver', function(newMax, oldMax, scope) {
+                  if (newMin == 1 && newMax >= $scope.maxOvers2) {
+                      $scope.showRightComparison = false;
+                  } else {
+                      $scope.showRightComparison = true;
+                  }
+                  var beforeBalls = $scope.secondInning.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over < newMin;
+                  });
+
+                  var afterBalls = $scope.secondInning.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over <= newMax;
+                  });
+
+                  if (beforeBalls.length == 0) {
+                      $scope.leftRuns2 = 0;
+                      $scope.leftWickets2 = 0;
+                  } else {
+                      $scope.leftRuns2 = beforeBalls[beforeBalls.length - 1].cumul_runs;
+                      $scope.leftWickets2 = beforeBalls.filter(function(d) {
+                          return d.wicket == true && d.extras_type != "Nb";
+                      }).length;
+                  }
+                  $scope.rightRuns2 = afterBalls[afterBalls.length - 1].cumul_runs;
+                  $scope.rightWickets2 = afterBalls.filter(function(d) {
+                      return d.wicket == true && d.extras_type != "Nb";
+                  }).length;
+                  $scope.finalOver2 = Math.floor(afterBalls[afterBalls.length - 1].ovr) + 1;
+              });
+          });
 
           $scope.seeInning = function(inning) {
               if (inning == 1) {
@@ -185,6 +272,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.sortPlayers = function(key, playerList) {
               var sortField = $scope.sortKeyMap[key];
               playerList.sort(function(a, b) {
+                  if (key == "" && playerList == $scope.batsmen) {
+                      return a["batting_order"] - b["batting_order"];
+                  }
+                  if (key == "" && playerList == $scope.bowlers) {
+                      return a["bowling_order"] - b["bowling_order"];
+                  }
                   if (key == "Batting Order" || key == "Bowling Order") {
                       return a[sortField] - b[sortField];
                   } else {
