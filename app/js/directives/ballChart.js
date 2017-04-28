@@ -439,7 +439,7 @@ angular.module('myApp').directive('ballChart', function() {
                 scope.$watch('min', function(newMin, oldMin) {
                     scope.$watch('max', function(newMax, oldMax) {
                       /*console.log("Current Batsmen: " + newBatsmen)*/
-                      console.log("Current Batsmen: " + newBatsmen.length);
+                      //console.log("Current Batsmen: " + newBatsmen.length);
                       var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
                           var over = Math.floor(d.ovr) + 1;
                           return over >= newMin && over <= newMax;
@@ -463,7 +463,7 @@ angular.module('myApp').directive('ballChart', function() {
                               rightBat.style("opacity", 1);
                           }
                       }
-                      console.log("Current Bowlers: " + newBowlers.length);
+                      //console.log("Current Bowlers: " + newBowlers.length);
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {
                               //console.log(d.landing_y);
