@@ -395,8 +395,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             });
           }*/
 
-
-
           $scope.changeBowlers = function(bowler) {
               if ($scope.activeBowlers.includes(bowler.id)) {
                 if ($scope.currentBowlers.includes(bowler.id)) {

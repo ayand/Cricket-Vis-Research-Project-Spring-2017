@@ -176,7 +176,7 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("r", 3)
               .attr("fill", "#683F16");
 
-              var leftBat = ground.append("g")
+          var leftBat = ground.append("g")
               .attr("class", "left-bat");
 
           leftBat.append("rect")
@@ -212,18 +212,10 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("height", 10)
               .attr("fill", "blue");
 
-          /*ground.append("rect")
-              .attr("class", "pitch")
-              .attr("x", pitchStartX)
-              .attr("y", pitchStartY)
-              .attr("width", width)
-              .attr("height", height)
-              .attr("fill", "#F2D1B0");*/
-
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 10, ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 20, ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
-          ballY.domain([-0.5, 20.12]);
+          ballY.domain([-1, 20.12]);
 
           /*vis.append("circle")
               .attr("class", "black-dot")
@@ -296,7 +288,6 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("fill", "white")
               .text(function(d) { return d.data.zone; });
 
-
           var singleThing = [{ "amount": 1 }]
 
           var pie = d3.pie()
@@ -305,7 +296,7 @@ angular.module('myApp').directive('ballChart', function() {
               })
 
           var arc2 = d3.arc()
-              .outerRadius((svgDimension / 2) + 160)
+              .outerRadius((svgDimension / 2) + 175)
               .innerRadius((svgDimension / 2));
 
           var arcs2 = vis.selectAll("g.arc")
@@ -429,6 +420,7 @@ angular.module('myApp').directive('ballChart', function() {
                             }
                         }
                     }
+<<<<<<< HEAD
                 }
               })
 
