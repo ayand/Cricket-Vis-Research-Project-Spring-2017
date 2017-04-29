@@ -132,10 +132,6 @@ td {
   padding: 15px
 }
 
-.active {
-    opacity: 0.5
-}
-
 #yAxis.tick line {
     visibility: hidden;
 }

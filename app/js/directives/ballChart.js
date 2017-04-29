@@ -420,7 +420,6 @@ angular.module('myApp').directive('ballChart', function() {
                             }
                         }
                     }
-<<<<<<< HEAD
                 }
               })
 
