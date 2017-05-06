@@ -238,7 +238,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         }]
       },
       url: '/innings/:number',
-      templateUrl: 'partials/alternate-innings.html',
+      templateUrl: 'partials/alternate-innings-2.html',
       controller: function($scope, players, $stateParams, images, $uibModal) {
           $scope.imageDict = images;
           $scope.matchID = $scope.$parent.gameID;

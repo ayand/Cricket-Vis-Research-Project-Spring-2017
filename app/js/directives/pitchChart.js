@@ -265,7 +265,7 @@ angular.module('myApp').directive('pitchChart', function() {
 
           var arc1 = d3.arc()
               .outerRadius((svgDimension / 2) - 5)
-              .innerRadius((svgDimension / 2) - 25);
+              .innerRadius((svgDimension / 2) - 20);
 
           var arcs1 = vis.selectAll("g.arc")
               .data(pie(singleThing))

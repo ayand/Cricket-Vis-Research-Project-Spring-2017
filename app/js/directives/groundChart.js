@@ -8,10 +8,10 @@ angular.module('myApp').directive('groundChart', function() {
         restrict: 'EA',
         scope: {
           balls: '=',
-          batsmen: '=',
+          /*batsmen: '=',
           bowlers: '=',
           min: '=',
-          max: '=',
+          max: '=',*/
           dictionary: '='
         },
         link: function(scope, element, attrs) {
@@ -44,6 +44,27 @@ angular.module('myApp').directive('groundChart', function() {
               .attr("height", svgDimension)
               .attr("fill", "#1DA542");
 
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2))
+              .attr("cy", (svgDimension / 2))
+              .attr("r", innerRadius - 10)
+              .attr("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2))
+              .attr("cy", (svgDimension / 2))
+              .attr("r", 91.44)
+              .attr("stroke", "white")
+              .style("fill-opacity", 0);
+
+          ground.append("rect")
+              .attr("height", 75.2)
+              .attr("width", 12.2)
+              .attr("x", (svgDimension / 2) - 6.1)
+              .attr("y", (svgDimension / 2) - 37.6)
+              .attr("fill", "#B07942");
+
           var ballX = d3.scaleLinear().range([bottomEnd + 10, topEnd - 10]).domain([0, 360]);
           var ballY = d3.scaleLinear().range([topEnd - 10, bottomEnd + 10]).domain([0, 360]);
 
@@ -60,7 +81,7 @@ angular.module('myApp').directive('groundChart', function() {
 
           var arc1 = d3.arc()
               .outerRadius((svgDimension / 2) - 5)
-              .innerRadius(innerRadius + 5);
+              .innerRadius(innerRadius + 10);
 
           var arcs1 = vis.selectAll("g.arc")
               .data(pie(singleThing))
@@ -196,19 +217,6 @@ angular.module('myApp').directive('groundChart', function() {
 
               };
 
-              //console.log("dictionary:");
-              //console.log(scope.dictionary);
-
-              /*ground.append("rect")
-                  .attr("class", "pitch")
-                  .attr("x", (svgDimension / 2) - 1.83)
-                  .attr("y", (svgDimension / 2) - 11.28)
-                  .attr("width", 3.66)
-                  .attr("height", 22.56)
-                  .attr("fill", "#B07942");*/
-
-
-
               var validBalls = scope.balls.filter(function(d) {
                   return d["x"] != null && d["y"] != null;
               });
@@ -247,11 +255,10 @@ angular.module('myApp').directive('groundChart', function() {
 
               //console.log("Ball drawing done");
 
-              scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+              /*scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
                   scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
                     scope.$watch('min', function(newMin, oldMin) {
                         scope.$watch('max', function(newMax, oldMax) {
-                          /*console.log("Current Batsmen: " + newBatsmen)*/
                           //console.log("Current Batsmen: " + newBatsmen.length);
                           var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
                               var over = Math.floor(d.ovr) + 1;
@@ -267,16 +274,7 @@ angular.module('myApp').directive('groundChart', function() {
                           var hands = Array.from(new Set(batsmen.map(function(d) {
                               return scope.dictionary[d.toString()]["hand"];
                           })));
-                          /*leftBat.style("opacity", 0);
-                          rightBat.style("opacity", 0);
-                          if (hands.length == 1) {
-                              if (hands[0] == "Left") {
-                                  leftBat.style("opacity", 1);
-                              } else {
-                                  rightBat.style("opacity", 1);
-                              }
-                          }*/
-                          //console.log("Current Bowlers: " + newBowlers.length);
+
                           d3.selectAll(".dot")
                               .on("mouseover", function(d) {
                                   //console.log(d.landing_y);
@@ -365,8 +363,7 @@ angular.module('myApp').directive('groundChart', function() {
                           });
                       });
                   });
-              });
-
+              });*/
         }
     }
 })
