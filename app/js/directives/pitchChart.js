@@ -1,11 +1,11 @@
-angular.module('myApp').directive('ballChart', function() {
+angular.module('myApp').directive('pitchChart', function() {
     /*var height = 406.08;
     var width = 65.88;*/
     var trueHeight = 451.2;
     var trueWidth = 73.2;
     var height = 402.4; // 442.64
     var width = 61; // 67.1
-    var svgDimension = 640;
+    var svgDimension = 580;
     var pitchStartX = (svgDimension / 2) - (width / 2);
     var pitchStartY = (svgDimension / 2) - (height / 2);
     var trueX = (svgDimension / 2) - (trueWidth / 2);
@@ -223,7 +223,7 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("cy", 25)
               .attr("r", 25);*/
 
-          var zones = [
+          /*var zones = [
               { "zone": 1, "amount": 1 },
               { "zone": 2, "amount": 1 },
               { "zone": 3, "amount": 1 },
@@ -232,7 +232,7 @@ angular.module('myApp').directive('ballChart', function() {
               { "zone": 6, "amount": 1 },
               { "zone": 7, "amount": 1 },
               { "zone": 8, "amount": 1 }
-          ];
+          ];*/
 
           var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
               "#FF5500", "#FF7700", "#FF9900"];
@@ -256,28 +256,26 @@ angular.module('myApp').directive('ballChart', function() {
               return d.wicket == true && d.extras_type != "Nb";
           }
 
-          var zoneDonut = d3.pie()
+          var singleThing = [{ "amount": 1 }]
+
+          var pie = d3.pie()
               .value(function(d) {
                   return d.amount;
               })
 
           var arc1 = d3.arc()
-              .outerRadius((svgDimension / 2))
-              .innerRadius((svgDimension / 2) - 40);
+              .outerRadius((svgDimension / 2) - 5)
+              .innerRadius((svgDimension / 2) - 25);
 
           var arcs1 = vis.selectAll("g.arc")
-              .data(zoneDonut(zones))
+              .data(pie(singleThing))
               .enter()
               .append("g")
               .attr("transform", "translate(" + (svgDimension / 2) + ", "
                   + (svgDimension / 2) + ")");
 
           arcs1.append("path")
-              .attr("class", "zone-path")
-              .attr("fill", function(d, i) {
-                  //console.log("Index: " + i);
-                  return colors[i];
-              })
+              .attr("fill", "black")
               .style("stroke", "white")
               .attr("d", arc1);
 
@@ -288,16 +286,9 @@ angular.module('myApp').directive('ballChart', function() {
               .attr("fill", "white")
               .text(function(d) { return d.data.zone; });
 
-          var singleThing = [{ "amount": 1 }]
-
-          var pie = d3.pie()
-              .value(function(d) {
-                  return d.amount;
-              })
-
           var arc2 = d3.arc()
               .outerRadius((svgDimension / 2) + 175)
-              .innerRadius((svgDimension / 2));
+              .innerRadius((svgDimension / 2) - 5);
 
           var arcs2 = vis.selectAll("g.arc")
               .data(pie(singleThing))
@@ -314,6 +305,8 @@ angular.module('myApp').directive('ballChart', function() {
 
           var tip = d3.tip().attr('class', 'd3-tip');
           vis.call(tip);
+
+          var className = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
 
           var ballMouseout = function(newMin, newMax){
             d3.selectAll('.dot').style('opacity',1);
@@ -371,7 +364,7 @@ angular.module('myApp').directive('ballChart', function() {
                     if (d == curBall) {
                         return 1;
                     } else {
-                        return 0.2;
+                        return 0.1;
                     }
             });
             tip.html(tooltipText(curBall)).show();
@@ -381,7 +374,7 @@ angular.module('myApp').directive('ballChart', function() {
           //console.log("dictionary:");
           //console.log(scope.dictionary);
 
-          var className = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+
 
           var validBalls = scope.balls.filter(function(d) {
               return d["landing_x"] != null && d["landing_y"] != null;
@@ -408,7 +401,7 @@ angular.module('myApp').directive('ballChart', function() {
                     return "black";
                 } else {
                     if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                        return "#AAAAAA";
+                        return "#999999";
                     } else {
                         if (d.extras_type != "") {
                             return "#FF8000";
@@ -416,7 +409,7 @@ angular.module('myApp').directive('ballChart', function() {
                             if (d.runs_batter < 4) {
                               return "#00CCCC";
                             } else {
-                                return "#000099";
+                                return "#0000FF";
                             }
                         }
                     }
@@ -483,7 +476,7 @@ angular.module('myApp').directive('ballChart', function() {
                               }
                           });
 
-                          arcs1.on("click", function(d) {
+                          d3.selectAll(".zone-path").on("click", function(d) {
                               if (selectedZone == d.data.zone) {
                                   selectedZone = 0;
                                   d3.selectAll(".zone-path")

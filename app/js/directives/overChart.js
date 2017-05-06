@@ -59,7 +59,7 @@ angular.module('myApp')
             return "black";
         } else {
             if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                return "#AAAAAA";
+                return "#999999";
             } else {
                 if (d.extras_type != "") {
                     return "#FF8000";
@@ -67,7 +67,7 @@ angular.module('myApp')
                     if (d.runs_batter < 4) {
                       return "#00CCCC";
                     } else {
-                        return "#000099";
+                        return "#0000FF";
                     }
                 }
             }

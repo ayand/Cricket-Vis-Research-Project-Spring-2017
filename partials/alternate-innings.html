@@ -1,9 +1,25 @@
+<h2 align="center">{{ "Inning " + inning}}</h2>
 <div class="row" style="background-color: #cccccc">
-  <h3 align="center">{{ "Inning " + inning}}</h3>
-  <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
-    <br>
-    <h4>{{ battingTeam + " Batsmen" }}</h4>
-    <select ng-model="selectedBatsmanKey">
+  <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+    <h3>Pitch Map</h3>
+    <pitch-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></pitch-chart>
+  </div>
+  <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+    <h3>Zones</h3>
+    <zone-donut batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver"></zone-donut>
+  </div>
+  <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+    <h3>Ground Map</h3>
+    <ground-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></ground-chart>
+    <!--<zone-donut></zone-donut>-->
+  </div>
+</div>
+<br>
+<div class="row" style="background-color: #cccccc">
+  <h3 align="center">Stats for Overs {{ slider.minimumOver }} - {{ (slider.maximumOver < maxOvers) ? slider.maximumOver : maxOvers }}</h3>
+  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <h3 align="center">{{ battingTeam + " Batsmen" }}</h3>
+    <select align="center" ng-model="selectedBatsmanKey">
       <option value="">---Please select---</option>
       <option value="Batting Order">Batting Order</option>
       <option value="Runs Scored">Runs Scored</option>
@@ -19,17 +35,18 @@
             <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="60" alt="batsmanImage"/><br>
               <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBatsman(batsmen[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
-              <p uib-tooltip="Runs Scored">RS: {{ batsman.runs_scored }}</p>
-              <p uib-tooltip="Balls Faced">BF: {{ batsman.balls_faced }}</p>
-              <p uib-tooltip="Strike Rate">SR: {{ batsman.strike_rate.toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</p>
-              <p uib-tooltip="Form">F:  {{ batsman.form.toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</p>
+              <p uib-tooltip="Runs Scored">RS: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }}</p>
+              <p uib-tooltip="Balls Faced">BF: {{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }}</p>
+              <p uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</p>
+              <p uib-tooltip="Form">F:  {{ (batsman.form) ? batsman.form.toFixed(2) : "-" }}</p>
             </td>
           </tr>
         </tbody>
     </table>
-    <br>
-    <h4>{{ bowlingTeam + " Bowlers" }}</h4>
-    <select ng-model="selectedBowlerKey">
+  </div>
+  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+    <h3 align="center">{{ bowlingTeam + " Bowlers" }}</h3>
+    <select align="center" ng-model="selectedBowlerKey">
       <option value="">---Please select---</option>
       <option value="Bowling Order">Bowling Order</option>
       <option value="Runs Conceded">Runs Conceded</option>
@@ -45,24 +62,15 @@
             <td ng-class="activeBowlers.includes(bowlers[$index].id) ? '' : 'active'" align="center" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index], $parent.playerDict, imageDict, matchID)" height="60" alt="bowlerImage"/><br>
               <!--<button align="center" type="button" class="btn btn-success btn-xs" ng-click="showBowler(bowlers[$index], $parent.playerDict, imageDict, matchID)">Stats</button>-->
-              <p uib-tooltip="Overs Bowled">OB: {{ bowler.overs_bowled }}</p>
-              <p uib-tooltip="Runs Conceded">RC: {{ bowler.runs_conceded }}</p>
-              <p uib-tooltip="Wickets Taken">W:  {{ bowler.wickets_taken }}</p>
-              <p uib-tooltip="Extras Conceded">EC: {{ bowler.extras_conceded }}</p>
+              <p uib-tooltip="Overs Bowled">OB: {{ (bowler.overs_bowled != -1) ? bowler.overs_bowled.toString() : "-" }}</p>
+              <p uib-tooltip="Runs Conceded">RC: {{ (bowler.runs_conceded != -1) ? bowler.runs_conceded.toString() : "-" }}</p>
+              <p uib-tooltip="Wickets Taken">W:  {{ (bowler.wickets_taken != -1) ? bowler.wickets_taken.toString() : "-" }}</p>
+              <p uib-tooltip="Extras Conceded">EC: {{ (bowler.extras_conceded != -1) ? bowler.extras_conceded.toString() : "-" }}</p>
             </td>
           </tr>
         </tbody>
     </table>
   </div>
-  <div align="center" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-    <h3>Pitch Map</h3>
-    <h4>Overs Displayed</h4>
-    <!--<rzslider rz-slider-model="rangeSlider.minimumOver" rz-slider-high="rangeSlider.maximumOver" rz-slider-options="rangeSlider.options"></rzslider>-->
-    <ball-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></ball-chart>
-  </div>
 </div>
-<!--<div align="center" ng-show="(inning == 2)">
-  <h3>Inning Graph</h3>
-  <br>
-  <inning-graph balls="$parent.allBalls" min="slider.minimumOver" max="slider.maximumOver"></inning-graph>
-</div>-->
+<br>
+<br>

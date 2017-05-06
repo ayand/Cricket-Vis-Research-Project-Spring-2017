@@ -243,6 +243,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.imageDict = images;
           $scope.matchID = $scope.$parent.gameID;
           $scope.inning = parseInt($stateParams.number);
+          $scope.maxOvers = ($scope.inning == 1) ? $scope.$parent.maxOvers1 : $scope.$parent.maxOvers2;
           $scope.slider = null;
           if ($scope.inning == 1) {
               $scope.slider = $scope.$parent.rangeSlider1;
@@ -345,19 +346,22 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           $scope.normalStyling = {
               "color": "black",
-              "background-color": "#aaaaaa"
+              "background-color": "#aaaaaa",
+              "border": "1px solid white"
           };
 
           $scope.batsmanStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.battingTeam],
-              "font-weight": "bold"
+              "font-weight": "bold",
+              "border": "1px solid white"
           }
 
           $scope.bowlerStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.bowlingTeam],
-              "font-weight": "bold"
+              "font-weight": "bold",
+              "border": "1px solid white"
           }
 
           $scope.currentBatsmen = [];
@@ -472,10 +476,10 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                     var form = ballsFaced.filter(function(d) { return d.control == 1 }).length / bf;
                     $scope.batsmen[i].form = form;
                   } else {
-                      $scope.batsmen[i].runs_scored = 0;
-                      $scope.batsmen[i].balls_faced = 0;
-                      $scope.batsmen[i].strike_rate = 0;
-                      $scope.batsmen[i].form = 0;
+                      $scope.batsmen[i].runs_scored = -1;
+                      $scope.batsmen[i].balls_faced = -1;
+                      $scope.batsmen[i].strike_rate = -1;
+                      $scope.batsmen[i].form = -1;
                   }
 
               }
@@ -511,10 +515,10 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                       }).length;
                       $scope.bowlers[i].wickets_taken = wicketsTaken;
                   } else {
-                      $scope.bowlers[i].runs_conceded = 0;
-                      $scope.bowlers[i].wickets_taken = 0;
-                      $scope.bowlers[i].overs_bowled = 0;
-                      $scope.extras_conceded = 0;
+                      $scope.bowlers[i].runs_conceded = -1;
+                      $scope.bowlers[i].wickets_taken = -1;
+                      $scope.bowlers[i].overs_bowled = -1;
+                      $scope.extras_conceded = -1;
                   }
               }
 
