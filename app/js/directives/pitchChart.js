@@ -368,6 +368,8 @@ angular.module('myApp').directive('pitchChart', function() {
                     }
             });
             tip.html(tooltipText(curBall)).show();
+            console.log("x: " + curBall["ended_x"])
+            console.log("y: " + curBall["ended_y"])
 
           };
 

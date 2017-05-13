@@ -1,7 +1,7 @@
 angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $q) {
     var getGameInfo = function(id) {
       var deferred = $q.defer();
-      $http.get('/data/games/' + id + ".json").success(function(data, status, headers, config) {
+      $http.get('https://serene-spire-90540.herokuapp.com/matches/' + id).success(function(data, status, headers, config) {
           //console.log("Number of balls: " + data.length);
           deferred.resolve(data);
       }).error(function(data, status, headers, config) {
@@ -13,7 +13,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
 
     var getPlayers = function() {
       var deferred = $q.defer();
-      $http.get('/data/cleaned_info/players.json').success(function(data, status, headers, config) {
+      $http.get('https://serene-spire-90540.herokuapp.com/players/').success(function(data, status, headers, config) {
           deferred.resolve(data);
       }).error(function(data, status, headers, config) {
         console.log("Error: " + JSON.stringify(data));
@@ -44,11 +44,23 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
       return deferred.promise;
     };
 
+    var getGames = function() {
+        var deferred = $q.defer();
+        $http.get('https://serene-spire-90540.herokuapp.com/matches/').success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+          console.log("Error: " + JSON.stringify(data));
+          deferred.rejct();
+        });
+        return deferred.promise;
+    }
+
 
     return {
         getGameInfo: getGameInfo,
         getPlayers: getPlayers,
         getPlayerImages: getPlayerImages,
-        getFlagImages: getFlagImages
+        getFlagImages: getFlagImages,
+        getGames: getGames
     }
 }]);

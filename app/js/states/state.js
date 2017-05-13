@@ -3,18 +3,23 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
   $stateProvider
     .state('home', {
+      resolve: {
+        games: ['GameService', function(GameService) {
+            return GameService.getGames();
+        }]
+      },
       url: '/',
       templateUrl: 'partials/home.html',
-      controller: function($scope, $http, $state) {
+      controller: function($scope, $http, $state, games) {
           $scope.team1 = null;
           $scope.team2 = null;
           $scope.date = null;
           $scope.ground = null;
-          $scope.games = [];
-          $http.get('/data/cleaned_info/games.json')
+          $scope.games = games;
+          /*$http.get('/data/cleaned_info/games.json')
               .then(function(result) {
                   $scope.games = result.data;
-              });
+              });*/
 
           $scope.selectMatch = function(match) {
               $scope.team1 = match.team1_name;

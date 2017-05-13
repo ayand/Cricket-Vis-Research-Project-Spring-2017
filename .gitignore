@@ -6,4 +6,7 @@ tmp
 .DS_Store
 .idea
 *.pyc
-
+ending*
+stumps.js
+maxEnding*
+balls.json

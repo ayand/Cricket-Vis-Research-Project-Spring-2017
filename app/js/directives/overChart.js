@@ -196,7 +196,7 @@ angular.module('myApp')
                                 if(d==dot || d.inning != dot.inning){
                                     return 1;
                                 }else{
-                                    return 0;
+                                    return 0.2;
                                 }
                             });
                             tip.html(tooltipText(d)).show();

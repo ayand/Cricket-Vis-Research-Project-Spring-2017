@@ -1,8 +1,16 @@
 angular.module('myApp').directive('groundChart', function() {
+
     var svgDimension = 580;
     var innerRadius = (svgDimension / 2) - 30;
     var bottomEnd = (svgDimension / 2) - innerRadius;
     var topEnd = (svgDimension / 2) + innerRadius;
+
+    var decideColors = function(i) {
+      var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
+          "#FF5500", "#FF7700", "#FF9900"];
+
+      return colors[i];
+    }
 
     return {
         restrict: 'EA',
@@ -20,21 +28,7 @@ angular.module('myApp').directive('groundChart', function() {
               .attr("width", svgDimension)
               .attr("height", svgDimension);
 
-              function zoom() {
-                      //Geometric zoom
-                  d3.select(this).attr("transform", d3.event.transform);
-
-                      //This part onwards is an attempt at semantic; will almsot definitely need improvement
-                  var dots = vis.selectAll(".dot");
-                  dots.attr("r", function() {
-                      //console.log(d3.event)
-                      idealRadius = (2.5 / d3.event.transform.k) + 0.25
-                      return idealRadius;
-                  });
-              }
-
           var ground = vis.append("g")
-              .call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom));
 
           ground.append("rect")
               .attr("class", "ground")
@@ -78,33 +72,53 @@ angular.module('myApp').directive('groundChart', function() {
               .value(function(d) {
                   return d.amount;
               })
+              var zones = [
+                  { "zone": 1, "amount": 1 },
+                  { "zone": 2, "amount": 1 },
+                  { "zone": 3, "amount": 1 },
+                  { "zone": 4, "amount": 1 },
+                  { "zone": 5, "amount": 1 },
+                  { "zone": 6, "amount": 1 },
+                  { "zone": 7, "amount": 1 },
+                  { "zone": 8, "amount": 1 }
+              ];
 
-          var arc1 = d3.arc()
-              .outerRadius((svgDimension / 2) - 5)
-              .innerRadius(innerRadius + 10);
+              var zoneDonut = d3.pie()
+                  .value(function(d) {
+                      return d.amount;
+                  })
 
-          var arcs1 = vis.selectAll("g.arc")
-              .data(pie(singleThing))
-              .enter()
-              .append("g")
-              .attr("transform", "translate(" + (svgDimension / 2) + ", "
-                  + (svgDimension / 2) + ")");
+              var arc1 = d3.arc()
+                .outerRadius((svgDimension / 2) - 3)
+                .innerRadius((svgDimension / 2) - 27);
 
-          arcs1.append("path")
-              .attr("fill", "black")
-              .style("stroke", "white")
-              .attr("d", arc1);
+              var arcs1 = vis.selectAll("g.arc")
+                .data(zoneDonut(zones))
+                .enter()
+                .append("g")
+                .attr("transform", "translate(" + (svgDimension / 2) + ", "
+                    + (svgDimension / 2) + ")");
 
-          arcs1.append("text")
-              .attr("transform", function(d) { return "translate(" + arc1.centroid(d) + ")"; })
-              .attr("dy", ".35em")
-              .attr("font-family", "sans-serif")
-              .attr("fill", "white")
-              .text(function(d) { return d.data.zone; });
+              arcs1.append("path")
+                .attr("class", "zone-path")
+                .attr("fill", function(d, i) {
+                    //console.log("Index: " + i);
+                    return decideColors(i);
+                })
+                .style("stroke", "white")
+                .attr("d", arc1);
+
+              arcs1.append("text")
+                  .attr("transform", function(d) { return "translate(" + arc1.centroid(d) + ")"; })
+                  .attr("dy", ".35em")
+                  .attr("font-family", "sans-serif")
+                  .attr("fill", "white")
+                  .style("font-weight", "bold")
+                  .text(function(d) { return d.data.zone; });
 
           var arc2 = d3.arc()
               .outerRadius((svgDimension / 2) + 175)
-              .innerRadius((svgDimension / 2) - 5);
+              .innerRadius((svgDimension / 2) - 3);
 
           var arcs2 = vis.selectAll("g.arc")
               .data(pie(singleThing))
@@ -154,16 +168,16 @@ angular.module('myApp').directive('groundChart', function() {
 
               var className = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
 
-              var ballMouseout = function(newMin, newMax){
+              /*var ballMouseout = function(newMin, newMax){
                 d3.selectAll('.dot').style('opacity',1);
 
                 d3.selectAll(".zone-path")
                      .attr("fill", function(path, i) {
                          if (selectedZone == 0) {
-                             return colors[i];
+                             return decideColors(i);
                          } else {
                              if (path.data.zone == selectedZone) {
-                                 return colors[i];
+                                 return decideColors(i);
                              } else {
                                  return "gray";
                              }
@@ -198,7 +212,8 @@ angular.module('myApp').directive('groundChart', function() {
                   d3.selectAll(".zone-path")
                       .attr("fill", function(path, i) {
                           if (curBall.z == path.data.zone) {
-                              return colors[i];
+                              console.log(decideColors(i));
+                              return decideColors(i);
                           } else {
                               return 'gray';
                           }
@@ -215,7 +230,7 @@ angular.module('myApp').directive('groundChart', function() {
                 });
                 tip.html(tooltipText(curBall)).show();
 
-              };
+              };*/
 
               var validBalls = scope.balls.filter(function(d) {
                   return d["x"] != null && d["y"] != null;
@@ -308,7 +323,7 @@ angular.module('myApp').directive('groundChart', function() {
                                       selectedZone = 0;
                                       d3.selectAll(".zone-path")
                                           .attr("fill", function(path, i) {
-                                              return colors[i];
+                                              return decideColors(i);
                                       });
                                       d3.selectAll(".dot")
                                           .style("display", function(dot) {
@@ -334,7 +349,7 @@ angular.module('myApp').directive('groundChart', function() {
                                       d3.selectAll(".zone-path")
                                           .attr("fill", function(path, i) {
                                               if (selectedZone == path.data.zone) {
-                                                  return colors[i];
+                                                  return decideColors(i);
                                               } else {
                                                   return 'gray';
                                               }
