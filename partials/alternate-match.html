@@ -10,8 +10,9 @@
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <img align="center" class="center-block" ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
     <div class="row">
-      <h4 ng-click="seeInning(1)">{{ "1st Innings: " + firstBattingTeam}}</h5>
+      <h4>{{ "1st Innings: " + firstBattingTeam}}</h4>
       <h5>{{ firstTotalRuns + "-" + firstWickets}}</h5>
+      <label class="btn btn-success btn-sm" ng-click="seeInning(1)">Click for More</label>
     </div>
     <div ng-show="showBalls">
       <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-chart>
@@ -38,8 +39,9 @@
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <img align="center" class="center-block" ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
     <div class="row">
-      <h4 ng-click="seeInning(2)">{{ "2nd Innings: " + secondBattingTeam}}</h5>
+      <h4>{{ "2nd Innings: " + secondBattingTeam}}</h4>
       <h5>{{ secondTotalRuns + "-" + secondWickets}}</h5>
+      <label class="btn btn-success btn-sm" ng-click="seeInning(2)">Click for More</label>
     </div>
     <div ng-show="showBalls">
       <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-chart>

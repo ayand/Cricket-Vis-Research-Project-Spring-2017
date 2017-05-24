@@ -46,7 +46,7 @@ angular.module('myApp').directive('stumps', function() {
 
               var idealRadius = 3;
 
-              function zoom() {
+              /*function zoom() {
                   //Geometric zoom
                   d3.select(this).attr("transform", d3.event.transform);
 
@@ -57,13 +57,13 @@ angular.module('myApp').directive('stumps', function() {
                       idealRadius = (3 / d3.event.transform.k) + 0.25
                       return idealRadius;
                   });
-              }
+              }*/
 
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
           vis.call(tip);
 
           var window = vis.append("g")
-              .call(d3.zoom().scaleExtent([1, 24]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
+              //.call(d3.zoom().scaleExtent([1, 24]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
 
           //vis.call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
 
@@ -75,54 +75,54 @@ angular.module('myApp').directive('stumps', function() {
               .attr("fill", "#CCCCCC")
 
           window.append("rect")
-              .attr("height", 103.095)
-              .attr("width", 5.5245)
-              .attr("x", ((svgDimension / 2) - 2.76225))
-              .attr("y", (svgDimension - 103.095))
+              .attr("height", 137.46)
+              .attr("width", 7.366)
+              .attr("x", ((svgDimension / 2) - 3.683))
+              .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
               .attr("fill", "#B07942");
 
           window.append("rect")
-              .attr("height", 103.095)
-              .attr("width", 5.5245)
-              .attr("x", ((svgDimension / 2) - 16.6025))
-              .attr("y", (svgDimension - 103.095))
+              .attr("height", 137.46)
+              .attr("width", 7.366)
+              .attr("x", ((svgDimension / 2) - 22.1366666667))
+              .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
               .attr("fill", "#B07942");
 
           window.append("rect")
-              .attr("height", 103.095)
-              .attr("width", 5.5245)
-              .attr("x", ((svgDimension / 2) + 11.078))
-              .attr("y", (svgDimension - 103.095))
+              .attr("height", 137.46)
+              .attr("width", 7.366)
+              .attr("x", ((svgDimension / 2) + 14.7706666667))
+              .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
               .attr("fill", "#B07942");
 
           window.append("rect")
-              .attr("width", 15)
-              .attr("height", 3)
+              .attr("width", 20)
+              .attr("height", 4)
               .attr("x", (svgDimension / 2))
-              .attr("y", (svgDimension - 104.095))
+              .attr("y", (svgDimension - 138.793333333))
               .attr("rx", 3)
               .attr("rx", 3)
               .attr("fill", "#683F16");
 
           window.append("rect")
-              .attr("width", 15)
-              .attr("height", 3)
-              .attr("x", ((svgDimension / 2) - 15))
-              .attr("y", (svgDimension - 104.095))
+              .attr("width", 20)
+              .attr("height", 4)
+              .attr("x", ((svgDimension / 2) - 20))
+              .attr("y", (svgDimension - 138.793333333))
               .attr("rx", 3)
               .attr("rx", 3)
               .attr("fill", "#683F16");
 
           var ballX = d3.scaleLinear().range([0, svgDimension]);
           var ballY = d3.scaleLinear().range([svgDimension, 0])
-          ballX.domain([-2, 2]);
-          ballY.domain([0, 4]);
+          ballX.domain([-1.5, 1.5]);
+          ballY.domain([0, 3]);
 
           var validBalls = scope.balls.filter(function(d) {
               return d["ended_x"] != null && d["ended_y"] != null

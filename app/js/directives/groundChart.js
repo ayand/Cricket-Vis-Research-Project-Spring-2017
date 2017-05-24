@@ -5,12 +5,12 @@ angular.module('myApp').directive('groundChart', function() {
     var bottomEnd = (svgDimension / 2) - innerRadius;
     var topEnd = (svgDimension / 2) + innerRadius;
 
-    var decideColors = function(i) {
+    /*var decideColors = function(i) {
       var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
           "#FF5500", "#FF7700", "#FF9900"];
 
       return colors[i];
-    }
+    }*/
 
     return {
         restrict: 'EA',
@@ -101,10 +101,7 @@ angular.module('myApp').directive('groundChart', function() {
 
               arcs1.append("path")
                 .attr("class", "zone-path")
-                .attr("fill", function(d, i) {
-                    //console.log("Index: " + i);
-                    return decideColors(i);
-                })
+                .attr("fill", "#00CCFF")
                 .style("stroke", "white")
                 .attr("d", arc1);
 
@@ -160,8 +157,8 @@ angular.module('myApp').directive('groundChart', function() {
               var selectedZone = 0;
               var idealRadius = 2.5;
 
-              var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
-                  "#FF5500", "#FF7700", "#FF9900"];
+              /*var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
+                  "#FF5500", "#FF7700", "#FF9900"];*/
 
               var tip = d3.tip().attr('class', 'd3-tip');
               vis.call(tip);
@@ -267,118 +264,6 @@ angular.module('myApp').directive('groundChart', function() {
                         }
                     }
                   })
-
-              //console.log("Ball drawing done");
-
-              /*scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
-                  scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
-                    scope.$watch('min', function(newMin, oldMin) {
-                        scope.$watch('max', function(newMax, oldMax) {
-                          //console.log("Current Batsmen: " + newBatsmen.length);
-                          var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
-                              var over = Math.floor(d.ovr) + 1;
-                              return over >= newMin && over <= newMax;
-                          }).map(function(d) {
-                              return d.batsman;
-                          })))
-                          if (newBatsmen.length != 0) {
-                              batsmen = batsmen.filter(function(d) {
-                                  return newBatsmen.includes(d);
-                              });
-                          }
-                          var hands = Array.from(new Set(batsmen.map(function(d) {
-                              return scope.dictionary[d.toString()]["hand"];
-                          })));
-
-                          d3.selectAll(".dot")
-                              .on("mouseover", function(d) {
-                                  //console.log(d.landing_y);
-                                  ballMouseover(d);
-                              })
-                              .on("mouseout", function() {
-                                  ballMouseout(newMin, newMax);
-                              })
-                              .style("display",function(d){
-                                  var batsmanCondition = true;
-                                  if (newBatsmen.length != 0) {
-                                      batsmanCondition = newBatsmen.includes(d.batsman);
-                                  }
-                                  var bowlerCondition = true;
-                                  if (newBowlers.length != 0) {
-                                      bowlerCondition = newBowlers.includes(d.bowler);
-                                  }
-                                  var over = Math.floor(d.ovr) + 1;
-                                  var overCondition = ((over >= newMin) && (over <= newMax));
-                                  var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                                  //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                  if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                      return 'block';
-                                  } else {
-                                      return 'none';
-                                  }
-                              });
-
-                              d3.selectAll(".zone-path").on("click", function(d) {
-                                  if (selectedZone == d.data.zone) {
-                                      selectedZone = 0;
-                                      d3.selectAll(".zone-path")
-                                          .attr("fill", function(path, i) {
-                                              return decideColors(i);
-                                      });
-                                      d3.selectAll(".dot")
-                                          .style("display", function(dot) {
-                                              var batsmanCondition = true;
-                                              if (newBatsmen.length != 0) {
-                                                  batsmanCondition = newBatsmen.includes(dot.batsman);
-                                              }
-                                              var bowlerCondition = true;
-                                              if (newBowlers.length != 0) {
-                                                  bowlerCondition = newBowlers.includes(dot.bowler);
-                                              }
-                                              var over = Math.floor(dot.ovr) + 1;
-                                              var overCondition = ((over >= newMin) && (over <= newMax));
-                                              //var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                                              if (batsmanCondition && bowlerCondition && overCondition) {
-                                                  return 'block';
-                                              } else {
-                                                  return 'none';
-                                              }
-                                      });
-                                  } else {
-                                      selectedZone = d.data.zone;
-                                      d3.selectAll(".zone-path")
-                                          .attr("fill", function(path, i) {
-                                              if (selectedZone == path.data.zone) {
-                                                  return decideColors(i);
-                                              } else {
-                                                  return 'gray';
-                                              }
-                                      });
-                                      d3.selectAll(".dot")
-                                      .style("display",function(d){
-                                          var batsmanCondition = true;
-                                          if (newBatsmen.length != 0) {
-                                              batsmanCondition = newBatsmen.includes(d.batsman);
-                                          }
-                                          var bowlerCondition = true;
-                                          if (newBowlers.length != 0) {
-                                              bowlerCondition = newBowlers.includes(d.bowler);
-                                          }
-                                          var over = Math.floor(d.ovr) + 1;
-                                          var overCondition = ((over >= newMin) && (over <= newMax));
-                                          var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                                          if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                              return 'block';
-                                          } else {
-                                              return 'none';
-                                          }
-                                      });
-                                  }
-                              });
-                          });
-                      });
-                  });
-              });*/
         }
     }
 })

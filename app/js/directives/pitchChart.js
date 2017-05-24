@@ -1,10 +1,10 @@
 angular.module('myApp').directive('pitchChart', function() {
     /*var height = 406.08;
     var width = 65.88;*/
-    var trueHeight = 451.2;
-    var trueWidth = 73.2;
-    var height = 402.4; // 442.64
-    var width = 61; // 67.1
+    var trueHeight = 451.2 * 1.2;
+    var trueWidth = 73.2 * 1.2;
+    var height = 402.4 * 1.2; // 442.64
+    var width = 61 * 1.2; // 67.1
     var svgDimension = 580;
     var pitchStartX = (svgDimension / 2) - (width / 2);
     var pitchStartY = (svgDimension / 2) - (height / 2);
@@ -61,6 +61,14 @@ angular.module('myApp').directive('pitchChart', function() {
               return tooltipText;
           }
 
+          var correctZone = function(zone) {
+              if (zone <= 4) {
+                  return 5 - zone;
+              } else {
+                  return 13 - zone;
+              }
+          }
+
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
           vis.call(tip);
 
@@ -70,7 +78,7 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("y", 0)
               .attr("width", svgDimension)
               .attr("height", svgDimension)
-              .attr("fill", "#1DA542");
+              .attr("fill", "#CCCCCC");
 
 
           var ground = vis.append("g")
@@ -96,124 +104,124 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("x", trueX)
               .attr("y", trueY)
               .attr("width", trueWidth)
-              .attr("height", 48.8)
+              .attr("height", 48.8 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
               .attr("x", trueX)
-              .attr("y", trueY + 402.4)
+              .attr("y", trueY + (402.4 * 1.2))
               .attr("width", trueWidth)
-              .attr("height", 48.8)
+              .attr("height", 48.8 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
-              .attr("x", trueX + 10.2)
+              .attr("x", trueX + (10.2 * 1.2))
               .attr("y", trueY)
-              .attr("width", 52.8)
-              .attr("height", 24.4)
+              .attr("width", 52.8 * 1.2)
+              .attr("height", 24.4 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
-              .attr("x", trueX + 10.2)
-              .attr("y", trueY + 24.4)
-              .attr("width", 52.8)
-              .attr("height", 24.4)
+              .attr("x", trueX + (10.2 * 1.2))
+              .attr("y", trueY + (24.4 * 1.2))
+              .attr("width", 52.8 * 1.2)
+              .attr("height", 24.4 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
-              .attr("x", trueX + 10.2)
-              .attr("y", trueY + 402.4)
-              .attr("width", 52.8)
-              .attr("height", 24.4)
+              .attr("x", trueX + (10.2 * 1.2))
+              .attr("y", trueY + (402.4 * 1.2))
+              .attr("width", 52.8 * 1.2)
+              .attr("height", 24.4 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
-              .attr("x", trueX + 10.2)
-              .attr("y", trueY + 426.8)
-              .attr("width", 52.8)
-              .attr("height", 24.4)
+              .attr("x", trueX + (10.2 * 1.2))
+              .attr("y", trueY + (426.8 * 1.2))
+              .attr("width", 52.8 * 1.2)
+              .attr("height", 24.4 * 1.2)
               .style("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
-              .attr("cy", (trueY + 24.4))
-              .attr("r", 3)
+              .attr("cy", (trueY + (24.4 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 10)
-              .attr("cy", (trueY + 24.4))
-              .attr("r", 3)
+              .attr("cx", (svgDimension / 2) - 13)
+              .attr("cy", (trueY + (24.4 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 10)
-              .attr("cy", (trueY + 24.4))
-              .attr("r", 3)
+              .attr("cx", (svgDimension / 2) + 13)
+              .attr("cy", (trueY + (24.4 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
-              .attr("cy", (trueY + 426.8))
-              .attr("r", 3)
+              .attr("cy", (trueY + (426.8 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 10)
-              .attr("cy", (trueY + 426.8))
-              .attr("r", 3)
+              .attr("cx", (svgDimension / 2) - 13)
+              .attr("cy", (trueY + (426.8 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 10)
-              .attr("cy", (trueY + 426.8))
-              .attr("r", 3)
+              .attr("cx", (svgDimension / 2) + 13)
+              .attr("cy", (trueY + (426.8 * 1.2)))
+              .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
           var leftBat = ground.append("g")
               .attr("class", "left-bat");
 
           leftBat.append("rect")
-              .attr("x", (trueX - 5))
-              .attr("y", (trueY - 20))
-              .attr("width", 10)
-              .attr("height", 40)
+              .attr("x", (trueX - (5 * 1.2)))
+              .attr("y", (trueY - (20 * 1.2)))
+              .attr("width", 10 * 1.2)
+              .attr("height", 40 * 1.2)
               .attr("rx", 4)
               .attr("ry", 4);
 
           leftBat.append("rect")
-              .attr("x", (trueX - 2.5))
-              .attr("y", (trueY - 30))
-              .attr("width", 5)
-              .attr("height", 10)
+              .attr("x", (trueX - (2.5 * 1.2)))
+              .attr("y", (trueY - (30 * 1.2)))
+              .attr("width", 5 * 1.2)
+              .attr("height", 10 * 1.2)
               .attr("fill", "blue");
 
           var rightBat = ground.append("g")
               .attr("class", "right-bat");
 
           rightBat.append("rect")
-              .attr("x", (trueX - 5 + trueWidth))
-              .attr("y", (trueY - 20))
-              .attr("width", 10)
-              .attr("height", 40)
+              .attr("x", (trueX - (5 * 1.2) + trueWidth))
+              .attr("y", (trueY - (20 * 1.2)))
+              .attr("width", 10 * 1.2)
+              .attr("height", 40 * 1.2)
               .attr("rx", 4)
               .attr("ry", 4);
 
           rightBat.append("rect")
-              .attr("x", (trueX - 2.5 + trueWidth))
-              .attr("y", (trueY - 30))
-              .attr("width", 5)
-              .attr("height", 10)
+              .attr("x", (trueX - (2.5 * 1.2) + trueWidth))
+              .attr("y", (trueY - (30 * 1.2)))
+              .attr("width", 5 * 1.2)
+              .attr("height", 10 * 1.2)
               .attr("fill", "blue");
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - 20, ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
           ballY.domain([-1, 20.12]);
 
@@ -237,10 +245,11 @@ angular.module('myApp').directive('pitchChart', function() {
           var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
               "#FF5500", "#FF7700", "#FF9900"];
 
-          var idealRadius = 2.5;
+          var idealRadius = 3 * 1.2;
 
           function zoom() {
               //Geometric zoom
+              console.log(d3.event.transform);
               d3.select(this).attr("transform", d3.event.transform);
 
               //This part onwards is an attempt at semantic; will almsot definitely need improvement
@@ -256,50 +265,6 @@ angular.module('myApp').directive('pitchChart', function() {
               return d.wicket == true && d.extras_type != "Nb";
           }
 
-          var singleThing = [{ "amount": 1 }]
-
-          var pie = d3.pie()
-              .value(function(d) {
-                  return d.amount;
-              })
-
-          var arc1 = d3.arc()
-              .outerRadius((svgDimension / 2) - 5)
-              .innerRadius((svgDimension / 2) - 20);
-
-          var arcs1 = vis.selectAll("g.arc")
-              .data(pie(singleThing))
-              .enter()
-              .append("g")
-              .attr("transform", "translate(" + (svgDimension / 2) + ", "
-                  + (svgDimension / 2) + ")");
-
-          arcs1.append("path")
-              .attr("fill", "black")
-              .style("stroke", "white")
-              .attr("d", arc1);
-
-          arcs1.append("text")
-              .attr("transform", function(d) { return "translate(" + arc1.centroid(d) + ")"; })
-              .attr("dy", ".35em")
-              .attr("font-family", "sans-serif")
-              .attr("fill", "white")
-              .text(function(d) { return d.data.zone; });
-
-          var arc2 = d3.arc()
-              .outerRadius((svgDimension / 2) + 175)
-              .innerRadius((svgDimension / 2) - 5);
-
-          var arcs2 = vis.selectAll("g.arc")
-              .data(pie(singleThing))
-              .enter()
-              .append("g")
-              .attr("transform", "translate(" + (svgDimension / 2) + ", "
-                  + (svgDimension / 2) + ")");
-
-          arcs2.append("path")
-              .attr("fill", "#CCCCCC")
-              .attr("d", arc2);
 
           var selectedZone = 0;
 
@@ -314,10 +279,10 @@ angular.module('myApp').directive('pitchChart', function() {
             d3.selectAll(".zone-path")
                  .attr("fill", function(path, i) {
                      if (selectedZone == 0) {
-                         return colors[i];
+                         return "#00CCFF";
                      } else {
                          if (path.data.zone == selectedZone) {
-                             return colors[i];
+                             return "#00CCFF";
                          } else {
                              return "gray";
                          }
@@ -351,8 +316,8 @@ angular.module('myApp').directive('pitchChart', function() {
             if (curBall.z != 0) {
               d3.selectAll(".zone-path")
                   .attr("fill", function(path, i) {
-                      if (curBall.z == path.data.zone) {
-                          return colors[i];
+                      if (curBall.z == correctZone(path.data.zone)) {
+                          return "#00CCFF";
                       } else {
                           return 'gray';
                       }
@@ -469,7 +434,7 @@ angular.module('myApp').directive('pitchChart', function() {
                               }
                               var over = Math.floor(d.ovr) + 1;
                               var overCondition = ((over >= newMin) && (over <= newMax));
-                              var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                              var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
                               //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
                               if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
                                   return 'block';
@@ -482,9 +447,7 @@ angular.module('myApp').directive('pitchChart', function() {
                               if (selectedZone == d.data.zone) {
                                   selectedZone = 0;
                                   d3.selectAll(".zone-path")
-                                      .attr("fill", function(path, i) {
-                                          return colors[i];
-                                  });
+                                      .attr("fill", "#00CCFF");
                                   d3.selectAll(".dot")
                                       .style("display", function(dot) {
                                           var batsmanCondition = true;
@@ -509,7 +472,7 @@ angular.module('myApp').directive('pitchChart', function() {
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(path, i) {
                                           if (selectedZone == path.data.zone) {
-                                              return colors[i];
+                                              return "#00CCFF";
                                           } else {
                                               return 'gray';
                                           }
@@ -526,7 +489,7 @@ angular.module('myApp').directive('pitchChart', function() {
                                       }
                                       var over = Math.floor(d.ovr) + 1;
                                       var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
+                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
                                       if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
                                           return 'block';
                                       } else {
