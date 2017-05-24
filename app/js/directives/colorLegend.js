@@ -45,7 +45,7 @@ angular.module('myApp').directive('colorLegend', function() {
           })
 
           legendItem.append('circle')
-            .attr("cx", 140)
+            .attr("cx", 145)
             .attr("cy", 40)
             .attr("r", 12.5)
             .style("fill", function (d, i) {
@@ -53,7 +53,7 @@ angular.module('myApp').directive('colorLegend', function() {
             })
 
           legendItem.append('text')
-              .attr("x", 170)
+              .attr("x", 175)
               .attr("y", 50)
               .text(function (d, i) {
                 return d;
