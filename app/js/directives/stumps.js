@@ -6,7 +6,10 @@ angular.module('myApp').directive('stumps', function() {
         restrict: 'EA',
         scope: {
             balls: '=',
-            dictionary: '='
+            dictionary: '=',
+            batsmen: '=',
+            min: '=',
+            max: '='
         },
         link: function(scope, element, attrs) {
           var vis = d3.select(element[0])
@@ -46,26 +49,10 @@ angular.module('myApp').directive('stumps', function() {
 
               var idealRadius = 3;
 
-              /*function zoom() {
-                  //Geometric zoom
-                  d3.select(this).attr("transform", d3.event.transform);
-
-                  //This part onwards is an attempt at semantic; will almsot definitely need improvement
-                  var dots = vis.selectAll(".dot");
-                  dots.attr("r", function() {
-                      //console.log(d3.event)
-                      idealRadius = (3 / d3.event.transform.k) + 0.25
-                      return idealRadius;
-                  });
-              }*/
-
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
           vis.call(tip);
 
           var window = vis.append("g")
-              //.call(d3.zoom().scaleExtent([1, 24]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
-
-          //vis.call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
 
           window.append("rect")
               .attr("width", svgDimension)
@@ -119,6 +106,60 @@ angular.module('myApp').directive('stumps', function() {
               .attr("rx", 3)
               .attr("fill", "#683F16");
 
+          var leftBat = window.append("g")
+              .attr("class", "left-bat");
+
+          leftBat.append("rect")
+              .attr("x", 50)
+              .attr("y", 0)
+              .attr("width", 11.25)
+              .attr("height", 35)
+              .attr("fill", "blue");
+
+          leftBat.append("rect")
+              .attr("x", 44.625)
+              .attr("y", 35)
+              .attr("width", 20)
+              .attr("height", 90)
+              .attr("rx", 4)
+              .attr("ry", 4);
+
+          leftBat.append("text")
+              .attr("x", 49.625)
+              .attr("y", 80)
+              .attr("dy", ".35em")
+              .attr("font-family", "sans-serif")
+              .attr("fill", "white")
+              .style("font-weight", "bold")
+              .text("R");
+
+          var rightBat = window.append("g")
+              .attr("class", "right-bat");
+
+          rightBat.append("rect")
+              .attr("x", 518.75)
+              .attr("y", 0)
+              .attr("width", 11.25)
+              .attr("height", 35)
+              .attr("fill", "blue");
+
+          rightBat.append("rect")
+              .attr("x", 513.375)
+              .attr("y", 35)
+              .attr("width", 20)
+              .attr("height", 90)
+              .attr("rx", 4)
+              .attr("ry", 4);
+
+          rightBat.append("text")
+              .attr("x", 519.375)
+              .attr("y", 80)
+              .attr("dy", ".35em")
+              .attr("font-family", "sans-serif")
+              .attr("fill", "white")
+              .style("font-weight", "bold")
+              .text("L");
+
           var ballX = d3.scaleLinear().range([0, svgDimension]);
           var ballY = d3.scaleLinear().range([svgDimension, 0])
           ballX.domain([-1.5, 1.5]);
@@ -161,6 +202,36 @@ angular.module('myApp').directive('stumps', function() {
                     }
                 }
               })
+
+          scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+              scope.$watch('min', function(newMin, oldMin) {
+                  scope.$watch('max', function(newMax, oldMax) {
+                    var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                        var over = Math.floor(d.ovr) + 1;
+                        return over >= newMin && over <= newMax;
+                    }).map(function(d) {
+                        return d.batsman;
+                    })))
+                    if (newBatsmen.length != 0) {
+                        batsmen = batsmen.filter(function(d) {
+                            return newBatsmen.includes(d);
+                        });
+                    }
+                    var hands = Array.from(new Set(batsmen.map(function(d) {
+                        return scope.dictionary[d.toString()]["hand"];
+                    })));
+                    leftBat.style("opacity", 0);
+                    rightBat.style("opacity", 0);
+                    if (hands.length == 1) {
+                        if (hands[0] == "Left") {
+                            rightBat.style("opacity", 1);
+                        } else {
+                            leftBat.style("opacity", 1);
+                        }
+                    }
+                  })
+              })
+          })
 
         }
     }

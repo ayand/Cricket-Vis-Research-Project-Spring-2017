@@ -157,77 +157,10 @@ angular.module('myApp').directive('groundChart', function() {
               var selectedZone = 0;
               var idealRadius = 2.5;
 
-              /*var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
-                  "#FF5500", "#FF7700", "#FF9900"];*/
-
               var tip = d3.tip().attr('class', 'd3-tip');
               vis.call(tip);
 
               var className = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
-
-              /*var ballMouseout = function(newMin, newMax){
-                d3.selectAll('.dot').style('opacity',1);
-
-                d3.selectAll(".zone-path")
-                     .attr("fill", function(path, i) {
-                         if (selectedZone == 0) {
-                             return decideColors(i);
-                         } else {
-                             if (path.data.zone == selectedZone) {
-                                 return decideColors(i);
-                             } else {
-                                 return "gray";
-                             }
-                         }
-                     })
-
-                d3.selectAll(className)
-                    .style("opacity", function(ball) {
-                        var over = Math.floor(ball.ovr) + 1;
-                        if (over >= newMin && over <= newMax) {
-                             //console.log('not fading');
-                           return 1;
-                        } else {
-                           //console.log('fading');
-                           return 0.2;
-                        }
-                    });
-                tip.hide();
-              };
-
-              var ballMouseover = function(curBall){
-                // console.log(curBall)
-                d3.selectAll('.dot').style('opacity',function(d){
-                    if(d==curBall){
-                        return 1;
-                    }else{
-                        return 0.2;
-                    }
-                });
-
-                if (curBall.z != 0) {
-                  d3.selectAll(".zone-path")
-                      .attr("fill", function(path, i) {
-                          if (curBall.z == path.data.zone) {
-                              console.log(decideColors(i));
-                              return decideColors(i);
-                          } else {
-                              return 'gray';
-                          }
-                      })
-                }
-
-                d3.selectAll(className)
-                    .style('opacity', function(d) {
-                        if (d == curBall) {
-                            return 1;
-                        } else {
-                            return 0.1;
-                        }
-                });
-                tip.html(tooltipText(curBall)).show();
-
-              };*/
 
               var validBalls = scope.balls.filter(function(d) {
                   return d["x"] != null && d["y"] != null;

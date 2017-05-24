@@ -1,6 +1,4 @@
 angular.module('myApp').directive('pitchChart', function() {
-    /*var height = 406.08;
-    var width = 65.88;*/
     var trueHeight = 451.2 * 1.2;
     var trueWidth = 73.2 * 1.2;
     var height = 402.4 * 1.2; // 442.64
@@ -26,14 +24,6 @@ angular.module('myApp').directive('pitchChart', function() {
             .append("svg")
               .attr("width", svgDimension)
               .attr("height", svgDimension)
-              /*.call(d3.zoom().scaleExtent([1, 10]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
-            .append("g");*/
-
-          /*function zoom() {
-              vis.attr("transform", d3.event.transform);
-              var dots = vis.selectAll(".dot")
-
-          }*/
 
           var tooltipText = function(d) {
               var overNumber = Math.floor(d.ovr) + 1;
@@ -83,14 +73,6 @@ angular.module('myApp').directive('pitchChart', function() {
 
           var ground = vis.append("g")
               .call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
-
-          /*ground.append("circle")
-              .attr("class", "ground")
-              .attr("cx", (svgDimension / 2))
-              .attr("cy", (svgDimension / 2))
-              .attr("r", (svgDimension / 2) - 60)
-              .attr("fill", "#1DA542");*/
-
 
           ground.append("rect")
               .attr("class", "pitch")
@@ -184,63 +166,10 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("r", 3 * 1.2)
               .attr("fill", "#683F16");
 
-          var leftBat = ground.append("g")
-              .attr("class", "left-bat");
-
-          leftBat.append("rect")
-              .attr("x", (trueX - (5 * 1.2)))
-              .attr("y", (trueY - (20 * 1.2)))
-              .attr("width", 10 * 1.2)
-              .attr("height", 40 * 1.2)
-              .attr("rx", 4)
-              .attr("ry", 4);
-
-          leftBat.append("rect")
-              .attr("x", (trueX - (2.5 * 1.2)))
-              .attr("y", (trueY - (30 * 1.2)))
-              .attr("width", 5 * 1.2)
-              .attr("height", 10 * 1.2)
-              .attr("fill", "blue");
-
-          var rightBat = ground.append("g")
-              .attr("class", "right-bat");
-
-          rightBat.append("rect")
-              .attr("x", (trueX - (5 * 1.2) + trueWidth))
-              .attr("y", (trueY - (20 * 1.2)))
-              .attr("width", 10 * 1.2)
-              .attr("height", 40 * 1.2)
-              .attr("rx", 4)
-              .attr("ry", 4);
-
-          rightBat.append("rect")
-              .attr("x", (trueX - (2.5 * 1.2) + trueWidth))
-              .attr("y", (trueY - (30 * 1.2)))
-              .attr("width", 5 * 1.2)
-              .attr("height", 10 * 1.2)
-              .attr("fill", "blue");
-
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
           var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
           ballY.domain([-1, 20.12]);
-
-          /*vis.append("circle")
-              .attr("class", "black-dot")
-              .attr("cx", 25)
-              .attr("cy", 25)
-              .attr("r", 25);*/
-
-          /*var zones = [
-              { "zone": 1, "amount": 1 },
-              { "zone": 2, "amount": 1 },
-              { "zone": 3, "amount": 1 },
-              { "zone": 4, "amount": 1 },
-              { "zone": 5, "amount": 1 },
-              { "zone": 6, "amount": 1 },
-              { "zone": 7, "amount": 1 },
-              { "zone": 8, "amount": 1 }
-          ];*/
 
           var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
               "#FF5500", "#FF7700", "#FF9900"];
@@ -248,14 +177,12 @@ angular.module('myApp').directive('pitchChart', function() {
           var idealRadius = 3 * 1.2;
 
           function zoom() {
-              //Geometric zoom
+
               console.log(d3.event.transform);
               d3.select(this).attr("transform", d3.event.transform);
 
-              //This part onwards is an attempt at semantic; will almsot definitely need improvement
               var dots = vis.selectAll(".dot");
               dots.attr("r", function() {
-                  //console.log(d3.event)
                   idealRadius = (2.5 / d3.event.transform.k) + 0.25
                   return idealRadius;
               });
@@ -264,7 +191,6 @@ angular.module('myApp').directive('pitchChart', function() {
           var isWicketBall = function(d) {
               return d.wicket == true && d.extras_type != "Nb";
           }
-
 
           var selectedZone = 0;
 
@@ -338,11 +264,6 @@ angular.module('myApp').directive('pitchChart', function() {
 
           };
 
-          //console.log("dictionary:");
-          //console.log(scope.dictionary);
-
-
-
           var validBalls = scope.balls.filter(function(d) {
               return d["landing_x"] != null && d["landing_y"] != null;
           });
@@ -389,32 +310,6 @@ angular.module('myApp').directive('pitchChart', function() {
               scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
                 scope.$watch('min', function(newMin, oldMin) {
                     scope.$watch('max', function(newMax, oldMax) {
-                      /*console.log("Current Batsmen: " + newBatsmen)*/
-                      //console.log("Current Batsmen: " + newBatsmen.length);
-                      var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
-                          var over = Math.floor(d.ovr) + 1;
-                          return over >= newMin && over <= newMax;
-                      }).map(function(d) {
-                          return d.batsman;
-                      })))
-                      if (newBatsmen.length != 0) {
-                          batsmen = batsmen.filter(function(d) {
-                              return newBatsmen.includes(d);
-                          });
-                      }
-                      var hands = Array.from(new Set(batsmen.map(function(d) {
-                          return scope.dictionary[d.toString()]["hand"];
-                      })));
-                      leftBat.style("opacity", 0);
-                      rightBat.style("opacity", 0);
-                      if (hands.length == 1) {
-                          if (hands[0] == "Left") {
-                              leftBat.style("opacity", 1);
-                          } else {
-                              rightBat.style("opacity", 1);
-                          }
-                      }
-                      //console.log("Current Bowlers: " + newBowlers.length);
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {
                               //console.log(d.landing_y);
