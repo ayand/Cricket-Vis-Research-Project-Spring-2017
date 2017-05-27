@@ -47,6 +47,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       url: '/match/:id',
       templateUrl: 'partials/alternate-match.html',
       controller: function($scope, balls, players, flags, $state, $stateParams) {
+          $scope.showLegend = true;
+          $scope.hover = true;
           $scope.gameID = $stateParams.id;
           $scope.allBalls = balls;
           $scope.playerDict = players;
@@ -224,6 +226,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 $scope.rangeSlider1.minimumOver = 1;
                 $scope.rangeSlider1.maximumOver = 50;
               }
+              $scope.showLegend = false;
+              $scope.hover = false;
               $state.go('home.match.innings', { number: inning });
           }
 
@@ -351,22 +355,25 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           $scope.normalStyling = {
               "color": "black",
-              "background-color": "#aaaaaa",
-              "border": "1px solid white"
+              "background-color": "#ffffff",
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
           };
 
           $scope.batsmanStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.battingTeam],
               "font-weight": "bold",
-              "border": "1px solid white"
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
           }
 
           $scope.bowlerStyling = {
               "color": "white",
               "background-color": $scope.teamColors[$scope.bowlingTeam],
               "font-weight": "bold",
-              "border": "1px solid white"
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
           }
 
           $scope.currentBatsmen = [];
@@ -433,8 +440,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               });
           }*/
 
-          $scope.selectedBatsmanKey = "";
-          $scope.selectedBowlerKey = "";
+          $scope.selectedBatsmanKey = "Batting Order";
+          $scope.selectedBowlerKey = "Bowling Order";
 
           $scope.isWicket = function(d) {
               return d.wicket == true && d.extras_type != "Nb" && d.wicket_method != "run out";

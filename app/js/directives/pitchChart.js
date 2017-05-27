@@ -20,6 +20,10 @@ angular.module('myApp').directive('pitchChart', function() {
             dictionary: '='
         },
         link: function(scope, element, attrs) {
+
+          var selectedZone = 0;
+          var zoneColors = [];
+
           var vis = d3.select(element[0])
             .append("svg")
               .attr("width", svgDimension)
@@ -68,7 +72,7 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("y", 0)
               .attr("width", svgDimension)
               .attr("height", svgDimension)
-              .attr("fill", "#CCCCCC");
+              .attr("fill", "#FFFFFF");
 
 
           var ground = vis.append("g")
@@ -178,7 +182,7 @@ angular.module('myApp').directive('pitchChart', function() {
 
           function zoom() {
 
-              console.log(d3.event.transform);
+              //console.log(d3.event.transform);
               d3.select(this).attr("transform", d3.event.transform);
 
               var dots = vis.selectAll(".dot");
@@ -192,12 +196,11 @@ angular.module('myApp').directive('pitchChart', function() {
               return d.wicket == true && d.extras_type != "Nb";
           }
 
-          var selectedZone = 0;
-
           var tip = d3.tip().attr('class', 'd3-tip');
           vis.call(tip);
 
-          var className = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+          var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+          var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
 
           var ballMouseout = function(newMin, newMax){
             d3.selectAll('.dot').style('opacity',1);
@@ -205,17 +208,18 @@ angular.module('myApp').directive('pitchChart', function() {
             d3.selectAll(".zone-path")
                  .attr("fill", function(path, i) {
                      if (selectedZone == 0) {
-                         return "#00CCFF";
+                         return zoneColors[i];
                      } else {
                          if (path.data.zone == selectedZone) {
-                             return "#00CCFF";
+                             return zoneColors[i];
                          } else {
                              return "gray";
                          }
                      }
                  })
+                 .style("stroke", "#CCCCCC")
 
-            d3.selectAll(className)
+            d3.selectAll(activeClassName)
                 .style("opacity", function(ball) {
                     var over = Math.floor(ball.ovr) + 1;
                     if (over >= newMin && over <= newMax) {
@@ -239,18 +243,25 @@ angular.module('myApp').directive('pitchChart', function() {
                 }
             });
 
+            if (zoneColors.length == 0) {
+              d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                  zoneColors.push(e.attributes.fill.value);
+              });
+            }
+
             if (curBall.z != 0) {
               d3.selectAll(".zone-path")
                   .attr("fill", function(path, i) {
                       if (curBall.z == correctZone(path.data.zone)) {
-                          return "#00CCFF";
+                          return zoneColors[i];
                       } else {
                           return 'gray';
                       }
                   })
+                  .style("stroke", "black")
             }
 
-            d3.selectAll(className)
+            d3.selectAll(activeClassName)
                 .style('opacity', function(d) {
                     if (d == curBall) {
                         return 1;
@@ -259,8 +270,8 @@ angular.module('myApp').directive('pitchChart', function() {
                     }
             });
             tip.html(tooltipText(curBall)).show();
-            console.log("x: " + curBall["ended_x"])
-            console.log("y: " + curBall["ended_y"])
+            //console.log("x: " + curBall["ended_x"])
+            //console.log("y: " + curBall["ended_y"])
 
           };
 
@@ -286,18 +297,18 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("r", idealRadius) //Previous value: 3.5
               .attr("fill", function(d) {
                 if (isWicketBall(d)) {
-                    return "black";
+                    return "#DE2D26";
                 } else {
                     if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                        return "#999999";
+                        return "#CCCCCC";
                     } else {
                         if (d.extras_type != "") {
-                            return "#FF8000";
+                            return "#7BCCC4";
                         } else {
                             if (d.runs_batter < 4) {
-                              return "#00CCCC";
+                              return "#43A2CA";
                             } else {
-                                return "#0000FF";
+                                return "#0868AC";
                             }
                         }
                     }
@@ -310,6 +321,7 @@ angular.module('myApp').directive('pitchChart', function() {
               scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
                 scope.$watch('min', function(newMin, oldMin) {
                     scope.$watch('max', function(newMax, oldMax) {
+                      selectedZone = 0;
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {
                               //console.log(d.landing_y);
@@ -338,11 +350,35 @@ angular.module('myApp').directive('pitchChart', function() {
                               }
                           });
 
-                          d3.selectAll(".zone-path").on("click", function(d) {
+                          if (selectedZone != 0) {
+                              zoneColors = [];
+                              d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                                  zoneColors.push(e.attributes.fill.value);
+                              });
+                              d3.selectAll(".zone-path")
+                                  .attr("fill", function(path, i) {
+                                      if (selectedZone == path.data.zone) {
+                                          return zoneColors[i];
+                                      } else {
+                                          return 'gray';
+                                      }
+                              })
+                          }
+
+                          d3.selectAll(".zone-path").on("click", function(d, index) {
+                              //console.log(d3.selectAll(".zone-path"));
+
+                              //console.log("Colors");
+                              //console.log(colors);
                               if (selectedZone == d.data.zone) {
                                   selectedZone = 0;
+                                  //console.log("Zones:");
+                                  //console.log(d3.selectAll(".zone-path")._groups[0][index].attributes.fill.value);
                                   d3.selectAll(".zone-path")
-                                      .attr("fill", "#00CCFF");
+                                      .attr("fill", function(path, i) {
+                                          return zoneColors[i];
+                                      })
+                                      .style('stroke', '#CCCCCC');
                                   d3.selectAll(".dot")
                                       .style("display", function(dot) {
                                           var batsmanCondition = true;
@@ -363,15 +399,23 @@ angular.module('myApp').directive('pitchChart', function() {
                                           }
                                   });
                               } else {
+                                  if (selectedZone == 0 || zoneColors.length == 0) {
+                                    zoneColors = [];
+                                    d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                                        zoneColors.push(e.attributes.fill.value);
+                                    });
+                                  }
                                   selectedZone = d.data.zone;
+                                  console.log(zoneColors);
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(path, i) {
                                           if (selectedZone == path.data.zone) {
-                                              return "#00CCFF";
+                                              return zoneColors[i];
                                           } else {
                                               return 'gray';
                                           }
-                                  });
+                                  })
+                                  .style("stroke", "black");
                                   d3.selectAll(".dot")
                                   .style("display",function(d){
                                       var batsmanCondition = true;
@@ -393,6 +437,34 @@ angular.module('myApp').directive('pitchChart', function() {
                                   });
                               }
                           });
+
+                          d3.selectAll(activeClassName)
+                              .on("mouseover", function(d) {
+                                  return;
+                              })
+                              .on("mouseout", function() {
+                                  return;
+                              })
+
+                          d3.selectAll(activeClassName)
+                              .on("mouseover", function(d) {
+                                  var over = Math.floor(d.ovr) + 1;
+                                  if (over >= newMin && over <= newMax) {
+                                    ballMouseover(d);
+                                  }
+
+                              })
+                              .on("mouseout", function() {
+                                  ballMouseout(newMin, newMax);
+                              })
+
+                          d3.selectAll(inactiveClassName)
+                              .on("mouseover", function(d) {
+                                  return;
+                              })
+                              .on("mouseout", function() {
+                                  return;
+                              })
                       });
                   });
               });

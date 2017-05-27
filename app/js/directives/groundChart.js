@@ -5,21 +5,25 @@ angular.module('myApp').directive('groundChart', function() {
     var bottomEnd = (svgDimension / 2) - innerRadius;
     var topEnd = (svgDimension / 2) + innerRadius;
 
-    /*var decideColors = function(i) {
-      var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
-          "#FF5500", "#FF7700", "#FF9900"];
-
-      return colors[i];
-    }*/
+    var colorScales = [
+      ["#D95F0E"],
+      ["#FFF7BC", "#D95F0E"],
+      ["#FFF7BC", "#FEC44F", "#D95F0E"],
+      ["#FFFFD4", "#FED98E", "#FE9929", "#CC4C02"],
+      ["#FFFFD4", "#FED98E", "#FE9929", "#D95F0E", "#993404"],
+      ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#D95F0E", "#993404"],
+      ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"],
+      ["#FFFFE5", "#FFF7BC", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"]
+    ];
 
     return {
         restrict: 'EA',
         scope: {
           balls: '=',
-          /*batsmen: '=',
+          batsmen: '=',
           bowlers: '=',
           min: '=',
-          max: '=',*/
+          max: '=',
           dictionary: '='
         },
         link: function(scope, element, attrs) {
@@ -36,7 +40,7 @@ angular.module('myApp').directive('groundChart', function() {
               .attr("y", 0)
               .attr("width", svgDimension)
               .attr("height", svgDimension)
-              .attr("fill", "#1DA542");
+              .attr("fill", "#40DA69");
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
@@ -101,17 +105,9 @@ angular.module('myApp').directive('groundChart', function() {
 
               arcs1.append("path")
                 .attr("class", "zone-path")
-                .attr("fill", "#00CCFF")
-                .style("stroke", "white")
+                .attr("fill", "white")
+                .style("stroke", "#CCCCCC")
                 .attr("d", arc1);
-
-              arcs1.append("text")
-                  .attr("transform", function(d) { return "translate(" + arc1.centroid(d) + ")"; })
-                  .attr("dy", ".35em")
-                  .attr("font-family", "sans-serif")
-                  .attr("fill", "white")
-                  .style("font-weight", "bold")
-                  .text(function(d) { return d.data.zone; });
 
           var arc2 = d3.arc()
               .outerRadius((svgDimension / 2) + 175)
@@ -125,10 +121,10 @@ angular.module('myApp').directive('groundChart', function() {
                   + (svgDimension / 2) + ")");
 
           arcs2.append("path")
-              .attr("fill", "#CCCCCC")
+              .attr("fill", "#FFFFFF")
               .attr("d", arc2);
 
-              var tooltipText = function(d) {
+              /*var tooltipText = function(d) {
                   var overNumber = Math.floor(d.ovr) + 1;
                   var ballNumber = (d.ovr * 10) % 10;
                   var batsman = d.batsman_name;
@@ -152,7 +148,7 @@ angular.module('myApp').directive('groundChart', function() {
                   var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
                   var tooltipText = (line1 + line2 + line3 + line4);
                   return tooltipText;
-              }
+              }*/
 
               var selectedZone = 0;
               var idealRadius = 2.5;
@@ -180,22 +176,68 @@ angular.module('myApp').directive('groundChart', function() {
                   .attr("r", idealRadius) //Previous value: 3.5
                   .attr("fill", function(d) {
                     if (isWicketBall(d)) {
-                        return "black";
+                        return "#DE2D26";
                     } else {
                         if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                            return "#999999";
+                            return "#CCCCCC";
                         } else {
                             if (d.extras_type != "") {
-                                return "#FF8000";
+                                return "#7BCCC4";
                             } else {
                                 if (d.runs_batter < 4) {
-                                  return "#00CCCC";
+                                  return "#43A2CA";
                                 } else {
-                                    return "#0000FF";
+                                    return "#0868AC";
                                 }
                             }
                         }
                     }
+                  });
+
+                  scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+                      scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
+                          scope.$watch('min', function(newMin, oldMin) {
+                              scope.$watch('max', function(newMax, oldMax) {
+                                  var consideredBalls = scope.balls.filter(function(dot) {
+                                      var batsmanCondition = true;
+                                      if (newBatsmen.length != 0) {
+                                          batsmanCondition = newBatsmen.includes(dot.batsman);
+                                      }
+                                      var bowlerCondition = true;
+                                      if (newBowlers.length != 0) {
+                                          bowlerCondition = newBowlers.includes(dot.bowler);
+                                      }
+                                      var over = Math.floor(dot.ovr) + 1;
+                                      var overCondition = ((over >= newMin) && (over <= newMax));
+                                      return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
+                                  });
+
+                                  var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+
+                                  consideredBalls.forEach(function(d) {
+                                      var zone = d.z - 1;
+                                      zoneScores[zone] += d.runs_w_extras;
+                                  });
+
+                                  var scoreSet = Array.from(new Set(zoneScores));
+                                  scoreSet.sort(function(a, b) {
+                                      return a - b;
+                                  })
+
+                                  var list = scoreSet.length - 1;
+
+                                  d3.selectAll(".zone-path")
+                                      .attr("fill", function(d, i) {
+                                          var score = zoneScores[i];
+                                          return colorScales[list][scoreSet.indexOf(score)];
+                                      })
+                                      .style("stroke", "#CCCCCC")
+                                      .on("mouseover", function(d, i) {
+                                          console.log(zoneScores[i])
+                                      });
+                              })
+                          })
+                      })
                   })
         }
     }

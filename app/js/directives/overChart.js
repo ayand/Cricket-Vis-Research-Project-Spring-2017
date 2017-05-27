@@ -13,7 +13,8 @@ angular.module('myApp')
       val: '=',
       dictionary: '=',
       min: '=',
-      max: '='
+      max: '=',
+      hoverswitch: '=',
     },
     link: function (scope, element, attrs) {
       var vis = d3.select(element[0])
@@ -56,18 +57,18 @@ angular.module('myApp')
 
       var decideColor = function(d) {
         if (isWicketBall(d)) {
-            return "black";
+            return "#DE2D26";
         } else {
             if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                return "#999999";
+                return "#CCCCCC";
             } else {
                 if (d.extras_type != "") {
-                    return "#FF8000";
+                    return "#7BCCC4";
                 } else {
                     if (d.runs_batter < 4) {
-                      return "#00CCCC";
+                      return "#43A2CA";
                     } else {
-                        return "#0000FF";
+                        return "#0868AC";
                     }
                 }
             }
@@ -165,6 +166,8 @@ angular.module('myApp')
           .attr("transform", "translate(0, " + (height - margin) + ")")
           .call(overAxis)
 
+          console.log(scope.hoverswitch)
+
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
 
@@ -180,44 +183,59 @@ angular.module('myApp')
                               return 0.2;
                           }
                       })
-                      .on("mouseover", function(d) {
-                          var over = Math.floor(d.ovr) + 1;
-                          if (over >= newMin && over <= newMax) {
-                            d3.selectAll('.' + className)
-                                .style("opacity", function(ball) {
-                                    if (d == ball) {
-                                        return 1;
-                                    } else {
-                                        return 0.2;
-                                    }
-                                });
+                })
+            })
 
-                            d3.selectAll('.dot').style('opacity',function(dot){
-                                if(d==dot || d.inning != dot.inning){
-                                    return 1;
-                                }else{
-                                    return 0.2;
-                                }
-                            });
-                            tip.html(tooltipText(d)).show();
-                          }
-                      })
-                      .on("mouseout", function() {
+            scope.$watch('hoverswitch', function(newVal, oldVal) {
+                console.log(newVal);
+                if (newVal) {
+                  d3.selectAll('.' + className)
+                    .on("mouseover", function(d) {
+                        var over = Math.floor(d.ovr) + 1;
+                        if (over >= scope.min && over <= scope.max) {
                           d3.selectAll('.' + className)
-                            .style("opacity", function(ball) {
-                              var over = Math.floor(ball.ovr) + 1;
-                              if (over >= newMin && over <= newMax) {
-                                  //console.log('not fading');
+                              .style("opacity", function(ball) {
+                                  if (d == ball) {
+                                      return 1;
+                                  } else {
+                                      return 0.2;
+                                  }
+                              });
+
+                          d3.selectAll('.dot').style('opacity',function(dot){
+                              if(d==dot || d.inning != dot.inning){
                                   return 1;
-                              } else {
-                                  //console.log('fading');
+                              }else{
                                   return 0.2;
                               }
-                            });
-                          d3.selectAll(".dot").style("opacity", 1);
-                          tip.hide();
-                      });
-                })
+                          });
+                          tip.html(tooltipText(d)).show();
+                        }
+                    })
+                    .on("mouseout", function() {
+                        d3.selectAll('.' + className)
+                          .style("opacity", function(ball) {
+                            var over = Math.floor(ball.ovr) + 1;
+                            if (over >= scope.min && over <= scope.max) {
+                                //console.log('not fading');
+                                return 1;
+                            } else {
+                                //console.log('fading');
+                                return 0.2;
+                            }
+                          });
+                        d3.selectAll(".dot").style("opacity", 1);
+                        tip.hide();
+                    });
+                } else {
+                  d3.selectAll('.' + className)
+                    .on("mouseover", function() {
+                        return;
+                    })
+                    .on("mouseout", function() {
+                        return;
+                    })
+                }
             })
     }
   }

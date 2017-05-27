@@ -59,7 +59,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("height", svgDimension)
               .attr("x", 0)
               .attr("y", 0)
-              .attr("fill", "#CCCCCC")
+              .attr("fill", "#FFFFFF")
 
           window.append("rect")
               .attr("height", 137.46)
@@ -114,15 +114,16 @@ angular.module('myApp').directive('stumps', function() {
               .attr("y", 0)
               .attr("width", 11.25)
               .attr("height", 35)
-              .attr("fill", "blue");
+              .attr("fill", "#6F5E25");
 
           leftBat.append("rect")
               .attr("x", 44.625)
-              .attr("y", 35)
+              .attr("y", 33)
               .attr("width", 20)
               .attr("height", 90)
               .attr("rx", 4)
-              .attr("ry", 4);
+              .attr("ry", 4)
+              .attr("fill", "#6F5E25");
 
           leftBat.append("text")
               .attr("x", 49.625)
@@ -131,7 +132,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("font-family", "sans-serif")
               .attr("fill", "white")
               .style("font-weight", "bold")
-              .text("R");
+              .text("L");
 
           var rightBat = window.append("g")
               .attr("class", "right-bat");
@@ -141,15 +142,16 @@ angular.module('myApp').directive('stumps', function() {
               .attr("y", 0)
               .attr("width", 11.25)
               .attr("height", 35)
-              .attr("fill", "blue");
+              .attr("fill", "#6F5E25");
 
           rightBat.append("rect")
               .attr("x", 513.375)
-              .attr("y", 35)
+              .attr("y", 33)
               .attr("width", 20)
               .attr("height", 90)
               .attr("rx", 4)
-              .attr("ry", 4);
+              .attr("ry", 4)
+              .attr("fill", "#6F5E25");
 
           rightBat.append("text")
               .attr("x", 519.375)
@@ -158,7 +160,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("font-family", "sans-serif")
               .attr("fill", "white")
               .style("font-weight", "bold")
-              .text("L");
+              .text("R");
 
           var ballX = d3.scaleLinear().range([0, svgDimension]);
           var ballY = d3.scaleLinear().range([svgDimension, 0])
@@ -185,18 +187,18 @@ angular.module('myApp').directive('stumps', function() {
               .attr("r", idealRadius) //Previous value: 3.5
               .attr("fill", function(d) {
                 if (isWicketBall(d)) {
-                    return "black";
+                    return "#DE2D26";
                 } else {
                     if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                        return "#999999";
+                        return "#CCCCCC";
                     } else {
                         if (d.extras_type != "") {
-                            return "#FF8000";
+                            return "#7BCCC4";
                         } else {
                             if (d.runs_batter < 4) {
-                              return "#00CCCC";
+                              return "#43A2CA";
                             } else {
-                                return "#0000FF";
+                                return "#0868AC";
                             }
                         }
                     }
@@ -224,9 +226,9 @@ angular.module('myApp').directive('stumps', function() {
                     rightBat.style("opacity", 0);
                     if (hands.length == 1) {
                         if (hands[0] == "Left") {
-                            rightBat.style("opacity", 1);
-                        } else {
                             leftBat.style("opacity", 1);
+                        } else {
+                            rightBat.style("opacity", 1);
                         }
                     }
                   })

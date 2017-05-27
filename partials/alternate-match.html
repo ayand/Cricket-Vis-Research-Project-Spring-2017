@@ -1,68 +1,65 @@
-<div style="background-color: #cccccc; color: black">
+<div style="color: black">
 <div align="center">
-  <h2>{{ $parent.date + " - (" + $parent.ground + ")" }}</h2>
-  <h2>{{ $parent.team1 + " vs " + $parent.team2 }}</h2>
+  <h2>{{ $parent.date + " - (" + $parent.ground + ")" }}<br>{{ $parent.team1 + " vs " + $parent.team2 }}</h2>
   <h3>Skyline of Overs</h3>
-  <label class="btn btn-success" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
-  <label class="btn btn-info" ng-click="seeOvers()">Over Summary</label>
+  <label class="btn btn-default" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
+  <label class="btn btn-default" ng-click="seeOvers()">Over Summary</label>
 </div>
 <div class="row">
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-    <img align="center" class="center-block" ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
+    <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
     <div class="row">
-      <h4>{{ "1st Innings: " + firstBattingTeam}}</h4>
-      <h5>{{ firstTotalRuns + "-" + firstWickets}}</h5>
-      <label class="btn btn-success btn-sm" ng-click="seeInning(1)">Click for More</label>
+      <h4>{{ "1st Innings: " + firstBattingTeam}}<br>{{ firstTotalRuns + "-" + firstWickets}}</h4>
+      <label class="btn btn-default btn-sm" ng-click="seeInning(1)">Click for More</label>
     </div>
 
   </div>
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-    <img align="center" class="center-block" ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
+    <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
     <div class="row">
-      <h4>{{ "2nd Innings: " + secondBattingTeam}}</h4>
-      <h5>{{ secondTotalRuns + "-" + secondWickets}}</h5>
-      <label class="btn btn-success btn-sm" ng-click="seeInning(2)">Click for More</label>
+      <h4>{{ "2nd Innings: " + secondBattingTeam}}<br>{{ secondTotalRuns + "-" + secondWickets}}</h4>
+      <label class="btn btn-default btn-sm" ng-click="seeInning(2)">Click for More</label>
     </div>
   </div>
 </div>
 <div class="row">
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <div ng-show="showBalls">
-      <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-chart>
+      <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
     </div>
     <div ng-show="!showBalls">
       <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
     </div>
     <div align="center" ng-show="showLeftComparison">
       <table style="width:720px" align="center" class="table">
-        <tr style="font-weight:bold" align="center">
-          <td>Before Over {{ rangeSlider1.minimumOver }}</th>
-          <td>After Over {{ finalOver1 }}</th>
+        <tr style="font-weight:bold; text-align: center">
+          <th style="text-align: center">Before Over {{ rangeSlider1.minimumOver }}</th>
+          <th style="text-align: center">After Over {{ finalOver1 }}</th>
         </tr>
-        <tr align="center">
+        <tr style="text-align: center">
           <td>{{ leftRuns1 + "-" + leftWickets1 }}</td>
           <td>{{ rightRuns1 + "-" + rightWickets1 }}</td>
         </tr>
       </table>
     </div>
-    <div style="width:720px" ng-show="showSlider1">
+    <div style="width:720px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}" ng-show="showSlider1">
         <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
     </div>
   </div>
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <div ng-show="showBalls">
-      <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-chart>
+      <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
     </div>
     <div ng-show="!showBalls">
       <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
     </div>
     <div align="center" ng-show="showRightComparison">
       <table style="width:720px" align="center" class="table">
-        <tr style="font-weight:bold" align="center">
-          <td>Before Over {{ rangeSlider2.minimumOver }}</th>
-          <td>After Over {{ finalOver2 }}</th>
+        <tr style="font-weight:bold; text-align: center">
+          <th style="text-align: center">Before Over {{ rangeSlider2.minimumOver }}</th>
+          <th style="text-align: center">After Over {{ finalOver2 }}</th>
         </tr>
-        <tr align="center">
+        <tr style="text-align: center">
           <td>{{ leftRuns2 + "-" + leftWickets2 }}</td>
           <td>{{ rightRuns2 + "-" + rightWickets2 }}</td>
         </tr>
@@ -73,11 +70,10 @@
     </div>
   </div>
 </div>
-<br>
-<div class="row">
+<div ng-show="showLegend" class="row">
   <div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <h3>Color Key</h3>
-    <color-legend></color-legend>
+    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver"></color-legend>
   </div>
 </div>
 <div class="container-fluid" autoscroll="true" ui-view></div>
