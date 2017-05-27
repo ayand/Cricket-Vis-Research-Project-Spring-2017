@@ -11,6 +11,14 @@ angular.module('myApp').directive('colorLegend', function() {
         return over >= min && over <= max;
     }
 
+    var correctZone = function(zone) {
+        if (zone <= 4) {
+            return 5 - zone;
+        } else {
+            return 13 - zone;
+        }
+    }
+
     var decideColor = function(d) {
       if (isWicketBall(d)) {
           return "rgb(222, 45, 38)";
@@ -37,7 +45,10 @@ angular.module('myApp').directive('colorLegend', function() {
             min1: '=',
             max1: '=',
             min2: '=',
-            max2: '='
+            max2: '=',
+            batsmen: '=',
+            bowlers: '=',
+            inning: '='
         },
         link: function(scope, element, attrs) {
           var legend = d3.select(element[0])
@@ -100,26 +111,71 @@ angular.module('myApp').directive('colorLegend', function() {
                     }
                 })
 
-                d3.selectAll(".ballBar1").style("opacity", function(d) {
-                    if (inOverRange(d, scope.min1, scope.max1) && decideColor(d) == color) {
-                        return 1;
-                    } else {
-                        return 0.2;
-                    }
-                })
+                if (!(scope.inning === 1 || scope.inning === 2)) {
+                  d3.selectAll(".ballBar1").style("opacity", function(d) {
+                      if (decideColor(d) == color) {
+                          return 1;
+                      } else {
+                          return 0.2;
+                      }
+                  })
 
-                d3.selectAll(".ballBar2").style("opacity", function(d) {
-                    if (inOverRange(d, scope.min2, scope.max2) && decideColor(d) == color) {
-                        return 1;
-                    } else {
-                        return 0.2;
-                    }
-                })
+                  d3.selectAll(".ballBar2").style("opacity", function(d) {
+                      if (decideColor(d) == color) {
+                          return 1;
+                      } else {
+                          return 0.2;
+                      }
+                  })
+                } else {
+                    var activeClassName = (scope.inning == 1) ? ".ballBar1" : ".ballBar2";
+                    var inactiveClassName = (scope.inning == 1) ? ".ballBar2" : ".ballBar1";
+                    var activeMin = (scope.inning == 1) ? scope.min1 : scope.min2;
+                    var activeMax = (scope.inning == 1) ? scope.max1 : scope.max2;
+
+                    d3.selectAll(inactiveClassName).style("opacity", function(d) {
+                        if (decideColor(d) == color) {
+                            return 1;
+                        } else {
+                            return 0.2;
+                        }
+                    });
+
+                    var zoneColors = [];
+                    d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                        zoneColors.push(e.attributes.fill.value);
+                    });
+
+                    d3.selectAll(activeClassName).style("opacity", function(d) {
+                        var overCondition = inOverRange(d, activeMin, activeMax);
+                        var batsmanCondition = true;
+                        if (scope.batsmen.length != 0) {
+                            batsmanCondition = scope.batsmen.includes(d.batsman);
+                        }
+                        var bowlerCondition = true;
+                        if (scope.bowlers.length != 0) {
+                            bowlerCondition = scope.bowlers.includes(d.bowler);
+                        }
+                        var zoneCondition = true;
+                        if (d.z == 0) {
+                            zoneCondition = !zoneColors.includes("gray");
+                        } else {
+                            zoneCondition = (zoneColors[correctZone(d.z) - 1] != "gray");
+                        }
+                        if (overCondition && batsmanCondition && bowlerCondition && zoneCondition && decideColor(d) == color) {
+                            return 1;
+                        } else {
+                            return 0.2;
+                        }
+                    })
+                }
+
+
             })
             .on("mouseout", function() {
                 d3.selectAll(".dot").style("opacity", 1);
 
-                d3.selectAll(".ballBar1").style("opacity", function(d) {
+                /*d3.selectAll(".ballBar1").style("opacity", function(d) {
                     if (inOverRange(d, scope.min1, scope.max1)) {
                         return 1;
                     } else {
@@ -133,7 +189,49 @@ angular.module('myApp').directive('colorLegend', function() {
                     } else {
                         return 0.2;
                     }
-                })
+                })*/
+
+                if (!(scope.inning === 1 || scope.inning === 2)) {
+                  d3.selectAll(".ballBar1").style("opacity", 1)
+
+                  d3.selectAll(".ballBar2").style("opacity", 1)
+                } else {
+                  var activeClassName = (scope.inning == 1) ? ".ballBar1" : ".ballBar2";
+                  var inactiveClassName = (scope.inning == 1) ? ".ballBar2" : ".ballBar1";
+                  var activeMin = (scope.inning == 1) ? scope.min1 : scope.min2;
+                  var activeMax = (scope.inning == 1) ? scope.max1 : scope.max2;
+
+                  d3.selectAll(inactiveClassName).style("opacity", 1);
+
+                  var zoneColors = [];
+                  d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                      zoneColors.push(e.attributes.fill.value);
+                  });
+                  console.log(zoneColors);
+
+                  d3.selectAll(activeClassName).style("opacity", function(d) {
+                      var overCondition = inOverRange(d, activeMin, activeMax);
+                      var batsmanCondition = true;
+                      if (scope.batsmen.length != 0) {
+                          batsmanCondition = scope.batsmen.includes(d.batsman);
+                      }
+                      var bowlerCondition = true;
+                      if (scope.bowlers.length != 0) {
+                          bowlerCondition = scope.bowlers.includes(d.bowler);
+                      }
+                      var zoneCondition = true;
+                      if (d.z == 0) {
+                          zoneCondition = !zoneColors.includes("gray");
+                      } else {
+                          zoneCondition = (zoneColors[correctZone(d.z) - 1] != "gray");
+                      }
+                      if (overCondition && batsmanCondition && bowlerCondition && zoneCondition) {
+                          return 1;
+                      } else {
+                          return 0.2;
+                      }
+                  })
+                }
             })
 
           legendItem.append('text')

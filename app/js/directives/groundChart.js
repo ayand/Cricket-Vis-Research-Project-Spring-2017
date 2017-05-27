@@ -6,7 +6,7 @@ angular.module('myApp').directive('groundChart', function() {
     var topEnd = (svgDimension / 2) + innerRadius;
 
     var colorScales = [
-      ["#D95F0E"],
+      ["#FFF7BC"],
       ["#FFF7BC", "#D95F0E"],
       ["#FFF7BC", "#FEC44F", "#D95F0E"],
       ["#FFFFD4", "#FED98E", "#FE9929", "#CC4C02"],
