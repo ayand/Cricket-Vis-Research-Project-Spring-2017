@@ -26,6 +26,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $scope.team2 = match.team2_name;
               $scope.date = match.date.split(" ")[0];
               $scope.ground = match.ground_name;
+              $scope.result = match.result;
               $state.go('home.match', { id: match.match_id });
           }
       }
