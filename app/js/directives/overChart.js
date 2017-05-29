@@ -166,7 +166,7 @@ angular.module('myApp')
           .attr("transform", "translate(0, " + (height - margin) + ")")
           .call(overAxis)
 
-          console.log(scope.hoverswitch)
+          //console.log(scope.hoverswitch)
 
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
@@ -187,7 +187,7 @@ angular.module('myApp')
             })
 
             scope.$watch('hoverswitch', function(newVal, oldVal) {
-                console.log(newVal);
+                //console.log(newVal);
                 if (newVal) {
                   d3.selectAll('.' + className)
                     .on("mouseover", function(d) {
