@@ -97,11 +97,11 @@ angular.module('myApp').directive('colorLegend', function() {
                 return legendColors(i)
             })
             .on("mouseover", function() {
-                console.log("enter");
+                //console.log("enter");
                 //console.log(d3.select(this)._groups[0][0].style.fill)
                 var color = d3.select(this)._groups[0][0].style.fill;
-                console.log("Color: " + color);
-                console.log(color == "rgb(204, 204, 204)")
+                /*console.log("Color: " + color);
+                console.log(color == "rgb(204, 204, 204)")*/
                 //d3.selectAll(".dot").style('opacity', 0.2)
                 d3.selectAll(".dot").style("opacity", function(d) {
                     if (decideColor(d) == color) {
@@ -207,7 +207,7 @@ angular.module('myApp').directive('colorLegend', function() {
                   d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
                       zoneColors.push(e.attributes.fill.value);
                   });
-                  console.log(zoneColors);
+                  //console.log(zoneColors);
 
                   d3.selectAll(activeClassName).style("opacity", function(d) {
                       var overCondition = inOverRange(d, activeMin, activeMax);

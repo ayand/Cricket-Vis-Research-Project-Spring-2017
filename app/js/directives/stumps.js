@@ -68,7 +68,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
-              .attr("fill", "#B07942");
+              .attr("fill", "#FAE3A1");
 
           window.append("rect")
               .attr("height", 137.46)
@@ -77,7 +77,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
-              .attr("fill", "#B07942");
+              .attr("fill", "#FAE3A1");
 
           window.append("rect")
               .attr("height", 137.46)
@@ -86,7 +86,7 @@ angular.module('myApp').directive('stumps', function() {
               .attr("y", (svgDimension - 137.46))
               .attr("rx", 4)
               .attr("rx", 4)
-              .attr("fill", "#B07942");
+              .attr("fill", "#FAE3A1");
 
           window.append("rect")
               .attr("width", 20)

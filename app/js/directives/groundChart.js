@@ -233,7 +233,7 @@ angular.module('myApp').directive('groundChart', function() {
                                       })
                                       .style("stroke", "#CCCCCC")
                                       .on("mouseover", function(d, i) {
-                                          console.log(zoneScores[i])
+                                          //console.log(zoneScores[i])
                                       });
                               })
                           })

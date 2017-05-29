@@ -138,37 +138,37 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("cx", (svgDimension / 2))
               .attr("cy", (trueY + (24.4 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 13)
+              .attr("cx", (svgDimension / 2) - 9)
               .attr("cy", (trueY + (24.4 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 13)
+              .attr("cx", (svgDimension / 2) + 9)
               .attr("cy", (trueY + (24.4 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
               .attr("cy", (trueY + (426.8 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 13)
+              .attr("cx", (svgDimension / 2) - 9)
               .attr("cy", (trueY + (426.8 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 13)
+              .attr("cx", (svgDimension / 2) + 9)
               .attr("cy", (trueY + (426.8 * 1.2)))
               .attr("r", 3 * 1.2)
-              .attr("fill", "#683F16");
+              .attr("fill", "#FAE3A1");
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
           var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
@@ -276,7 +276,7 @@ angular.module('myApp').directive('pitchChart', function() {
 
             if (zoneColors.length == 0) {
               d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                  console.log("Colors: " + e.attributes.fill.value)
+                  //console.log("Colors: " + e.attributes.fill.value)
                   zoneColors.push(e.attributes.fill.value);
               });
             }
@@ -521,7 +521,7 @@ angular.module('myApp').directive('pitchChart', function() {
                                     });
                                   }
                                   selectedZone = d.data.zone;
-                                  console.log(zoneColors);
+                                  //console.log(zoneColors);
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(path, i) {
                                           if (selectedZone == path.data.zone) {
@@ -553,7 +553,7 @@ angular.module('myApp').directive('pitchChart', function() {
 
                                   d3.selectAll(activeClassName)
                                     .style("opacity",function(d){
-                                      console.log("Dealing with active class");
+                                      //console.log("Dealing with active class");
                                       var batsmanCondition = true;
                                       if (newBatsmen.length != 0) {
                                           batsmanCondition = newBatsmen.includes(d.batsman);
