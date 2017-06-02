@@ -1,12 +1,12 @@
 <div class="row">
   <div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <h3>Color Key</h3>
-    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver" batsmen="currentBatsmen" bowlers="currentBowlers" inning="inning"></color-legend>
+    <!-- <h3>Color Key</h3> -->
+    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver" batsmen="currentBatsmen" bowlers="currentBowlers" inning="inning"></color-legend>    
   </div>
 </div>
 <h3 align="center">{{ "Inning " + inning}}</h3>
 <div class="row">
-  <div style="border-left: 1px solid black" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Pitch Map</h3>
     <pitch-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></pitch-chart>
   </div>
@@ -14,7 +14,7 @@
     <h3>Stumps</h3>
     <stumps balls="inningBalls" dictionary="$parent.playerDict" batsmen="currentBatsmen" min="slider.minimumOver" max="slider.maximumOver"></stumps>
   </div>
-  <div style="border-right: 1px solid black" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <div style="border-left: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Ground Map</h3>
     <ground-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></ground-chart>
   </div>

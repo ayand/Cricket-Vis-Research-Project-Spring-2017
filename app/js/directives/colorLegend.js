@@ -55,6 +55,8 @@ angular.module('myApp').directive('colorLegend', function() {
             .append("svg")
               .attr("width", width)
               .attr("height", height)
+              // .style("border-top","1px solid #dbdbdb")
+              // .style("border-bottom","1px solid #dbdbdb")
 
           legend.append('rect')
               .attr("x", 0)
@@ -96,6 +98,7 @@ angular.module('myApp').directive('colorLegend', function() {
             .style("fill", function (d, i) {
                 return legendColors(i)
             })
+            .style("cursor","pointer")
             .on("mouseover", function() {
                 //console.log("enter");
                 //console.log(d3.select(this)._groups[0][0].style.fill)
