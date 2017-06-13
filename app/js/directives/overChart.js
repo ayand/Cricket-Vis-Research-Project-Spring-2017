@@ -57,7 +57,7 @@ angular.module('myApp')
 
       var decideColor = function(d) {
         if (isWicketBall(d)) {
-            return "#FF9933";
+            return "#DE2D26";
         } else {
             if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
                 return "#CCCCCC";
