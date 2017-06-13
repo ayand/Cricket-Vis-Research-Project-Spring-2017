@@ -124,32 +124,6 @@ angular.module('myApp').directive('groundChart', function() {
               .attr("fill", "#FFFFFF")
               .attr("d", arc2);
 
-              /*var tooltipText = function(d) {
-                  var overNumber = Math.floor(d.ovr) + 1;
-                  var ballNumber = (d.ovr * 10) % 10;
-                  var batsman = d.batsman_name;
-                  var bowler = d.bowler_name;
-                  var runs = d.runs_w_extras;
-                  var scoreType = d.extras_type;
-                  var score = "";
-                  if (scoreType == "Wd") {
-                      score = "Wides";
-                  } else if (scoreType == "Lb") {
-                      score = "Leg byes";
-                  } else if (scoreType == "Nb") {
-                      score = "No Ball";
-                  } else {
-                      score = "Runs"
-                  }
-                  //var wicket = d.wicket;
-                  var line1 = "<strong>Over " + overNumber + ", Ball " + ballNumber + "</strong><br/>";
-                  var line2 = batsman + ": " + runs + " " + score + "<br/>"
-                  var line3 = "Bowled by " + bowler + "<br/>";
-                  var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
-                  var tooltipText = (line1 + line2 + line3 + line4);
-                  return tooltipText;
-              }*/
-
               var selectedZone = 0;
               var idealRadius = 2.5;
 
@@ -176,7 +150,7 @@ angular.module('myApp').directive('groundChart', function() {
                   .attr("r", idealRadius) //Previous value: 3.5
                   .attr("fill", function(d) {
                     if (isWicketBall(d)) {
-                        return "#DE2D26";
+                        return "#FF9933";
                     } else {
                         if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
                             return "#CCCCCC";

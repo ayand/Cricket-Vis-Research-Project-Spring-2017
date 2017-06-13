@@ -1,7 +1,7 @@
 <div class="row">
   <div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <!-- <h3>Color Key</h3> -->
-    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver" batsmen="currentBatsmen" bowlers="currentBowlers" inning="inning"></color-legend>    
+    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver" batsmen="currentBatsmen" bowlers="currentBowlers" inning="inning"></color-legend>
   </div>
 </div>
 <h3 align="center">{{ "Inning " + inning}}</h3>
@@ -11,7 +11,7 @@
     <pitch-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></pitch-chart>
   </div>
   <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-    <h3>Stumps</h3>
+    <h3>Stump Map</h3>
     <stumps balls="inningBalls" dictionary="$parent.playerDict" batsmen="currentBatsmen" min="slider.minimumOver" max="slider.maximumOver"></stumps>
   </div>
   <div style="border-left: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
@@ -23,7 +23,7 @@
   <h3 align="center">Player Stats for Overs {{ slider.minimumOver }} - {{ (slider.maximumOver < maxOvers) ? slider.maximumOver : maxOvers }}</h3>
   <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <h3 align="center">{{ battingTeam + " Batsmen" }}</h3>
-    <h4>Sorting Order</h4>
+    <h4>Sort By</h4>
     <select align="center" ng-model="selectedBatsmanKey">
       <option value="Batting Order">Batting Order</option>
       <option value="Runs Scored">Runs Scored</option>
@@ -49,7 +49,7 @@
   </div>
   <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <h3 align="center">{{ bowlingTeam + " Bowlers" }}</h3>
-    <h4>Sorting Order</h4>
+    <h4>Sort By</h4>
     <select align="center" ng-model="selectedBowlerKey">
       <option value="Bowling Order">Bowling Order</option>
       <option value="Runs Conceded">Runs Conceded</option>
