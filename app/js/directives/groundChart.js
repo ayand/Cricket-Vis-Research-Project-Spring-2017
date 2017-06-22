@@ -5,6 +5,14 @@ angular.module('myApp').directive('groundChart', function() {
     var bottomEnd = (svgDimension / 2) - innerRadius;
     var topEnd = (svgDimension / 2) + innerRadius;
 
+    var correctZone = function(zone) {
+        if (zone <= 4) {
+            return 5 - zone;
+        } else {
+            return 13 - zone;
+        }
+    }
+
     var colorScales = [
       ["#FFF7BC"],
       ["#FFF7BC", "#D95F0E"],
@@ -189,7 +197,7 @@ angular.module('myApp').directive('groundChart', function() {
                                   var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
 
                                   consideredBalls.forEach(function(d) {
-                                      var zone = d.z - 1;
+                                      var zone = correctZone(d.z) - 1;
                                       zoneScores[zone] += d.runs_w_extras;
                                   });
 
