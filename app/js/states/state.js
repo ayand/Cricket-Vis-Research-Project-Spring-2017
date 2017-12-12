@@ -3,12 +3,209 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
   $stateProvider
     .state('home', {
+      url: '/',
+      templateUrl: 'partials/system-home.html',
+      controller: function($scope, $state) {
+          $scope.atHome = true;
+          $scope.seeMatches = function() {
+              $scope.atHome = false;
+              $state.go('home.matches');
+          }
+
+          $scope.seeMatchups = function() {
+              $scope.atHome = false;
+              $state.go('home.matchup');
+          }
+      }
+    })
+    .state('home.matchup', {
+      resolve: {
+          players: ['GameService', function(GameService) {
+              return GameService.getPlayerList();
+          }],
+          playerDict: ['GameService', function(GameService) {
+              return GameService.getPlayers();
+          }],
+          images: ['GameService', function(GameService) {
+              return GameService.getPlayerImages();
+          }],
+          games: ['GameService', function(GameService) {
+              return GameService.getGames();
+          }]
+      },
+      url: '/matchups',
+      templateUrl: 'partials/matchup.html',
+      controller: function($scope, $state, players, playerDict, images, GameService, games) {
+
+          $scope.teams = d3.nest()
+              .key(function(d) { return d.team; })
+              .sortKeys(d3.ascending)
+              .entries(players);
+
+          $scope.images = images;
+
+          $scope.otherTeams = [];
+
+          $scope.representedGames = [];
+
+          $scope.playerDict = playerDict;
+          $scope.consideredBalls = [];
+
+          $scope.showVizes = false;
+
+          $scope.displayedBalls = [];
+
+          $scope.validPlayers = [];
+
+          $scope.selectedBatsman = null;
+          $scope.selectedBowler = null;
+
+          $scope.currentGame = null;
+
+          $scope.selectBatsmanFirst = false;
+          $scope.selectBowlerFirst = false;
+          $scope.selectBatsmanSecond = false;
+          $scope.selectBowlerSecond = false;
+
+          $scope.selectFirstPlayer = false;
+          $scope.selectSecondPlayer = false;
+
+          $scope.$watch('selectBatsmanFirst', function(newVal, oldVal) {
+              if (newVal) {
+                $scope.selectFirstPlayer = true;
+              } else {
+                $scope.selectFirstPlayer = false;
+              }
+          })
+
+          $scope.$watch('selectBowlerFirst', function(newVal, oldVal) {
+              if (newVal) {
+                $scope.selectFirstPlayer = true;
+              } else {
+                $scope.selectFirstPlayer = false;
+              }
+          })
+
+          $scope.reset = function() {
+            //$scope.side = "";
+            $scope.displayedBalls = [];
+
+            $scope.validPlayers = [];
+
+            $scope.selectedBatsman = null;
+            $scope.selectedBowler = null;
+
+            $scope.selectBatsmanFirst = false;
+            $scope.selectBowlerFirst = false;
+            $scope.selectBatsmanSecond = false;
+            $scope.selectBowlerSecond = false;
+
+            $scope.selectFirstPlayer = false;
+            $scope.selectSecondPlayer = false;
+            $scope.showVizes = false;
+            $scope.otherTeams = [];
+            $scope.currentGame = null;
+          }
+
+          $scope.seeGame = function(game) {
+              $scope.currentGame = game;
+          }
+
+          $scope.selectBatsman = function(batsman) {
+              $scope.selectedBatsman = batsman.id;
+              $scope.showVizes = false;
+              if ($scope.selectBatsmanFirst) {
+                  $scope.otherTeams = $scope.teams.filter(function(d) { return d.key != batsman.team; });
+                  $scope.selectBowlerSecond = true;
+                  $scope.selectSecondPlayer = true;
+                  GameService.getBallsByBatsman(batsman.id)
+                      .then(function(result) {
+                          $scope.consideredBalls = result;
+                          $scope.validPlayers = Array.from(new Set($scope.consideredBalls.map(function(d) {
+                              return d.bowler;
+                          })));
+                      });
+              } else {
+                  if (!$scope.validPlayers.includes(batsman.id)) {
+                      return;
+                  }
+                  $scope.displayedBalls = $scope.consideredBalls.filter(function(d) {
+                      return d.bowler == $scope.selectedBowler && d.batsman == $scope.selectedBatsman;
+                  });
+
+                  var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
+                  $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
+                  $scope.representedGames.sort(function(a, b) { return a.match_id - b.match_id });
+                  $scope.showVizes = $scope.displayedBalls.length != 0;
+              }
+          }
+
+          $scope.selectBowler = function(bowler) {
+              $scope.selectedBowler = bowler.id;
+              if ($scope.selectBowlerFirst) {
+                  $scope.otherTeams = $scope.teams.filter(function(d) { return d.key != bowler.team; });
+                  $scope.selectBatsmanSecond = true;
+                  $scope.selectSecondPlayer = true;
+                  GameService.getBallsByBowler(bowler.id)
+                      .then(function(result) {
+                          $scope.consideredBalls = result;
+                          $scope.validPlayers = Array.from(new Set($scope.consideredBalls.map(function(d) {
+                              return d.batsman;
+                          })));
+                      });
+              } else {
+                  if (!$scope.validPlayers.includes(bowler.id)) {
+                      return;
+                  }
+                  $scope.displayedBalls = $scope.consideredBalls.filter(function(d) {
+                      return d.bowler == $scope.selectedBowler && d.batsman == $scope.selectedBatsman;
+                  });
+
+                  var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
+                  $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
+                  $scope.representedGames.sort(function(a, b) { return a.match_id - b.match_id });
+                  $scope.showVizes = $scope.displayedBalls.length != 0;
+              }
+          }
+
+          var teamName = {
+            "Afghanistan": "afghanistan",
+            "Australia": "australia",
+            "Bangladesh": "bangladesh",
+            "England": "england",
+            "India": "india",
+            "Ireland": "ireland",
+            "New Zealand": "nz",
+            "Pakistan": "pakistan",
+            "Scotland": "scotland",
+            "South Africa": "sa",
+            "Sri Lanka": "sl",
+            "United Arab Emirates": "uae",
+            "West Indies": "wi",
+            "Zimbabwe": "zimbabwe"
+          }
+
+          $scope.normalStyling = {
+              "background-color": "#ffffff",
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
+          };
+
+          $scope.selectedStyling = {
+              "background-color": "#cccccc",
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
+          };
+
+      }
+    })
+    .state('home.matches', {
       resolve: {
         games: ['GameService', function(GameService) {
             return GameService.getGames();
         }]
       },
-      url: '/',
+      url: '/matches',
       templateUrl: 'partials/home.html',
       controller: function($scope, $http, $state, games) {
           $scope.team1 = null;
@@ -27,11 +224,11 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $scope.date = match.date.split(" ")[0];
               $scope.ground = match.ground_name;
               $scope.result = match.result;
-              $state.go('home.match', { id: match.match_id });
+              $state.go('home.matches.match', { id: match.match_id });
           }
       }
     })
-    .state('home.match', {
+    .state('home.matches.match', {
       resolve: {
           balls: ['GameService', '$stateParams', function(GameService, $stateParams) {
               return GameService.getGameInfo($stateParams.id)
@@ -229,7 +426,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
               $scope.showLegend = false;
               $scope.hover = false;
-              $state.go('home.match.innings', { number: inning });
+              $state.go('home.matches.match.innings', { number: inning });
           }
 
           $scope.seeBalls = function() {
@@ -241,7 +438,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }
       }
     })
-    .state('home.match.innings', {
+    .state('home.matches.match.innings', {
       resolve: {
         images: ['GameService', function(GameService) {
             return GameService.getPlayerImages();
@@ -394,24 +591,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
           }
 
-          /*$scope.showBatsman = function(batsman, dictionary, imageDict, gameID) {
-            $uibModal.open({
-                "animation": true,
-                "ariaLabelledBy": "modal-title-bottom",
-                "ariaDescribedBy": "modal-body-bottom",
-                "templateUrl": "partials/batsmanInfo.html",
-                "size": "sm",
-                controller: function($scope, $uibModalInstance) {
-                    $scope.displayedPlayer = batsman;
-                    $scope.imageURL = imageDict[batsman.name];
-                    $scope.statistics = dictionary[batsman.id]["games"][gameID]["batting_inning"];
-                    $scope.close = function() {
-                        $uibModalInstance.close(batsman);
-                    }
-                }
-            });
-          }*/
-
           $scope.changeBowlers = function(bowler) {
               if ($scope.activeBowlers.includes(bowler.id)) {
                 if ($scope.currentBowlers.includes(bowler.id)) {
@@ -422,24 +601,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                 }
               }
           }
-
-          /*$scope.showBowler = function(bowler, dictionary, imageDict, gameID) {
-              $uibModal.open({
-                  "animation": true,
-                  "ariaLabelledBy": "modal-title-bottom",
-                  "ariaDescribedBy": "modal-body-bottom",
-                  "templateUrl": "partials/bowlerInfo.html",
-                  "size": "sm",
-                  controller: function($scope, $uibModalInstance) {
-                      $scope.displayedPlayer = bowler;
-                      $scope.imageURL = imageDict[bowler.name];
-                      $scope.statistics = dictionary[bowler.id]["games"][gameID]["bowling_inning"];
-                      $scope.close = function() {
-                          $uibModalInstance.close(bowler);
-                      }
-                  }
-              });
-          }*/
 
           $scope.selectedBatsmanKey = "Batting Order";
           $scope.selectedBowlerKey = "Bowling Order";
@@ -496,8 +657,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   }
 
               }
-
-
 
               for (var i = 0; i < $scope.bowlers.length; i++) {
                   if ($scope.activeBowlers.includes($scope.bowlers[i].id)) {

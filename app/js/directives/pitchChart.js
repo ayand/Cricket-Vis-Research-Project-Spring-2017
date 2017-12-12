@@ -375,6 +375,7 @@ angular.module('myApp').directive('pitchChart', function() {
                               var overCondition = ((over >= newMin) && (over <= newMax));
                               var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
                               //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
+                              //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition)
                               if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
                                   return 'block';
                               } else {

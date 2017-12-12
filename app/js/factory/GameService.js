@@ -17,7 +17,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
           deferred.resolve(data);
       }).error(function(data, status, headers, config) {
         console.log("Error: " + JSON.stringify(data));
-        deferred.rejct();
+        deferred.reject();
       });
       return deferred.promise;
     };
@@ -28,7 +28,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
           deferred.resolve(data);
       }).error(function(data, status, headers, config) {
         console.log("Error: " + JSON.stringify(data));
-        deferred.rejct();
+        deferred.reject();
       });
       return deferred.promise;
     };
@@ -39,7 +39,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
           deferred.resolve(data);
       }).error(function(data, status, headers, config) {
         console.log("Error: " + JSON.stringify(data));
-        deferred.rejct();
+        deferred.reject();
       });
       return deferred.promise;
     };
@@ -50,17 +50,52 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {
           console.log("Error: " + JSON.stringify(data));
-          deferred.rejct();
+          deferred.reject();
         });
         return deferred.promise;
     }
 
+    var getPlayerList = function() {
+        var deferred = $q.defer();
+        $http.get('https://serene-spire-90540.herokuapp.com/players/list').success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            console.log("Error: " + JSON.stringify(data));
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    var getBallsByBatsman = function(batsman) {
+      var deferred = $q.defer();
+      $http.get('https://serene-spire-90540.herokuapp.com/matches/batsman/' + batsman).success(function(data, status, headers, config) {
+          deferred.resolve(data);
+      }).error(function(data, status, headers, config) {
+          console.log("Error: " + JSON.stringify(data));
+          deferred.reject();
+      });
+      return deferred.promise;
+    }
+
+    var getBallsByBowler = function(bowler) {
+      var deferred = $q.defer();
+      $http.get('https://serene-spire-90540.herokuapp.com/matches/bowler/' + bowler).success(function(data, status, headers, config) {
+          deferred.resolve(data);
+      }).error(function(data, status, headers, config) {
+          console.log("Error: " + JSON.stringify(data));
+          deferred.reject();
+      });
+      return deferred.promise;
+    }
 
     return {
         getGameInfo: getGameInfo,
         getPlayers: getPlayers,
         getPlayerImages: getPlayerImages,
         getFlagImages: getFlagImages,
-        getGames: getGames
+        getGames: getGames,
+        getPlayerList: getPlayerList,
+        getBallsByBatsman: getBallsByBatsman,
+        getBallsByBowler: getBallsByBowler
     }
 }]);

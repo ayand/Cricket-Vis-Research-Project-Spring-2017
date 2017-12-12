@@ -219,9 +219,13 @@ angular.module('myApp').directive('stumps', function() {
                             return newBatsmen.includes(d);
                         });
                     }
-                    var hands = Array.from(new Set(batsmen.map(function(d) {
-                        return scope.dictionary[d.toString()]["hand"];
-                    })));
+                    var hands = [];
+                    if (newBatsmen.length != 0) {
+                      var hands = Array.from(new Set(batsmen.map(function(d) {
+                          return scope.dictionary[d.toString()]["hand"];
+                      })));
+                    }
+
                     leftBat.style("opacity", 0);
                     rightBat.style("opacity", 0);
                     if (hands.length == 1) {

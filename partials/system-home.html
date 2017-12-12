@@ -1,0 +1,13 @@
+<div align="center"  style="background-color: #222222; color: white">
+  <h1>CricVis-2015</h1>
+  <!--<h4>A Deeper Look into the 2015 Cricket World Cup</h4>-->
+</div>
+<p align="center">
+    <button type="button" class="btn btn-default btn-sm" ng-click="seeMatches()">Match Analysis</button>
+    <button type="button" class="btn btn-default btn-sm" ng-click="seeMatchups()">Player Matchup</button>
+</p>
+<div class="jumbotron"  align="center" ng-show="atHome">
+  <img class="center-block" src="data/images/cricket_logo.jpg" alt="logo"/><br>
+  <h3>The One-Stop Visual Portal for Exploring the 2015 Cricket World Cup!</h3>
+</div>
+<div ui-view></div>

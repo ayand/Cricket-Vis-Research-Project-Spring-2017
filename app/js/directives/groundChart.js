@@ -195,7 +195,8 @@ angular.module('myApp').directive('groundChart', function() {
                                   });
 
                                   var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
-
+                                  console.log("Number of balls considered:")
+                                  console.log(consideredBalls.length);
                                   consideredBalls.forEach(function(d) {
                                       var zone = correctZone(d.z) - 1;
                                       zoneScores[zone] += d.runs_w_extras;

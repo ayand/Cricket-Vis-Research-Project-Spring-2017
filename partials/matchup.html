@@ -1,0 +1,113 @@
+<div align="center">
+  <h3>Batsman-Bowler Matchup</h3>
+  <br>
+  <br>
+  <div align="center" class="row">
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+          <h4 align="center">Side Selection</h4>
+          <div class="btn-group" ng-hide="selectBowlerFirst || selectBatsmanFirst">
+              <label class="btn btn-default" ng-click="selectBatsmanFirst = true">Select Batsman</label>
+              <label class="btn btn-default" ng-click="selectBowlerFirst = true">Select Bowler</label>
+          </div>
+          <br>
+          <br>
+          <label class="btn btn-danger" ng-click="reset()">Reset</label>
+          <br>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" ng-show="selectFirstPlayer">
+        <h4 align="center" ng-show="selectBatsmanFirst">Batsman Selection</h4>
+        <h4 align="center" ng-show="selectBowlerFirst">Bowler Selection</h4>
+        <br>
+        <div class="playerList">
+          <uib-accordion align="center" close-others="oneAtATime">
+              <div uib-accordion-group ng-repeat="team in teams" class="panel-default" heading="{{ team.key }}" is-open="status.isFirstOpen" is-disabled="status.isFirstDisabled">
+                  <table class="table" cellpadding="10">
+                      <tr ng-repeat="player in team.values" ng-style="((selectBatsmanFirst && selectedBatsman == player.id) || (selectBowlerFirst && selectedBowler == player.id)) ? selectedStyling: normalStyling">
+                          <td>
+                            <img ng-src="{{images[player.name]}}" height="60" alt="batsman"/>
+                          </td>
+                          <td>
+                            <br>
+                            <p style="font-size:16px">{{ player.name }}</p>
+                          </td>
+                          <td>
+                            <br>
+                            <button class="btn btn-default btn-sm" ng-click="selectBatsman(player)" ng-show="selectBatsmanFirst">Select as Batsman</button>
+                            <button class="btn btn-default btn-sm" ng-click="selectBowler(player)" ng-show="selectBowlerFirst">Select as Bowler</button>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+          </uib-accordion>
+        </div>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" ng-show="selectSecondPlayer">
+        <h4 align="center" ng-show="selectBatsmanSecond">Batsman Selection</h4>
+        <h4 align="center" ng-show="selectBowlerSecond">Bowler Selection</h4>
+        <br>
+        <div class="playerList">
+          <uib-accordion align="center" close-others="oneAtATime">
+              <div uib-accordion-group ng-repeat="team in otherTeams" class="panel-default" heading="{{ team.key }}" is-open="status.isFirstOpen" is-disabled="status.isFirstDisabled">
+                  <table class="table" cellpadding="10">
+                      <tr ng-repeat="player in team.values" ng-style="((selectBatsmanSecond && selectedBatsman == player.id) || (selectBowlerSecond && selectedBowler == player.id)) ? selectedStyling: normalStyling">
+                          <td>
+                            <img ng-src="{{images[player.name]}}" height="60" alt="bowler"/>
+                          </td>
+                          <td>
+                            <br>
+                            <p style="font-size:16px">{{ player.name }}</p>
+                          </td>
+                          <td>
+                            <br>
+                            <div ng-show="validPlayers.includes(player.id)">
+                              <button class="btn btn-default btn-sm" ng-click="selectBatsman(player)" ng-show="selectBatsmanSecond">Select as Batsman</button>
+                              <button class="btn btn-default btn-sm" ng-click="selectBowler(player)" ng-show="selectBowlerSecond">Select as Bowler</button>
+                            </div>
+                            <p ng-hide="validPlayers.includes(player.id)" style="color:#993333; font-size:16px; font-weight:bold">No interaction</p>
+                          </td>
+                      </tr>
+                  </table>
+              </div>
+          </uib-accordion>
+        </div>
+      </div>
+  </div>
+  <br>
+  <br>
+  <div ng-show="showVizes">
+      <div class="row">
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="90" alt="batsmanImage"/><br>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="background-color:#cccccc">
+            <h3>{{ playerDict[selectedBatsman.toString()].name + " vs " + playerDict[selectedBowler.toString()].name }}</h3>
+            <h4>Number of balls: {{ displayedBalls.length }}</h4>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <img align="left" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="90" alt="bowlerImage"/><br>
+          </div>
+      </div>
+      <br>
+      <div align="center" class="row">
+          <h3>Games</h3>
+          <div class="btn-group">
+            <label class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
+          </div>
+      </div>
+      <br>
+      <div class="row">
+        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <h3>Pitch Map</h3>
+            <pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>
+        </div>
+        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <h3>Stump Map</h3>
+            <stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>
+        </div>
+        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <h3>Ground Map</h3>
+            <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
+        </div>
+      </div>
+  </div>
+</div>

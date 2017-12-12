@@ -78,6 +78,13 @@ svg {
   overflow-y: auto;
 }
 
+.playerList {
+    max-height: 300px;
+    max-width: 600px;
+    overflow-y: auto;
+    border:1px solid black;
+}
+
 /*.player-table {
   max-width: 650px;
   max-height: 200px;
