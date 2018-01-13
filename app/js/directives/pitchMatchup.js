@@ -248,7 +248,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
               var validBalls = newBalls.filter(function(d) { return d["landing_x"] != null && d["landing_y"] != null; });
 
               var balls = ground.selectAll(".dot")
-                  .data(validBalls);
+                  .data(validBalls, function(d) { return d.delivery_number; });
 
               var ballsEnter = balls.enter().append("circle")
                   .attr("class", "dot")

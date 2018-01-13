@@ -228,7 +228,7 @@ angular.module('myApp').directive('stumpMatchup', function() {
               });
 
               var balls = window.selectAll(".dot")
-                  .data(validBalls);
+                  .data(validBalls, function(d) { return d.delivery_number; });
 
               var ballsEnter = balls.enter().append("circle")
                   .attr("class", "dot")
