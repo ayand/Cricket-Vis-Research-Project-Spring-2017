@@ -191,6 +191,7 @@ angular.module('myApp')
                 if (newVal) {
                   d3.selectAll('.' + className)
                     .on("mouseover", function(d) {
+                        console.log("Hovering!")
                         var over = Math.floor(d.ovr) + 1;
                         if (over >= scope.min && over <= scope.max) {
                           d3.selectAll('.' + className)

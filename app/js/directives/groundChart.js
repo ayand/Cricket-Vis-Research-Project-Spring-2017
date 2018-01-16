@@ -195,8 +195,6 @@ angular.module('myApp').directive('groundChart', function() {
                                   });
 
                                   var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
-                                  console.log("Number of balls considered:")
-                                  console.log(consideredBalls.length);
                                   consideredBalls.forEach(function(d) {
                                       var zone = correctZone(d.z) - 1;
                                       zoneScores[zone] += d.runs_w_extras;
@@ -209,15 +207,17 @@ angular.module('myApp').directive('groundChart', function() {
 
                                   var list = scoreSet.length - 1;
 
+                                  //console.log("Resetting zone colors");
+                                  var zoneColors = [];
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(d, i) {
                                           var score = zoneScores[i];
+                                          zoneColors.push(colorScales[list][scoreSet.indexOf(score)])
                                           return colorScales[list][scoreSet.indexOf(score)];
                                       })
                                       .style("stroke", "#CCCCCC")
-                                      .on("mouseover", function(d, i) {
-                                          //console.log(zoneScores[i])
-                                      });
+
+                                  scope.$emit('zoneColors', zoneColors);
                               })
                           })
                       })

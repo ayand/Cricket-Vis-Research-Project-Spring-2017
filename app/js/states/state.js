@@ -461,6 +461,13 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               return d.inning == $scope.inning;
           });
 
+          $scope.zoneColors = [];
+
+          $scope.$on('zoneColors', function(event, data) {
+              //console.log(data);
+              $scope.zoneColors = data;
+          })
+
           $scope.batsmanIDs = Array.from(new Set($scope.inningBalls.map(function(d) {
               return d.batsman;
           })));
