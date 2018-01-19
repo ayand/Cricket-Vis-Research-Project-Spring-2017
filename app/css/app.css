@@ -78,6 +78,24 @@ svg {
   overflow-y: auto;
 }
 
+.team-list {
+    max-width: 1500px;
+    overflow-x: auto;
+}
+
+.jumbotron {
+    max-width: 1500px;
+}
+
+.team-table {
+    table {
+      th, td {
+          padding: 40px;
+          border: 1px solid black;
+      }
+    }
+}
+
 .playerList {
     max-height: 300px;
     max-width: 600px;

@@ -3,8 +3,9 @@
   <!--<h4>A Deeper Look into the 2015 Cricket World Cup</h4>-->
 </div>
 <p align="center">
-    <button type="button" class="btn btn-default btn-sm" ng-click="seeMatches()">Match Analysis</button>
-    <button type="button" class="btn btn-default btn-sm" ng-click="seeMatchups()">Player Matchup</button>
+    <button type="button" class="btn btn-default btn-sm" ng-click="selectView('home.tournament')">Tournament View</button>
+    <button type="button" class="btn btn-default btn-sm" ng-click="selectView('home.matches')">Match Analysis</button>
+    <button type="button" class="btn btn-default btn-sm" ng-click="selectView('home.matchup')">Player Matchup</button>
 </p>
 <div class="jumbotron"  align="center" ng-show="atHome">
   <img class="center-block" src="data/images/cricket_logo.jpg" alt="logo"/><br>

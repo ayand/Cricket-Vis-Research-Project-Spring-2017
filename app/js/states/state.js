@@ -7,15 +7,33 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       templateUrl: 'partials/system-home.html',
       controller: function($scope, $state) {
           $scope.atHome = true;
-          $scope.seeMatches = function() {
-              $scope.atHome = false;
-              $state.go('home.matches');
-          }
 
-          $scope.seeMatchups = function() {
+          $scope.selectView = function(view) {
               $scope.atHome = false;
-              $state.go('home.matchup');
+              $state.go(view);
           }
+      }
+    })
+    .state('home.tournament', {
+      resolve: {
+          teams: ['GameService', function(GameService) {
+              return GameService.getFlagImages();
+          }]
+      },
+      url: '/tournament',
+      templateUrl: 'partials/tournament-view.html',
+      controller: function($scope, $state, teams) {
+          $scope.teams = [];
+          for (team in teams) {
+              $scope.teams.push({
+                  "name": team,
+                  "image": teams[team]
+              })
+          }
+          $scope.teams.sort(function(a, b) {
+              return a["name"] > b["name"] ? 1 : (a["name"] < b["name"] ? -1 : 0)
+          })
+          console.log($scope.teams);
       }
     })
     .state('home.matchup', {

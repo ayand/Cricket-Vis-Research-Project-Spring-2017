@@ -88,6 +88,28 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
       return deferred.promise;
     }
 
+    var getMatchesByTeam = function(team) {
+        var deferred = $q.defer();
+        $http.get('https://serene-spire-90540.herokuapp.com/matches/team/' + team).success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            console.log("Error: " + JSON.stringify(data));
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
+    var getPlayersByTeam = function(team) {
+        var deferred = $q.defer();
+        $http.get('https://serene-spire-90540.herokuapp.com/players/team/' + team).success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            console.log("Error: " + JSON.stringify(data));
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
     return {
         getGameInfo: getGameInfo,
         getPlayers: getPlayers,
@@ -96,6 +118,8 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
         getGames: getGames,
         getPlayerList: getPlayerList,
         getBallsByBatsman: getBallsByBatsman,
-        getBallsByBowler: getBallsByBowler
+        getBallsByBowler: getBallsByBowler,
+        getMatchesByTeam: getMatchesByTeam,
+        getPlayersByTeam: getPlayersByTeam
     }
 }]);

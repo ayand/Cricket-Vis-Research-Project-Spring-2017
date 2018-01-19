@@ -1,0 +1,28 @@
+<div align="center">
+    <h3>Tournament Analysis</h3>
+    <br>
+    <h4>Select a team to analyze</h4>
+    <br>
+    <div class="team-list">
+        <table class="team-table" style="background-color:#aaaaaa">
+            <tr>
+                <th style="text-align:center; width:100px; cursor:pointer;" ng-repeat="team in teams">
+                    <h6>{{ team['name'] }}</h6>
+                </th>
+            </tr>
+            <tr>
+                <td ng-repeat="team in teams" style="cursor:pointer; width: 100px; padding-right: 20px; img { display: block; margin-left: auto; margin-right: auto; }">
+                    <img style="vertical-align:middle" class="center-block" ng-src="{{ team['image'] }}" height="50" alt="team1Flag"/>
+                    <br>
+                    <br>
+                </td>
+            </tr>
+            <!--<tr>
+                <td align="center" ng-repeat="team in teams" style="cursor:pointer">
+                    <br>
+                    <h6>{{ team['name'] }}</h6>
+                </td>
+            </tr>-->
+        </table>
+    </div>
+</div>
