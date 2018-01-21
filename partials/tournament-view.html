@@ -6,12 +6,12 @@
     <div class="team-list">
         <table class="team-table" style="background-color:#aaaaaa">
             <tr>
-                <th style="text-align:center; width:100px; cursor:pointer;" ng-repeat="team in teams">
+                <th ng-click="selectTeam(team)" style="text-align:center; width:100px; cursor:pointer;" ng-style="team['name'] != selectedTeam ? normalStyling : selectedStyling" ng-repeat="team in teams">
                     <h6>{{ team['name'] }}</h6>
                 </th>
             </tr>
             <tr>
-                <td ng-repeat="team in teams" style="cursor:pointer; width: 100px; padding-right: 20px; img { display: block; margin-left: auto; margin-right: auto; }">
+                <td ng-click="selectTeam(team)" ng-style="team['name'] != selectedTeam ? normalStyling : selectedStyling" ng-repeat="team in teams" style="cursor:pointer; width: 100px; padding-right: 20px; img { display: block; margin-left: auto; margin-right: auto; }">
                     <img style="vertical-align:middle" class="center-block" ng-src="{{ team['image'] }}" height="50" alt="team1Flag"/>
                     <br>
                     <br>
@@ -24,5 +24,7 @@
                 </td>
             </tr>-->
         </table>
+    </div>
+    <div class="container-fluid" autoscroll="true" ui-view></div>
     </div>
 </div>

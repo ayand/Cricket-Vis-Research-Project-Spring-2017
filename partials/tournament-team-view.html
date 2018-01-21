@@ -1,0 +1,18 @@
+<div align="center">
+  <br>
+    <h4>{{ teamName }}</h4>
+    <br>
+    <h5>Tournament Analysis</h5>
+    <br>
+    <div class="btn-group">
+        <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+    </div>
+    <br>
+    <br>
+    <div ng-show="selectedSide == 'Batting'">
+      <tournament-view matches="teamData.batting_balls" team="teamName"></tournament-view>
+    </div>
+    <div ng-show="selectedSide == 'Bowling'">
+      <tournament-view matches="teamData.bowling_balls" team="teamName"></tournament-view>
+    </div>
+</div>

@@ -75,7 +75,7 @@ angular.module('myApp').directive('groundChart', function() {
           var ballY = d3.scaleLinear().range([topEnd - 10, bottomEnd + 10]).domain([0, 360]);
 
           var isWicketBall = function(d) {
-              return d.wicket == true && d.extras_type != "Nb";
+              return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           }
 
           var singleThing = [{ "amount": 1 }]

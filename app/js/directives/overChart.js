@@ -52,7 +52,7 @@ angular.module('myApp')
       teamColors["Sri Lanka"] = "#000099";
 
       var isWicketBall = function(d) {
-          return d.wicket == true && d.extras_type != "Nb";
+          return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
       }
 
       var decideColor = function(d) {

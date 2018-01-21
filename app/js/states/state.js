@@ -33,8 +33,80 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.teams.sort(function(a, b) {
               return a["name"] > b["name"] ? 1 : (a["name"] < b["name"] ? -1 : 0)
           })
-          console.log($scope.teams);
+
+          $scope.teamName = {
+            "Afghanistan": "afghanistan",
+            "Australia": "australia",
+            "Bangladesh": "bangladesh",
+            "England": "england",
+            "India": "india",
+            "Ireland": "ireland",
+            "New Zealand": "nz",
+            "Pakistan": "pakistan",
+            "Scotland": "scotland",
+            "South Africa": "sa",
+            "Sri Lanka": "sl",
+            "United Arab Emirates": "uae",
+            "West Indies": "wi",
+            "Zimbabwe": "zimbabwe"
+          }
+
+          $scope.normalStyling = {
+              "color": "black",
+              "background-color": "#AAAAAA"
+          }
+
+          $scope.selectedStyling = {
+              "color": "white",
+              "background-color": "black",
+              "font-weight": "bold"
+          }
+
+          $scope.selectedTeam = null;
+
+          $scope.selectTeam = function(team) {
+              $scope.selectedTeam = team.name;
+              $state.go('home.tournament.team', { team: $scope.teamName[team.name] })
+          }
+
+          //console.log($scope.teams);
       }
+    })
+    .state('home.tournament.team', {
+        resolve: {
+            matches: ['GameService', '$stateParams', function(GameService, $stateParams) {
+                return GameService.getMatchesByTeam($stateParams.team);
+            }]
+        },
+        url: '/team/:team',
+        templateUrl: "partials/tournament-team-view.html",
+        controller: function($scope, $state, matches, $stateParams) {
+          $scope.teamNameDict = {
+            "afghanistan": "Afghanistan",
+            "australia": "Australia",
+            "bangladesh": "Bangladesh",
+            "england": "England",
+            "india": "India",
+            "ireland": "Ireland",
+            "nz": "New Zealand",
+            "pakistan": "Pakistan",
+            "scotland": "Scotland",
+            "sa": "South Africa",
+            "sl": "Sri Lanka",
+            "uae": "United Arab Emirates",
+            "wi": "West Indies",
+            "zimbabwe": "Zimbabwe"
+          }
+          $scope.teamName = $scope.teamNameDict[$stateParams.team]
+          $scope.teamData = matches;
+          $scope.selectedSide = "Batting";
+          $scope.sides = ["Batting", "Bowling"]
+
+          $scope.selectSide = function(side) {
+              $scope.selectedSide = side;
+          }
+          console.log($scope.teamData);
+        }
     })
     .state('home.matchup', {
       resolve: {
@@ -292,7 +364,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.firstBattingTeam = $scope.firstInning[0].batting_team;
           $scope.firstTotalRuns = $scope.firstInning[$scope.firstInning.length - 1].cumul_runs;
           $scope.fWickets = $scope.firstInning.filter(function(d) {
-              return d.wicket == true && d.extras_type != "Nb";
+              return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           })
           $scope.firstWickets = $scope.fWickets.length;
 
@@ -316,7 +388,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.secondBattingTeam = $scope.secondInning[0].batting_team;
           $scope.secondTotalRuns = $scope.secondInning[$scope.secondInning.length - 1].cumul_runs;
           $scope.sWickets = $scope.secondInning.filter(function(d) {
-              return d.wicket == true && d.extras_type != "Nb";
+              return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           })
           $scope.secondWickets = $scope.sWickets.length;
 
@@ -385,12 +457,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   } else {
                       $scope.leftRuns1 = beforeBalls[beforeBalls.length - 1].cumul_runs;
                       $scope.leftWickets1 = beforeBalls.filter(function(d) {
-                          return d.wicket == true && d.extras_type != "Nb";
+                          return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
                       }).length;
                   }
                   $scope.rightRuns1 = afterBalls[afterBalls.length - 1].cumul_runs;
                   $scope.rightWickets1 = afterBalls.filter(function(d) {
-                      return d.wicket == true && d.extras_type != "Nb";
+                      return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
                   }).length;
                   $scope.finalOver1 = Math.floor(afterBalls[afterBalls.length - 1].ovr) + 1;
               });
@@ -419,12 +491,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   } else {
                       $scope.leftRuns2 = beforeBalls[beforeBalls.length - 1].cumul_runs;
                       $scope.leftWickets2 = beforeBalls.filter(function(d) {
-                          return d.wicket == true && d.extras_type != "Nb";
+                          return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
                       }).length;
                   }
                   $scope.rightRuns2 = afterBalls[afterBalls.length - 1].cumul_runs;
                   $scope.rightWickets2 = afterBalls.filter(function(d) {
-                      return d.wicket == true && d.extras_type != "Nb";
+                      return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
                   }).length;
                   $scope.finalOver2 = Math.floor(afterBalls[afterBalls.length - 1].ovr) + 1;
               });

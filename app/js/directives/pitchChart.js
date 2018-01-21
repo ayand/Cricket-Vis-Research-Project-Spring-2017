@@ -199,7 +199,7 @@ angular.module('myApp').directive('pitchChart', function() {
           }
 
           var isWicketBall = function(d) {
-              return d.wicket == true && d.extras_type != "Nb";
+              return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           }
 
           var tip = d3.tip().attr('class', 'd3-tip');
