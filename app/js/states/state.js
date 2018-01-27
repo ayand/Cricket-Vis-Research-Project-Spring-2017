@@ -8,6 +8,11 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       controller: function($scope, $state) {
           $scope.atHome = true;
 
+          $scope.$on("match", function(event, id) {
+              console.log(id);
+              $state.go('home.matches.match', { "id": id });
+          })
+
           $scope.selectView = function(view) {
               $scope.atHome = false;
               $state.go(view);
@@ -334,7 +339,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       },
       url: '/match/:id',
       templateUrl: 'partials/alternate-match.html',
-      controller: function($scope, balls, players, flags, $state, $stateParams) {
+      controller: function($scope, balls, players, flags, $state, $stateParams, GameService) {
           $scope.showLegend = true;
           $scope.hover = true;
           $scope.gameID = $stateParams.id;
@@ -342,6 +347,20 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.playerDict = players;
           $scope.flags = flags;
           $scope.showBalls = true;
+
+          GameService.getGames().then(function(data) {
+              var relevantGame = data.filter(function(d) { return d.match_id == $stateParams.id })[0];
+              console.log(relevantGame);
+              $scope.date = relevantGame.date.split(" ")[0];
+              $scope.ground = relevantGame.ground_name;
+              $scope.team1 = relevantGame.team1_name;
+              $scope.team2 = relevantGame.team2_name;
+              $scope.result = relevantGame.result;
+          })
+
+          $scope.$on("matchInfo", function(event, data) {
+              console.log("Match info for: " + data);
+          })
 
           $scope.firstInning = balls.filter(function(d) {
               return d.inning == 1;

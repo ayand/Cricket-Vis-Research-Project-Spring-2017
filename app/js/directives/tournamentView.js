@@ -1,6 +1,6 @@
 angular.module('myApp').directive('tournamentView', function() {
-    var yDimension = 850;
-    var xDimension = 1400;
+    var yDimension = 880;
+    var xDimension = 1200;
 
     var isWicketBall = function(d) {
         return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
@@ -40,6 +40,7 @@ angular.module('myApp').directive('tournamentView', function() {
 
             vis.append("rect")
                 .attr("fill", "#FFFFFF")
+                .style("stroke", "black")
                 .attr("width", xDimension)
                 .attr("height", yDimension);
 
@@ -63,7 +64,7 @@ angular.module('myApp').directive('tournamentView', function() {
             })
 
             var overs = [];
-            for (var i = 0; i < 50; i++) {
+            for (var i = 0; i < 70; i++) {
                 overs.push(i);
             }
 
@@ -71,71 +72,142 @@ angular.module('myApp').directive('tournamentView', function() {
                 .domain(overs)
                 .range([20, ((yDimension - 60) / 2)])
 
-            var match = timeline.selectAll(".match")
-                .data(scope.matches)
-                .enter()
-                .append("g")
-                .attr("class", "match")
-                .attr("transform", function(d) {
-                    var xPosition = matchScale(d.key);
-                    var maxOver = d3.max(d.values, function(ball) { return Math.ceil(parseFloat(ball.ovr)) })
-                    //console.log(maxOver);
-                    //var yPosition = 325
-                    var yPosition = d.winning_team != scope.team ? ((yDimension - 60) / 2) - 20 : ((50 - maxOver) * overScale.bandwidth());
-                    //console.log(yPosition);
-                    return "translate(" + xPosition + ", " + yPosition + ")"
-                });
+            var winningMatches = scope.matches.filter(function(d) { return d.winning_team == scope.team; })
+            var losingMatches = scope.matches.filter(function(d) { return d.winning_team != scope.team; })
 
-            match.selectAll(".ball")
-                .data(function(d) {
-                    return d.values;
-                })
-                .enter()
-                .append("rect")
-                .attr("class", "ball")
-                .attr("y", function(d) { return overScale(Math.floor(d.ovr)); })
-                .attr("x", function(d) {
-                    var ballWithinOver = d.ball_within_over - 1;
-                    var ballWidth = maxOverSizes[d.game];
-                    return ballWithinOver * ballWidth;
-                })
-                .attr("rx", 5)
-                .attr("ry", 5)
-                .attr("width", function(d) { return maxOverSizes[d.game] })
-                .attr("height", function(d) { return overScale.bandwidth(); })
-                .attr("fill", function(d) { return decideColor(d); })
-                .style("stroke", "white")
-                .on("mouseover", function(d) {
-                    console.log(d);
-                })
+                var overs = [];
 
-                match.append("rect")
-                    .attr("fill", function(d) {
-                        return d.winning_team == scope.team ? "#33CC33" : "#FF5050"
-                    })
-                    .style("stroke", "black")
-                    .attr("x", 0)
-                    .attr("y", function(d) {
-                        var maxOver = d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) })
-                        var yPosition = 20 + (maxOver * overScale.bandwidth()) + 1
-                        return d.winning_team == scope.team ? 0 : yPosition;
-                    })
-                    .attr("width", matchScale.bandwidth())
-                    .attr("height", 19)
-                    .on("mouseover", function(d) {
-                        console.log(d);
+                for (var i = 1; i <= 50; i++) {
+                    overs.push(i);
+                }
+
+                var winningOverScale = d3.scaleBand().domain(overs).range([((yDimension - 60) / 2), 20]);
+                var losingOverScale = d3.scaleBand().domain(overs).range([((yDimension - 60) / 2), (yDimension - 80)])
+
+                var wins = timeline.selectAll(".win")
+                    .data(winningMatches)
+                    .enter()
+                    .append("g")
+                    .attr("class", "win")
+                    .attr("transform", function(d) {
+                        var xPosition = matchScale(d.key);
+                        return "translate(" + xPosition + ", 0)"
                     });
 
-                match.append("text")
+                wins.append("rect")
+                    .attr("x", 0)
+                    .attr("y", function(d) {
+                        var maxOverPosition = winningOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                        return maxOverPosition - 20;
+                    })
+                    .attr("width", matchScale.bandwidth())
+                    .attr("height", 20)
+                    .attr("fill", "#33CC33")
+                    .on("click", function(d) {
+                        scope.$emit('match', d.key);
+                    })
+                    .style("cursor", "pointer");
+
+                wins.append("text")
                     .attr("x", matchScale.bandwidth() / 2)
                     .attr("y", function(d) {
-                        var maxOver = d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) })
-                        var yPosition = 20 + (maxOver * overScale.bandwidth()) + 15
-                        return d.winning_team == scope.team ? 15 : yPosition;
+                        var maxOverPosition = winningOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                        return maxOverPosition - 5;
                     })
-                    .text(function(d) { return d.opponent; })
                     .style("text-anchor", "middle")
+                    .text(function(d) { return d.opponent; })
                     .style("fill", "white")
+                    .on("click", function(d) {
+                        scope.$emit('match', d.key);
+                    })
+                    .style("cursor", "pointer")
+
+                var winBalls = wins.selectAll(".ball")
+                    .data(function(d) {
+                        return d.values;
+                    })
+                    .enter()
+                    .append("rect")
+                    .attr("class", "ball")
+                    .attr("y", function(d) { return winningOverScale(Math.ceil(d.ovr)); })
+                    .attr("x", function(d) {
+                        var ballWithinOver = d.ball_within_over - 1;
+                        var ballWidth = maxOverSizes[d.game];
+                        return ballWithinOver * ballWidth;
+                    })
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .attr("width", function(d) { return maxOverSizes[d.game] })
+                    .attr("height", function(d) { return winningOverScale.bandwidth(); })
+                    .attr("fill", function(d) { return decideColor(d); })
+                    .style("stroke", "white")
+
+                    var losses = timeline.selectAll(".loss")
+                        .data(losingMatches)
+                        .enter()
+                        .append("g")
+                        .attr("class", "loss")
+                        .attr("transform", function(d) {
+                            var xPosition = matchScale(d.key);
+                            return "translate(" + xPosition + ", 0)"
+                        });
+
+                    losses.append("rect")
+                        .attr("x", 0)
+                        .attr("y", function(d) {
+                            var maxOverPosition = losingOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                            return maxOverPosition + losingOverScale.bandwidth();
+                        })
+                        .attr("width", matchScale.bandwidth())
+                        .attr("height", 20)
+                        .attr("fill", "#FF5050")
+                        .on("click", function(d) {
+                            scope.$emit('match', d.key);
+                        })
+                        .style("cursor", "pointer");
+
+                    losses.append("text")
+                        .attr("x", matchScale.bandwidth() / 2)
+                        .attr("y", function(d) {
+                            var maxOverPosition = losingOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                            return maxOverPosition + losingOverScale.bandwidth() + 15;
+                        })
+                        .style("text-anchor", "middle")
+                        .text(function(d) { return d.opponent; })
+                        .style("fill", "white")
+                        .on("click", function(d) {
+                            scope.$emit('match', d.key);
+                        })
+                        .style("cursor", "pointer")
+
+                    var lossBalls = losses.selectAll(".ball")
+                        .data(function(d) {
+                            return d.values;
+                        })
+                        .enter()
+                        .append("rect")
+                        .attr("class", "ball")
+                        .attr("y", function(d) { return losingOverScale(Math.ceil(d.ovr)); })
+                        .attr("x", function(d) {
+                            var ballWithinOver = d.ball_within_over - 1;
+                            var ballWidth = maxOverSizes[d.game];
+                            return ballWithinOver * ballWidth;
+                        })
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .attr("width", function(d) { return maxOverSizes[d.game] })
+                        .attr("height", function(d) { return losingOverScale.bandwidth(); })
+                        .attr("fill", function(d) { return decideColor(d); })
+                        .style("stroke", "white")
+
+
+                timeline.append("g")
+                    .attr("class", "winningOverAxis")
+                    .call(d3.axisLeft(winningOverScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]))
+
+                timeline.append("g")
+                    .attr("class", "winningOverAxis")
+                    .call(d3.axisLeft(losingOverScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]))
 
                 timeline.append("line")
                     .style("stroke", "black")

@@ -3,7 +3,6 @@
     <h4>{{ teamName }}</h4>
     <br>
     <h5>Tournament Analysis</h5>
-    <br>
     <div class="btn-group">
         <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
     </div>
