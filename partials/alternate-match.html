@@ -27,11 +27,18 @@
 </div>
 <div class="row">
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-    <div ng-show="showBalls">
-      <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
+    <div ng-hide="showSlider2">
+      <div ng-show="showBalls">
+        <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
+      </div>
+      <div ng-show="!showBalls">
+        <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
+      </div>
     </div>
-    <div ng-show="!showBalls">
-      <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
+    <div ng-show="showSlider2">
+        <br>
+        <h4>Timeline for Innings 1 and 2</h4>
+        <over-timeline balls="allBalls"></over-timeline>
     </div>
     <div align="center" ng-show="showLeftComparison">
       <table style="width:720px" align="center" class="table">
@@ -50,11 +57,18 @@
     </div>
   </div>
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-    <div ng-show="showBalls">
-      <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
+    <div ng-hide="showSlider1">
+      <div ng-show="showBalls">
+        <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
+      </div>
+      <div ng-show="!showBalls">
+        <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
+      </div>
     </div>
-    <div ng-show="!showBalls">
-      <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
+    <div ng-show="showSlider1">
+        <br>
+        <h4>Timeline for Inning 1</h4>
+        <over-timeline balls="firstInning"></over-timeline>
     </div>
     <div align="center" ng-show="showRightComparison">
       <table style="width:720px" align="center" class="table">

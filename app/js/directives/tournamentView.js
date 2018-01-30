@@ -98,10 +98,10 @@ angular.module('myApp').directive('tournamentView', function() {
                     .attr("x", 0)
                     .attr("y", function(d) {
                         var maxOverPosition = winningOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
-                        return maxOverPosition - 20;
+                        return maxOverPosition - 40;
                     })
                     .attr("width", matchScale.bandwidth())
-                    .attr("height", 20)
+                    .attr("height", 40)
                     .attr("fill", "#33CC33")
                     .on("click", function(d) {
                         scope.$emit('match', d.key);
@@ -121,6 +121,20 @@ angular.module('myApp').directive('tournamentView', function() {
                         scope.$emit('match', d.key);
                     })
                     .style("cursor", "pointer")
+
+                    wins.append("text")
+                        .attr("x", matchScale.bandwidth() / 2)
+                        .attr("y", function(d) {
+                            var maxOverPosition = winningOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                            return maxOverPosition - 25;
+                        })
+                        .style("text-anchor", "middle")
+                        .text(function(d) { return d.date.split(" ")[0]; })
+                        .style("fill", "white")
+                        .on("click", function(d) {
+                            scope.$emit('match', d.key);
+                        })
+                        .style("cursor", "pointer")
 
                 var winBalls = wins.selectAll(".ball")
                     .data(function(d) {
@@ -159,7 +173,7 @@ angular.module('myApp').directive('tournamentView', function() {
                             return maxOverPosition + losingOverScale.bandwidth();
                         })
                         .attr("width", matchScale.bandwidth())
-                        .attr("height", 20)
+                        .attr("height", 40)
                         .attr("fill", "#FF5050")
                         .on("click", function(d) {
                             scope.$emit('match', d.key);
@@ -170,7 +184,7 @@ angular.module('myApp').directive('tournamentView', function() {
                         .attr("x", matchScale.bandwidth() / 2)
                         .attr("y", function(d) {
                             var maxOverPosition = losingOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
-                            return maxOverPosition + losingOverScale.bandwidth() + 15;
+                            return maxOverPosition + losingOverScale.bandwidth() + 35;
                         })
                         .style("text-anchor", "middle")
                         .text(function(d) { return d.opponent; })
@@ -179,6 +193,20 @@ angular.module('myApp').directive('tournamentView', function() {
                             scope.$emit('match', d.key);
                         })
                         .style("cursor", "pointer")
+
+                        losses.append("text")
+                            .attr("x", matchScale.bandwidth() / 2)
+                            .attr("y", function(d) {
+                                var maxOverPosition = losingOverScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
+                                return maxOverPosition + losingOverScale.bandwidth() + 15;
+                            })
+                            .style("text-anchor", "middle")
+                            .text(function(d) { return d.date.split(" ")[0]; })
+                            .style("fill", "white")
+                            .on("click", function(d) {
+                                scope.$emit('match', d.key);
+                            })
+                            .style("cursor", "pointer")
 
                     var lossBalls = losses.selectAll(".ball")
                         .data(function(d) {

@@ -9,9 +9,11 @@
     <br>
     <br>
     <div ng-show="selectedSide == 'Batting'">
-      <tournament-view matches="teamData.batting_balls" team="teamName"></tournament-view>
+      <!--<tournament-view matches="teamData.batting_balls" team="teamName"></tournament-view>-->
+      <tournament-timeline matches="teamData.batting_balls" team="teamName"></tournament-timeline>
     </div>
     <div ng-show="selectedSide == 'Bowling'">
-      <tournament-view matches="teamData.bowling_balls" team="teamName"></tournament-view>
+      <!--<tournament-view matches="teamData.bowling_balls" team="teamName"></tournament-view>-->
+      <tournament-timeline matches="teamData.bowling_balls" team="teamName"></tournament-timeline>
     </div>
 </div>
