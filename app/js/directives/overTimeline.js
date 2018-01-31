@@ -1,5 +1,5 @@
 angular.module('myApp').directive('overTimeline', function() {
-  var height = 450;
+  var height = 475;
   var width = 720;
   var margin = 60;
 
@@ -22,7 +22,9 @@ angular.module('myApp').directive('overTimeline', function() {
   return {
       restrict: "E",
       scope: {
-          balls: "="
+          balls: "=",
+          min: '=',
+          max: '='
       },
       link: function(scope, element, attrs) {
         var vis = d3.select(element[0])
@@ -143,6 +145,24 @@ angular.module('myApp').directive('overTimeline', function() {
             .attr("y", height - 20)
             .text("Over")
             .style("text-anchor", "end");
+
+        scope.$watch('min', function(newMin, oldMin) {
+            scope.$watch('max', function(newMax, oldMax) {
+
+                overs.style("display", function(d) {
+                    var greaterThan = d.key >= newMin;
+                    var lessThan = d.key <= newMax;
+                    console.log("Changing")
+                    return greaterThan && lessThan ? "block" : "none";
+                });
+
+                lines.style("display", function(d) {
+                    var greaterThan = d.over1 >= newMin;
+                    var lessThan = d.over2 <= newMax;
+                    return greaterThan && lessThan ? "block" : "none";
+                })
+            })
+        })
 
         console.log("Successful");
 

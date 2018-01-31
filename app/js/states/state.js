@@ -338,7 +338,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }]
       },
       url: '/match/:id',
-      templateUrl: 'partials/alternate-match.html',
+      templateUrl: 'partials/alternate-match-2.html',
       controller: function($scope, balls, players, flags, $state, $stateParams, GameService) {
           $scope.showLegend = true;
           $scope.hover = true;

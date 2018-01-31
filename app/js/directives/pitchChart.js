@@ -25,9 +25,7 @@ angular.module('myApp').directive('pitchChart', function() {
           var zoneColors = [];
 
           scope.$watchCollection('zoneColors', function(newZones, oldZones) {
-              console.log("New zones");
               zoneColors = newZones;
-              console.log(zoneColors);
           })
 
           var vis = d3.select(element[0])
