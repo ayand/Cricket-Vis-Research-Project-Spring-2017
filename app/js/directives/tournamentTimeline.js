@@ -8,7 +8,7 @@ angular.module('myApp').directive('tournamentTimeline', function() {
 
   var decideColor = function(d) {
     if (isWicketBall(d)) {
-        return "#DE2D26";
+        return "#F45333";
     } else {
         if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
             return "#CCCCCC";
@@ -107,31 +107,16 @@ angular.module('myApp').directive('tournamentTimeline', function() {
             .attr("fill", function(d) {
                 return d.winning_team == scope.team ? 'white' : "#FF5050";
             })
-            .style("opacity", 0.6)
+            .style("opacity", 0.3)
 
-            match.append("rect")
-                .attr("x", 0)
-                .attr("y", function(d) {
-                    var maxOverPosition = overScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
-                    return maxOverPosition - 20;
-                })
-                .attr("width", matchScale.bandwidth())
-                .attr("height", 20)
-                .attr("fill", "#3366FF")
-                .on("click", function(d) {
-                    scope.$emit('match', d.key);
-                })
-                .style("cursor", "pointer");
+            //var label = match.append()
 
             match.append("text")
                 .attr("x", matchScale.bandwidth() / 2)
-                .attr("y", function(d) {
-                    var maxOverPosition = overScale(d3.max(d.values, function(ball) { return Math.ceil(ball.ovr) }));
-                    return maxOverPosition - 5;
-                })
+                .attr("y", 85)
                 .style("text-anchor", "middle")
                 .text(function(d) { return d.opponent; })
-                .style("fill", "white")
+                .style("fill", "black")
                 .on("click", function(d) {
                     scope.$emit('match', d.key);
                 })
@@ -147,8 +132,6 @@ angular.module('myApp').directive('tournamentTimeline', function() {
                 var ballWidth = maxOverSizes[d.game];
                 return ballWithinOver * ballWidth;
             })
-            .attr("rx", 5)
-            .attr("ry", 5)
             .attr("width", function(d) { return maxOverSizes[d.game] })
             .attr("height", function(d) { return overScale.bandwidth(); })
             .attr("fill", function(d) { return decideColor(d); })

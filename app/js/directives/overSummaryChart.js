@@ -69,7 +69,7 @@ angular.module('myApp').directive('overSummaryChart', function() {
                 if (d.key == "runs") {
                     return teamColors[scope.team];
                 } else {
-                    return "#DE2D26"
+                    return "#F45333"
                 }
               })
           .selectAll("rect")

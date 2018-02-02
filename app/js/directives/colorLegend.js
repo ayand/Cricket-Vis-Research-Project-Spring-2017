@@ -3,7 +3,7 @@ angular.module('myApp').directive('colorLegend', function() {
     var height = 80;
 
     var isWicketBall = function(d) {
-        return d.wicket == true && d.extras_type != "Nb";
+        return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
     }
 
     var inOverRange = function(d, min, max) {
@@ -21,7 +21,7 @@ angular.module('myApp').directive('colorLegend', function() {
 
     var decideColor = function(d) {
       if (isWicketBall(d)) {
-          return "rgb(222, 45, 38)";
+          return "rgb(247, 96, 66)";
       } else {
           if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
               return "rgb(204, 204, 204)";
@@ -69,7 +69,7 @@ angular.module('myApp').directive('colorLegend', function() {
 
           var legendColors = d3.scaleOrdinal()
               .domain(["Non-Boundary", "Boundary", "Extra", "Wicket", "Dot Ball"])
-              .range(["#43A2CA", "#0868AC", "#7BCCC4", "#DE2D26", "#CCCCCC"]);
+              .range(["#43A2CA", "#0868AC", "#7BCCC4", "#F45333", "#CCCCCC"]);
 
           var ballTypes = ["Non-Boundary", "Boundary", "Extra", "Wicket", "Dot Ball"];
 

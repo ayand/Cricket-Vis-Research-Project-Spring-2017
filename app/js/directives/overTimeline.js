@@ -52,7 +52,8 @@ angular.module('myApp').directive('overTimeline', function() {
             .key(function(d) { return Math.ceil(d.ovr); })
             .rollup(function(leaves) { return {
                   "maxScore": d3.max(leaves, function(d) { return d.cumul_runs; }),
-                  "team": leaves[0].batting_team
+                  "team": leaves[0].batting_team,
+                  "wickets": leaves.filter(function(d) { return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd" })
               } })
             .entries(scope.balls);
 
@@ -82,21 +83,35 @@ angular.module('myApp').directive('overTimeline', function() {
             .style("stroke", function(d) { return teamColors[d.key] });
 
         var lines = inning.selectAll(".segment")
-            .data(function(d) { return d.lines; })
+            .data(function(d) { console.log(d); return d.lines; })
             .enter().append("line")
             .attr("class", "segment")
             .attr("x1", function(d) { return overScale(d.over1); })
             .attr("y1", function(d) { return runScale(d.score1); })
             .attr("x2", function(d) { return overScale(d.over2); })
             .attr("y2", function(d) { return runScale(d.score2); })
+            .style("stroke-width", 2);
 
-        var overs = inning.selectAll(".over")
+        var wicket = inning.selectAll(".wicket")
             .data(function(d) { return d.values; })
+            .enter().append("g")
+            .attr("class", "wicket")
+            .attr("transform", function(d) {
+                return "translate("+[overScale(d.key), runScale(d.value.maxScore)]+")"
+            });
+
+        var wicketBall = wicket.selectAll(".wicketBall")
+            .data(function(d) { return d.value.wickets; })
             .enter().append("circle")
-            .attr("class", "over")
-            .attr("cx", function(d) { return overScale(d.key); })
-            .attr("cy", function(d) { return runScale(d.value.maxScore); })
-            .attr("r", 3);
+            .attr("class", "wicketBall")
+            .attr("r", 3)
+            .attr("transform", function(d, i) {
+                var direction = d.inning == 1 ? -1 : 1;
+                var y = direction * i * 7;
+                return "translate("+[0,y]+")";
+            })
+            .attr("fill", "#F45333");
+
 
         var teamNames = data.map(function(d) { return d.key; });
 
@@ -149,17 +164,15 @@ angular.module('myApp').directive('overTimeline', function() {
         scope.$watch('min', function(newMin, oldMin) {
             scope.$watch('max', function(newMax, oldMax) {
 
-                overs.style("display", function(d) {
-                    var greaterThan = d.key >= newMin;
-                    var lessThan = d.key <= newMax;
-                    console.log("Changing")
-                    return greaterThan && lessThan ? "block" : "none";
-                });
-
                 lines.style("display", function(d) {
                     var greaterThan = d.over1 >= newMin;
                     var lessThan = d.over2 <= newMax;
                     return greaterThan && lessThan ? "block" : "none";
+                })
+
+                wicketBall.style("display", function(d) {
+                    var o = Math.ceil(d.ovr);
+                    return (o >= newMin && o <= newMax) ? "block" : "none";
                 })
             })
         })
