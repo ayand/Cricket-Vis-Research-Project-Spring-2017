@@ -1,0 +1,28 @@
+<div align="center">
+  <br>
+    <h4>{{ teamName }}</h4>
+    <br>
+    <h5>Tournament Analysis</h5>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-3 col-md-3 col-lg-3">
+            <h4 align="center">Team Players</h4>
+            <br>
+            <div class="player-list">
+              <table>
+                  <tr style="cursor:pointer" ng-repeat="player in players" ng-style="selected.includes(player.id) ? playerStyling : normalStyling" ng-click="clickPlayer(player.id)">
+                      <td>
+                        <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="60" alt="bowlerImage"/><br>
+                      </td>
+                      <td>{{ player.name }}</td>
+                  </tr>
+              </table>
+            </div>
+        </div>
+        <div class="col-sm-9 col-md-9 col-lg-9">
+            <tournament-display data="teamData" team="teamName" selected-players="selected"></tournament-display>
+        </div>
+    </div>
+
+</div>

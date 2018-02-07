@@ -81,11 +81,17 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         resolve: {
             matches: ['GameService', '$stateParams', function(GameService, $stateParams) {
                 return GameService.getMatchesByTeam($stateParams.team);
+            }],
+            players: ['GameService', '$stateParams', function(GameService, $stateParams) {
+                return GameService.getPlayersByTeam($stateParams.team);
+            }],
+            playerImages: ['GameService', '$stateParams', function(GameService, $stateParams) {
+                return GameService.getPlayerImages();
             }]
         },
         url: '/team/:team',
-        templateUrl: "partials/tournament-team-view.html",
-        controller: function($scope, $state, matches, $stateParams) {
+        templateUrl: "partials/tournament-display.html",
+        controller: function($scope, $state, matches, players, playerImages, $stateParams) {
           $scope.teamNameDict = {
             "afghanistan": "Afghanistan",
             "australia": "Australia",
@@ -105,7 +111,52 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.teamName = $scope.teamNameDict[$stateParams.team]
           $scope.teamData = matches;
           $scope.selectedSide = "Batting";
-          $scope.sides = ["Batting", "Bowling"]
+          $scope.sides = ["Batting", "Bowling"];
+
+          $scope.players = players;
+          $scope.imageDict = playerImages;
+
+          $scope.selected = [];
+
+          $scope.teamColors = {};
+          $scope.teamColors["India"] = "#0080FF";
+          $scope.teamColors["Bangladesh"] = "#5AAB54";
+          $scope.teamColors["United Arab Emirates"] = "#003366";
+          $scope.teamColors["Scotland"] = "#66B2FF";
+          $scope.teamColors["Ireland"] = "#80FF00";
+          $scope.teamColors["Afghanistan"] = "#0066CC";
+          $scope.teamColors["England"] = "#004C99";
+          $scope.teamColors["South Africa"] = "#006633";
+          $scope.teamColors["Australia"] = "gold";
+          $scope.teamColors["New Zealand"] = "#000000";
+          $scope.teamColors["West Indies"] = "#660000";
+          $scope.teamColors["Pakistan"] = "#00CC00";
+          $scope.teamColors["Zimbabwe"] = "#CC0000";
+          $scope.teamColors["Sri Lanka"] = "#000099";
+
+          $scope.normalStyling = {
+              "color": "black",
+              "background-color": "#ffffff",
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
+          };
+
+          $scope.playerStyling = {
+              "color": "white",
+              "background-color": $scope.teamColors[$scope.teamName],
+              "font-weight": "bold",
+              "border-left": "1px solid #bbbbbb",
+              "border-right": "1px solid #bbbbbb"
+          }
+
+          $scope.clickPlayer = function(id) {
+              if ($scope.selected.includes(id)) {
+                  var index = $scope.selected.indexOf(id);
+                  $scope.selected.splice(index, 1);
+              }  else {
+                  $scope.selected.push(id);
+              }
+          }
 
           $scope.selectSide = function(side) {
               $scope.selectedSide = side;

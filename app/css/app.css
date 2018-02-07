@@ -83,6 +83,24 @@ svg {
     overflow-x: auto;
 }
 
+td {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+div.player-list {
+    overflow-y: auto;
+    max-height: 800px;
+}
+
+.inactiveball {
+    opacity: 0.1;
+}
+
+.activeball {
+    opacity: 1;
+}
+
 .jumbotron {
     max-width: 1500px;
 }

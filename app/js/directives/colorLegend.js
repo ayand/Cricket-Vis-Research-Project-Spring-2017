@@ -21,7 +21,7 @@ angular.module('myApp').directive('colorLegend', function() {
 
     var decideColor = function(d) {
       if (isWicketBall(d)) {
-          return "rgb(247, 96, 66)";
+          return "rgb(244, 83, 51)";
       } else {
           if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
               return "rgb(204, 204, 204)";
