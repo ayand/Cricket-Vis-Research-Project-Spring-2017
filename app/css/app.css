@@ -440,3 +440,19 @@ td {
   bottom: initial;
   left: initial;
 }
+
+.visibleball {
+    display: block;
+}
+
+.invisibleball {
+    display: none;
+}
+
+.visiblebar {
+    opacity: 1;
+}
+
+.invisiblebar {
+    opacity: 0.1;
+}

@@ -50,7 +50,6 @@ angular.module('myApp').directive('pitchChart', function() {
               } else {
                   score = "Runs"
               }
-              //var wicket = d.wicket;
               var line1 = "<strong>Over " + overNumber + ", Ball " + ballNumber + "</strong><br/>";
               var line2 = batsman + ": " + runs + " " + score + "<br/>"
               var line3 = "Bowled by " + bowler + "<br/>";
@@ -185,8 +184,6 @@ angular.module('myApp').directive('pitchChart', function() {
           var idealRadius = 3 * 1.2;
 
           function zoom() {
-
-              //console.log(d3.event.transform);
               d3.select(this).attr("transform", d3.event.transform);
 
               var dots = vis.selectAll(".dot");
@@ -200,6 +197,21 @@ angular.module('myApp').directive('pitchChart', function() {
               return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           }
 
+          var isValidBall = function(d) {
+            var batsmanCondition = true;
+            if (scope.batsmen.length != 0) {
+                batsmanCondition = scope.batsmen.includes(d.batsman);
+            }
+            var bowlerCondition = true;
+            if (scope.bowlers.length != 0) {
+                bowlerCondition = scope.bowlers.includes(d.bowler);
+            }
+            var over = Math.floor(d.ovr) + 1;
+            var overCondition = ((over >= scope.min) && (over <= scope.max));
+            var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
+            return batsmanCondition && bowlerCondition && overCondition && zoneCondition;
+          }
+
           var tip = d3.tip().attr('class', 'd3-tip');
           vis.call(tip);
 
@@ -207,7 +219,6 @@ angular.module('myApp').directive('pitchChart', function() {
           var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
 
           var ballMouseout = function(newMin, newMax, newBatsmen, newBowlers){
-            //console.log(newBatsmen);
             d3.selectAll('.dot').style('opacity',1);
 
             d3.selectAll(".zone-path")
@@ -226,50 +237,15 @@ angular.module('myApp').directive('pitchChart', function() {
 
               d3.selectAll(activeClassName)
                 .style("opacity", function(ball) {
-                    var batsmanCondition = true;
-                    if (newBatsmen.length != 0) {
-                        batsmanCondition = newBatsmen.includes(ball.batsman);
-                    }
-                    var bowlerCondition = true;
-                    if (newBowlers.length != 0) {
-                      bowlerCondition = newBowlers.includes(ball.bowler);
-                    }
-                    var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == ball.z);
-                    var over = Math.floor(ball.ovr) + 1;
-                    if (over >= newMin && over <= newMax && batsmanCondition && bowlerCondition && zoneCondition) {
-                         //console.log('not fading');
+                    if (isValidBall(ball)) {
                        return 1;
-                    } else {
-                       //console.log('fading');
-                       return 0.1;
                     }
+                    return 0.1
                 });
-
-            /*d3.selectAll(activeClassName)
-                .style("opacity", function(ball) {
-                    var batsmanCondition = true;
-                    if (newBatsmen.length != 0) {
-                      batsmanCondition = newBatsmen.includes(d.batsman);
-                    }
-                    var bowlerCondition = true;
-                    if (newBowlers.length != 0) {
-                      bowlerCondition = newBowlers.includes(d.bowler);
-                    }
-                    var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                    var over = Math.floor(ball.ovr) + 1;
-                    if (over >= newMin && over <= newMax && batsmanCondition && bowlerCondition && zoneCondition) {
-                         //console.log('not fading');
-                       return 1;
-                    } else {
-                       //console.log('fading');
-                       return 0.1;
-                    }
-                });*/
             tip.hide();
           };
 
           var ballMouseover = function(curBall){
-            // console.log(curBall)
             d3.selectAll('.dot').style('opacity',function(d){
                 if(d==curBall){
                     return 1;
@@ -280,7 +256,6 @@ angular.module('myApp').directive('pitchChart', function() {
 
             if (zoneColors.length == 0) {
               d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                  //console.log("Colors: " + e.attributes.fill.value)
                   zoneColors.push(e.attributes.fill.value);
               });
             }
@@ -306,9 +281,6 @@ angular.module('myApp').directive('pitchChart', function() {
                     }
             });
             tip.html(tooltipText(curBall)).show();
-            //console.log("x: " + curBall["ended_x"])
-            //console.log("y: " + curBall["ended_y"])
-
           };
 
           var validBalls = scope.balls.filter(function(d) {
@@ -351,7 +323,7 @@ angular.module('myApp').directive('pitchChart', function() {
                 }
               })
 
-          //console.log("Ball drawing done");
+
 
           scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
               scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
@@ -360,85 +332,32 @@ angular.module('myApp').directive('pitchChart', function() {
                       selectedZone = 0;
                       d3.selectAll(".dot")
                           .on("mouseover", function(d) {
-                              //console.log(d.landing_y);
                               ballMouseover(d);
                           })
                           .on("mouseout", function() {
                               ballMouseout(newMin, newMax, newBatsmen, newBowlers);
                           })
-                          .style("display",function(d){
-                              var batsmanCondition = true;
-                              if (newBatsmen.length != 0) {
-                                  batsmanCondition = newBatsmen.includes(d.batsman);
-                              }
-                              var bowlerCondition = true;
-                              if (newBowlers.length != 0) {
-                                  bowlerCondition = newBowlers.includes(d.bowler);
-                              }
-                              var over = Math.floor(d.ovr) + 1;
-                              var overCondition = ((over >= newMin) && (over <= newMax));
-                              var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                              //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                              //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition)
-                              if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                  return 'block';
-                              } else {
-                                  return 'none';
-                              }
+                          .classed("visibleball",function(d){
+                              return isValidBall(d);
+                          })
+                          .classed("invisibleball", function(d) {
+                            return !isValidBall(d);
                           });
 
                           d3.selectAll(activeClassName)
                               .style("opacity", function(ball) {
-                                  var batsmanCondition = true;
-                                  if (newBatsmen.length != 0) {
-                                    batsmanCondition = newBatsmen.includes(ball.batsman);
-                                  }
-                                  var bowlerCondition = true;
-                                  if (newBowlers.length != 0) {
-                                    bowlerCondition = newBowlers.includes(ball.bowler);
-                                  }
-                                  var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == ball.z);
-                                  var over = Math.floor(ball.ovr) + 1;
-                                  if (over >= newMin && over <= newMax && batsmanCondition && bowlerCondition && zoneCondition) {
-                                       //console.log('not fading');
+                                  if (isValidBall(ball)) {
                                      return 1;
-                                  } else {
-                                     //console.log('fading');
-                                     return 0.1;
                                   }
+                                  return 0.1;
                               })
                               .on("mouseover", function(d) {
-                                var batsmanCondition = true;
-                                if (newBatsmen.length != 0) {
-                                    batsmanCondition = newBatsmen.includes(d.batsman);
-                                }
-                                var bowlerCondition = true;
-                                if (newBowlers.length != 0) {
-                                    bowlerCondition = newBowlers.includes(d.bowler);
-                                }
-                                var over = Math.floor(d.ovr) + 1;
-                                var overCondition = ((over >= newMin) && (over <= newMax));
-                                var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                if (isValidBall(d)) {
                                     ballMouseover(d);
-                                } else {
-                                    console.log("Inactive");
                                 }
                               })
                               .on("mouseout", function(d) {
-                                var batsmanCondition = true;
-                                if (newBatsmen.length != 0) {
-                                    batsmanCondition = newBatsmen.includes(d.batsman);
-                                }
-                                var bowlerCondition = true;
-                                if (newBowlers.length != 0) {
-                                    bowlerCondition = newBowlers.includes(d.bowler);
-                                }
-                                var over = Math.floor(d.ovr) + 1;
-                                var overCondition = ((over >= newMin) && (over <= newMax));
-                                var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                if (isValidBall(d)) {
                                   ballMouseout(newMin, newMax, newBatsmen, newBowlers);
                                 }
                               });
@@ -459,14 +378,8 @@ angular.module('myApp').directive('pitchChart', function() {
                           }
 
                           d3.selectAll(".zone-path").on("click", function(d, index) {
-                              //console.log(d3.selectAll(".zone-path"));
-
-                              //console.log("Colors");
-                              //console.log(colors);
                               if (selectedZone == d.data.zone) {
                                   selectedZone = 0;
-                                  //console.log("Zones:");
-                                  //console.log(d3.selectAll(".zone-path")._groups[0][index].attributes.fill.value);
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(path, i) {
                                         console.log("Changing color")
@@ -474,80 +387,29 @@ angular.module('myApp').directive('pitchChart', function() {
                                       })
                                       .style('stroke', '#CCCCCC');
                                   d3.selectAll(".dot")
-                                      .style("display", function(dot) {
-                                          var batsmanCondition = true;
-                                          if (newBatsmen.length != 0) {
-                                              batsmanCondition = newBatsmen.includes(dot.batsman);
-                                          }
-                                          var bowlerCondition = true;
-                                          if (newBowlers.length != 0) {
-                                              bowlerCondition = newBowlers.includes(dot.bowler);
-                                          }
-                                          var over = Math.floor(dot.ovr) + 1;
-                                          var overCondition = ((over >= newMin) && (over <= newMax));
-                                          //var zoneCondition = (selectedZone == 0 || selectedZone == d.z);
-                                          if (batsmanCondition && bowlerCondition && overCondition) {
-                                              return 'block';
-                                          } else {
-                                              return 'none';
-                                          }
-                                  });
+                                      .classed("visibleball",function(d){
+                                          return isValidBall(d);
+                                      })
+                                      .classed("invisibleball", function(d) {
+                                          return !isValidBall(d);
+                                      })
 
                                   d3.selectAll(activeClassName)
                                     .style("opacity",function(d){
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      if (isValidBall(d)) {
                                           return 1;
-                                      } else {
-                                          return 0.1;
                                       }
+                                      return 0.1;
                                     })
                                     .on("mouseover", function(d) {
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                      console.log("Hovering!")
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                          console.log("Hovering!");
+                                      if (isValidBall(d)) {
                                           ballMouseover(d);
                                       } else {
                                           return;
                                       }
-
                                     })
                                     .on("mouseout", function(d) {
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      if (isValidBall(d)) {
                                         ballMouseout(newMin, newMax, newBatsmen, newBowlers);
                                       }
                                     });
@@ -559,7 +421,6 @@ angular.module('myApp').directive('pitchChart', function() {
                                     });
                                   }
                                   selectedZone = d.data.zone;
-                                  //console.log(zoneColors);
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(path, i) {
                                           if (selectedZone == path.data.zone) {
@@ -570,79 +431,28 @@ angular.module('myApp').directive('pitchChart', function() {
                                   })
                                   .style("stroke", "black");
                                   d3.selectAll(".dot")
-                                  .style("display",function(d){
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
-                                          return 'block';
-                                      } else {
-                                          return 'none';
-                                      }
-                                  });
+                                  .classed("visibleball",function(d){
+                                      return isValidBall(d);
+                                  })
+                                  .classed("invisibleball", function(d) {
+                                      return !isValidBall(d);
+                                  })
 
                                   d3.selectAll(activeClassName)
                                     .style("opacity",function(d){
-                                      //console.log("Dealing with active class");
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      if (isValidBall(d)) {
                                           return 1;
-                                      } else {
-                                          return 0.1;
                                       }
+                                      return 0.1;
                                     })
                                     .on("mouseover", function(d) {
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      //console.log(batsmanCondition && bowlerCondition && overCondition && zoneCondition);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      if (isValidBall(d)) {
                                           console.log("Hovering!")
                                           ballMouseover(d);
-                                      } else {
-                                          return;
                                       }
                                     })
                                     .on("mouseout", function(d) {
-                                      var batsmanCondition = true;
-                                      if (newBatsmen.length != 0) {
-                                          batsmanCondition = newBatsmen.includes(d.batsman);
-                                      }
-                                      var bowlerCondition = true;
-                                      if (newBowlers.length != 0) {
-                                          bowlerCondition = newBowlers.includes(d.bowler);
-                                      }
-                                      var over = Math.floor(d.ovr) + 1;
-                                      var overCondition = ((over >= newMin) && (over <= newMax));
-                                      var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-                                      if (batsmanCondition && bowlerCondition && overCondition && zoneCondition) {
+                                      if (isValidBall(d)) {
                                         ballMouseout(newMin, newMax, newBatsmen, newBowlers);
                                       }
                                     });
@@ -656,12 +466,6 @@ angular.module('myApp').directive('pitchChart', function() {
                               .on("mouseout", function() {
                                   return;
                               })
-                          /*zoneColors = [];
-                          d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                              //console.log("Colors: " + e.attributes.fill.value)
-                              console.log("Resetting zone colors");
-                              zoneColors.push(e.attributes.fill.value);
-                          });*/
                       });
                   });
               });
