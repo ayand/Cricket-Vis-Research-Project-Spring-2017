@@ -123,14 +123,6 @@ angular.module('myApp').directive('tournamentDisplay', function() {
               })
               .style("opacity", 0.3)
 
-          /*battingMatch.append("rect")
-              .attr("x", 0)
-              .attr("y", 425)
-              .attr("width", matchScale.bandwidth() + 15)
-              .attr("height", 50)
-              .attr("fill", "none")
-              .style("stroke", "black");*/
-
           battingMatch.append("text")
               .attr("x", matchScale.bandwidth() / 2)
               .attr("y", 35)
