@@ -219,7 +219,7 @@ angular.module('myApp').directive('pitchChart', function() {
           var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
 
           var ballMouseout = function(newMin, newMax, newBatsmen, newBowlers){
-            d3.selectAll('.dot').style('opacity',1);
+            d3.selectAll('.visibleball').style('opacity',1);
 
             d3.selectAll(".zone-path")
                  .attr("fill", function(path, i) {
@@ -246,7 +246,7 @@ angular.module('myApp').directive('pitchChart', function() {
           };
 
           var ballMouseover = function(curBall){
-            d3.selectAll('.dot').style('opacity',function(d){
+            d3.selectAll('.visibleball').style('opacity',function(d){
                 if(d==curBall){
                     return 1;
                 }else{

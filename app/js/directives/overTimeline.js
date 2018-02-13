@@ -110,7 +110,8 @@ angular.module('myApp').directive('overTimeline', function() {
                 var y = direction * i * 7;
                 return "translate("+[0,y]+")";
             })
-            .attr("fill", "#F45333");
+            .attr("fill", "#F45333")
+            .style("stroke", "#F45333");
 
 
         var teamNames = data.map(function(d) { return d.key; });
@@ -129,14 +130,6 @@ angular.module('myApp').directive('overTimeline', function() {
                 inning.style("opacity", 1);
             })
             .style("cursor", "pointer");
-
-        /*legend.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", (width / 2))
-            .attr("height", 40)
-            .attr("fill", "white")
-            .style("stroke", "black")*/
 
         legend.append("circle")
             .attr("cx", 50)
