@@ -66,6 +66,11 @@ angular.module('myApp').directive('pitchChart', function() {
               }
           }
 
+          var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
+          ballX.domain([-1.525, 1.525]);
+          ballY.domain([-1, 20.12]);
+
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
           vis.call(tip);
 
@@ -77,6 +82,10 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("height", svgDimension)
               .attr("fill", "#FFFFFF");
 
+          var leftX = -1;
+          var rightX = -1;
+          var topY = -1;
+          var bottomY = -1;
 
           var ground = vis.append("g")
               .call(d3.zoom().scaleExtent([1, 12]).translateExtent([[0,0], [svgDimension, svgDimension]]).on("zoom", zoom))
@@ -173,10 +182,7 @@ angular.module('myApp').directive('pitchChart', function() {
               .attr("r", 3 * 1.2)
               .attr("fill", "#FAE3A1");
 
-          var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
-          ballX.domain([-1.525, 1.525]);
-          ballY.domain([-1, 20.12]);
+
 
           var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
               "#FF5500", "#FF7700", "#FF9900"];
@@ -209,14 +215,70 @@ angular.module('myApp').directive('pitchChart', function() {
             var over = Math.floor(d.ovr) + 1;
             var overCondition = ((over >= scope.min) && (over <= scope.max));
             var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
-            return batsmanCondition && bowlerCondition && overCondition && zoneCondition;
+
+            var brushXCondition = true;
+            var brushYCondition = true;
+            if (leftX != -1) {
+                brushXCondition = ballX(d["landing_x"]) >= leftX && ballX(d["landing_x"]) <= rightX;
+                if (d["landing_y"] < 0) {
+                    brushYCondition = ballY(-0.25) >= topY && ballY(-0.25) <= bottomY;
+                } else {
+                    brushYCondition = ballY(d["landing_y"]) >= topY && ballY(d["landing_y"]) <= bottomY;
+                }
+            }
+
+            return batsmanCondition && bowlerCondition && overCondition && zoneCondition
+                && brushXCondition && brushYCondition;
           }
+
+          var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+          var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
+
+          var brushstart = function() {
+              console.log("starting");
+          }
+
+          var brushmove = function() {
+              var e = d3.event.selection;
+              if (e) {
+                  leftX = e[0][0];
+                  rightX = e[1][0];
+                  topY = e[0][1];
+                  bottomY = e[1][1];
+                  d3.selectAll(".dot")
+                      .classed("visibleball", function(d) { return isValidBall(d); })
+                      .classed("invisibleball", function(d) { return !isValidBall(d); })
+
+                  d3.selectAll(activeClassName)
+                      .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
+              }
+          }
+
+          var brushend = function() {
+              if (!d3.event.selection) {
+                leftX = -1;
+                rightX = -1;
+                topY = -1;
+                bottomY = -1;
+                d3.selectAll(".dot")
+                    .classed("visibleball", function(d) { return isValidBall(d); })
+                    .classed("invisibleball", function(d) { return !isValidBall(d); })
+
+                d3.selectAll(activeClassName)
+                    .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
+              }
+          }
+
+          var brush = d3.brush()
+              .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
+              .on("start", brushstart)
+              .on("brush", brushmove)
+              .on("end", brushend);
 
           var tip = d3.tip().attr('class', 'd3-tip');
           vis.call(tip);
 
-          var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
-          var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
+
 
           var ballMouseout = function(newMin, newMax, newBatsmen, newBowlers){
             d3.selectAll('.visibleball').style('opacity',1);
@@ -287,8 +349,14 @@ angular.module('myApp').directive('pitchChart', function() {
               return d["landing_x"] != null && d["landing_y"] != null;
           });
 
+          var brushArea = ground.append("g")
+              .attr("class", "brush")
+              .call(brush);
+
           var balls = ground.selectAll(".dot")
               .data(validBalls);
+
+
 
           balls.enter().append("circle")
               .attr("class", "dot")
@@ -322,6 +390,8 @@ angular.module('myApp').directive('pitchChart', function() {
                     }
                 }
               })
+
+
 
 
 
