@@ -4,7 +4,7 @@
     <br>
     <h5>Tournament Analysis</h5>
     <br>
-    <br>
+
     <div class="row">
         <div class="col-sm-3 col-md-3 col-lg-3">
             <h4 align="center">Team Players</h4>
@@ -22,7 +22,13 @@
         </div>
         <div class="col-sm-9 col-md-9 col-lg-9">
             <!--<tournament-display data="teamData" team="teamName" selected-players="selected"></tournament-display>-->
-            <tournament-overview data="teamData" team="teamName" selected-players="selected"></tournament-overview>
+            <div class="btn-group">
+                <button class="btn btn-default" ng-click="changeView('allBalls')">All Tournament Balls</button>
+                <button class="btn btn-default" ng-click="changeView('scoreProgression')">Score Progressions</button>
+            </div>
+            <br>
+            <br>
+            <tournament-overview data="teamData" team="teamName" selected-players="selected" current-view="view"></tournament-overview>
         </div>
     </div>
 

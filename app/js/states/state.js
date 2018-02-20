@@ -158,6 +158,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
           }
 
+          $scope.view = "allBalls";
+
+          $scope.changeView = function(view) {
+              $scope.view = view;
+          }
+
           $scope.selectSide = function(side) {
               $scope.selectedSide = side;
           }

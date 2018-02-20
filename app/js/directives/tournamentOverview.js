@@ -33,7 +33,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
       scope: {
           data: "=",
           team: "=",
-          selectedPlayers: "="
+          selectedPlayers: "=",
+          currentView: "="
       },
       link: function(scope, element, attrs) {
           var getIndex = function(i) {
@@ -94,11 +95,16 @@ angular.module('myApp').directive('tournamentOverview', function() {
               var maxBattingSize = {};
               var maxBowlingSize = {};
 
+              var overScores = [];
+
               scope.data.batting_balls.forEach(function(d) {
                 var overs = d3.nest()
                     .key(function(ball) { return Math.floor(ball.ovr) })
                     .entries(d.values);
                 var maxOverLength = d3.max(overs, function(over) { return over.values.length; });
+                overs.forEach(function(d) {
+                    overScores.push(d3.max(d.values, function(v) { return v.cumul_runs; }))
+                })
                 maxBattingSize[d.key] = matchScale.bandwidth() / maxOverLength;
               })
 
@@ -107,8 +113,22 @@ angular.module('myApp').directive('tournamentOverview', function() {
                     .key(function(ball) { return Math.floor(ball.ovr) })
                     .entries(d.values);
                 var maxOverLength = d3.max(overs, function(over) { return over.values.length; });
+                overs.forEach(function(d) {
+                    overScores.push(d3.max(d.values, function(v) { return v.cumul_runs; }))
+                })
                 maxBowlingSize[d.key] = matchScale.bandwidth() / maxOverLength;
               })
+
+              //console.log("Over scores: " + overScores);
+
+              var scoreRange = d3.extent(overScores);
+
+              var colorLegend = ["#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C",
+                  "#FC4E2A", "#E31A1C", "#BD0026", "#800026"]
+
+              var overColorScale = d3.scaleQuantize()
+                  .domain(scoreRange)
+                  .range(colorLegend);
 
               var battingMatch = vis.selectAll(".battingMatch")
                   .data(scope.data.batting_balls)
@@ -199,7 +219,9 @@ angular.module('myApp').directive('tournamentOverview', function() {
                           .text("Cancelled")
                   }
 
-                      var battingBalls = battingMatch.selectAll(".ball")
+                  var battingBalls = battingMatch.append("g");
+
+                      battingBalls.selectAll(".ball")
                           .data(function(d) { return d.values; })
                           .enter().append("rect")
                           .attr("class", "ball")
@@ -223,7 +245,9 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   return "translate("+[matchScale(getIndex(i)),0]+")"
                               });
 
-                              var bowlingBalls = bowlingMatch.selectAll(".ball")
+                          var bowlingBalls = bowlingMatch.append("g")
+
+                              bowlingBalls.selectAll(".ball")
                                   .data(function(d) { return d.values; })
                                   .enter().append("rect")
                                   .attr("class", "ball")
@@ -238,6 +262,47 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .attr("height", function(d) { return bowlingScale.bandwidth(); })
                                   .attr("fill", function(d) { return decideColor(d); })
                                   .style("stroke", "white")
+
+                          battingBalls.style("opacity", 0);
+                          bowlingBalls.style("opacity", 0);
+
+                          var battingOvers = battingMatch.append("g");
+
+                          battingOvers.selectAll(".over")
+                              .data(function(d) {
+                                  return d3.nest()
+                                      .key(function(k) { return parseInt(Math.ceil(k.ovr)) })
+                                      .rollup(function(leaves) { return d3.max(leaves, function(leaf) { return leaf.cumul_runs; }) })
+                                      .entries(d.values);
+                              })
+                              .enter()
+                              .append("rect")
+                              .attr("class", "over")
+                              .attr("width", matchScale.bandwidth())
+                              .attr("height", battingScale.bandwidth())
+                              .attr("x", 0)
+                              .attr("y", function(d) { return battingScale(d.key) })
+                              .attr("fill", function(d) { return overColorScale(d.value); })
+                              .on("mouseover", function(d) { console.log(overColorScale(d.value)); })
+
+                              var bowlingOvers = bowlingMatch.append("g");
+
+                              bowlingOvers.selectAll(".over")
+                                  .data(function(d) {
+                                      return d3.nest()
+                                          .key(function(k) { return parseInt(Math.ceil(k.ovr)) })
+                                          .rollup(function(leaves) { return d3.max(leaves, function(leaf) { return leaf.cumul_runs; }) })
+                                          .entries(d.values);
+                                  })
+                                  .enter()
+                                  .append("rect")
+                                  .attr("class", "over")
+                                  .attr("width", matchScale.bandwidth())
+                                  .attr("height", bowlingScale.bandwidth())
+                                  .attr("x", 0)
+                                  .attr("y", function(d) { return bowlingScale(d.key) })
+                                  .attr("fill", function(d) { return overColorScale(d.value); })
+                                  .on("mouseover", function(d) { console.log(d); })
 
                           vis.append("g")
                               .attr("class", "batAxis")
@@ -276,6 +341,20 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                           .classed("inactiveball", function(d) {
                                               return !newPlayers.includes(d.batsman) && !newPlayers.includes(d.bowler);
                                           })
+                                  }
+                              })
+
+                              scope.$watch("currentView", function(newVal, oldVal) {
+                                  if (newVal == "allBalls") {
+                                      battingBalls.style("opacity", 1);
+                                      bowlingBalls.style("opacity", 1);
+                                      battingOvers.style("opacity", 0);
+                                      bowlingOvers.style("opacity", 0);
+                                  } else {
+                                      battingBalls.style("opacity", 0);
+                                      bowlingBalls.style("opacity", 0);
+                                      battingOvers.style("opacity", 1);
+                                      bowlingOvers.style("opacity", 1);
                                   }
                               })
       }
