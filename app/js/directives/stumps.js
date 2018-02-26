@@ -47,6 +47,30 @@ angular.module('myApp').directive('stumps', function() {
                   return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
               }
 
+              var stumpX = d3.scaleLinear().range([0, svgDimension]);
+              var stumpY = d3.scaleLinear().range([svgDimension, 0])
+              stumpX.domain([-1.5, 1.5]);
+              stumpY.domain([0, 3]);
+
+              var isValidBall = function(d) {
+                var batsmanCondition = true;
+                if (scope.batsmen.length != 0) {
+                    batsmanCondition = scope.batsmen.includes(d.batsman);
+                }
+                var bowlerCondition = true;
+                if (scope.bowlers.length != 0) {
+                    bowlerCondition = scope.bowlers.includes(d.bowler);
+                }
+                var over = Math.floor(d.ovr) + 1;
+                var overCondition = ((over >= scope.min) && (over <= scope.max));
+                var zoneCondition = (scope.zone == 0 || correctZone(scope.zone) == d.z);
+
+                return batsmanCondition && bowlerCondition && overCondition && zoneCondition;
+              }
+
+              var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
+              var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
+
               var idealRadius = 3;
 
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
@@ -162,10 +186,7 @@ angular.module('myApp').directive('stumps', function() {
               .style("font-weight", "bold")
               .text("R");
 
-          var ballX = d3.scaleLinear().range([0, svgDimension]);
-          var ballY = d3.scaleLinear().range([svgDimension, 0])
-          ballX.domain([-1.5, 1.5]);
-          ballY.domain([0, 3]);
+
 
           var validBalls = scope.balls.filter(function(d) {
               return d["ended_x"] != null && d["ended_y"] != null
@@ -178,10 +199,10 @@ angular.module('myApp').directive('stumps', function() {
           balls.enter().append("circle")
               .attr("class", "dot")
               .attr("cx", function(d) {
-                  return ballX(d["ended_x"]);
+                  return stumpX(d["ended_x"]);
               })
               .attr("cy", function(d) {
-                return ballY(d["ended_y"]);
+                return stumpY(d["ended_y"]);
 
               })
               .attr("r", idealRadius) //Previous value: 3.5

@@ -8,11 +8,23 @@
 <div class="row">
   <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Pitch Map</h3>
-    <pitch-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict" zone-colors="zoneColors"></pitch-chart>
+    <pitch-chart
+      balls="inningBalls"
+      batsmen="currentBatsmen"
+      bowlers="currentBowlers"
+      min="slider.minimumOver"
+      max="slider.maximumOver"
+      dictionary="$parent.playerDict"
+      zone-colors="zoneColors"></pitch-chart>
   </div>
   <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Stump Map</h3>
-    <stumps balls="inningBalls" dictionary="$parent.playerDict" batsmen="currentBatsmen" min="slider.minimumOver" max="slider.maximumOver"></stumps>
+    <stumps
+      balls="inningBalls"
+      dictionary="$parent.playerDict"
+      batsmen="currentBatsmen"
+      min="slider.minimumOver"
+      max="slider.maximumOver"></stumps>
   </div>
   <div style="border-left: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Ground Map</h3>

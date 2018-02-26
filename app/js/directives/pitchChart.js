@@ -66,10 +66,10 @@ angular.module('myApp').directive('pitchChart', function() {
               }
           }
 
-          var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
-          ballX.domain([-1.525, 1.525]);
-          ballY.domain([-1, 20.12]);
+          var pitchX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
+          var pitchY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
+          pitchX.domain([-1.525, 1.525]);
+          pitchY.domain([-1, 20.12]);
 
           var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
           vis.call(tip);
@@ -216,19 +216,19 @@ angular.module('myApp').directive('pitchChart', function() {
             var overCondition = ((over >= scope.min) && (over <= scope.max));
             var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
 
-            var brushXCondition = true;
-            var brushYCondition = true;
+            var pitchXCondition = true;
+            var pitchYCondition = true;
             if (leftX != -1) {
-                brushXCondition = ballX(d["landing_x"]) >= leftX && ballX(d["landing_x"]) <= rightX;
+                pitchXCondition = pitchX(d["landing_x"]) >= leftX && pitchX(d["landing_x"]) <= rightX;
                 if (d["landing_y"] < 0) {
-                    brushYCondition = ballY(-0.25) >= topY && ballY(-0.25) <= bottomY;
+                    pitchYCondition = pitchY(-0.25) >= topY && pitchY(-0.25) <= bottomY;
                 } else {
-                    brushYCondition = ballY(d["landing_y"]) >= topY && ballY(d["landing_y"]) <= bottomY;
+                    pitchYCondition = pitchY(d["landing_y"]) >= topY && pitchY(d["landing_y"]) <= bottomY;
                 }
             }
 
             return batsmanCondition && bowlerCondition && overCondition && zoneCondition
-                && brushXCondition && brushYCondition;
+                && pitchXCondition && pitchYCondition;
           }
 
           var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
@@ -361,13 +361,13 @@ angular.module('myApp').directive('pitchChart', function() {
           balls.enter().append("circle")
               .attr("class", "dot")
               .attr("cx", function(d) {
-                  return ballX(d["landing_x"]);
+                  return pitchX(d["landing_x"]);
               })
               .attr("cy", function(d) {
                 if (d["landing_y"] < 0) {
-                    return ballY(-0.25);
+                    return pitchY(-0.25);
                 } else {
-                    return ballY(d["landing_y"]);
+                    return pitchY(d["landing_y"]);
                 }
               })
               .attr("r", idealRadius) //Previous value: 3.5
@@ -390,10 +390,6 @@ angular.module('myApp').directive('pitchChart', function() {
                     }
                 }
               })
-
-
-
-
 
           scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
               scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
