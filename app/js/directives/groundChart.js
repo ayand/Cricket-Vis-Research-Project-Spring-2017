@@ -208,16 +208,16 @@ angular.module('myApp').directive('groundChart', function() {
                                   var list = scoreSet.length - 1;
 
                                   //console.log("Resetting zone colors");
-                                  var zoneColors = [];
+                                  var zColors = [];
                                   d3.selectAll(".zone-path")
                                       .attr("fill", function(d, i) {
                                           var score = zoneScores[i];
-                                          zoneColors.push(colorScales[list][scoreSet.indexOf(score)])
+                                          zColors.push(colorScales[list][scoreSet.indexOf(score)])
                                           return colorScales[list][scoreSet.indexOf(score)];
                                       })
                                       .style("stroke", "#CCCCCC")
 
-                                  scope.$emit('zoneColors', zoneColors);
+                                  scope.$emit('zoneColors', zColors);
                               })
                           })
                       })

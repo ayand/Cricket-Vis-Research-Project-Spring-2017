@@ -171,7 +171,11 @@ angular.module('myApp')
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
 
-                  d3.selectAll('.' + className).style("opacity", function(d) {
+                  d3.selectAll("." + className)
+                      .classed("visiblebar", function(d) { var over = Math.floor(d.ovr) + 1; return (over >= newMin && over <= newMax) })
+                      .classed("invisiblebar", function(d) { var over = Math.floor(d.ovr) + 1; return !(over >= newMin && over <= newMax) })
+
+                  /*d3.selectAll('.' + className).style("opacity", function(d) {
                           //console.log('i: ' + i);
                           //console.log('changing');
                           var over = Math.floor(d.ovr) + 1;
@@ -182,7 +186,7 @@ angular.module('myApp')
                               //console.log('fading');
                               return 0.2;
                           }
-                      })
+                      })*/
                 })
             })
 
@@ -194,7 +198,7 @@ angular.module('myApp')
                         console.log("Hovering!")
                         var over = Math.floor(d.ovr) + 1;
                         if (over >= scope.min && over <= scope.max) {
-                          d3.selectAll('.' + className)
+                          d3.selectAll('.visiblebar')
                               .style("opacity", function(ball) {
                                   if (d == ball) {
                                       return 1;
@@ -203,29 +207,20 @@ angular.module('myApp')
                                   }
                               });
 
-                          d3.selectAll('.dot').style('opacity',function(dot){
+                          /*d3.selectAll('.dot').style('opacity',function(dot){
                               if(d==dot || d.inning != dot.inning){
                                   return 1;
                               }else{
                                   return 0.2;
                               }
-                          });
+                          });*/
                           tip.html(tooltipText(d)).show();
                         }
                     })
                     .on("mouseout", function() {
-                        d3.selectAll('.' + className)
-                          .style("opacity", function(ball) {
-                            var over = Math.floor(ball.ovr) + 1;
-                            if (over >= scope.min && over <= scope.max) {
-                                //console.log('not fading');
-                                return 1;
-                            } else {
-                                //console.log('fading');
-                                return 0.2;
-                            }
-                          });
-                        d3.selectAll(".dot").style("opacity", 1);
+                        d3.selectAll('.visiblebar')
+                          .style("opacity", 1);
+                        //d3.selectAll(".dot").style("opacity", 1);
                         tip.hide();
                     });
                 } else {

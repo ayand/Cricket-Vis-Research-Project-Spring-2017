@@ -106,7 +106,7 @@ angular.module('myApp').directive('colorLegend', function() {
                 /*console.log("Color: " + color);
                 console.log(color == "rgb(204, 204, 204)")*/
                 //d3.selectAll(".dot").style('opacity', 0.2)
-                d3.selectAll(".dot").style("opacity", function(d) {
+                d3.selectAll(".brushedBall").style("opacity", function(d) {
                     if (decideColor(d) == color) {
                         return 1;
                     } else {
@@ -144,7 +144,15 @@ angular.module('myApp').directive('colorLegend', function() {
                         }
                     });
 
-                    var zoneColors = [];
+                    d3.selectAll(".brushedBar").style("opacity", function(d) {
+                        if (decideColor(d) == color) {
+                            return 1;
+                        } else {
+                            return 0.2;
+                        }
+                    });
+
+                    /*var zoneColors = [];
                     d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
                         zoneColors.push(e.attributes.fill.value);
                     });
@@ -170,13 +178,13 @@ angular.module('myApp').directive('colorLegend', function() {
                         } else {
                             return 0.2;
                         }
-                    })
+                    })*/
                 }
 
 
             })
             .on("mouseout", function() {
-                d3.selectAll(".dot").style("opacity", 1);
+                d3.selectAll(".brushedBall").style("opacity", 1);
 
                 /*d3.selectAll(".ballBar1").style("opacity", function(d) {
                     if (inOverRange(d, scope.min1, scope.max1)) {
@@ -206,7 +214,9 @@ angular.module('myApp').directive('colorLegend', function() {
 
                   d3.selectAll(inactiveClassName).style("opacity", 1);
 
-                  var zoneColors = [];
+                  d3.selectAll(".brushedBar").style("opacity", 1);
+
+                  /*var zoneColors = [];
                   d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
                       zoneColors.push(e.attributes.fill.value);
                   });
@@ -233,7 +243,7 @@ angular.module('myApp').directive('colorLegend', function() {
                       } else {
                           return 0.2;
                       }
-                  })
+                  })*/
                 }
             })
 

@@ -199,6 +199,41 @@ angular.module('myApp').directive('pitchChart', function() {
               });
           }
 
+          var brushstart = function() {
+              console.log("Starting")
+          }
+
+          var brushmove = function() {
+            var e = d3.event.selection;
+            if (e) {
+                leftX = e[0][0];
+                rightX = e[1][0];
+                topY = e[0][1];
+                bottomY = e[1][1];
+                d3.selectAll(".dot")
+                    .classed("visibleball", function(d) { return isValidBall(d); })
+                    .classed("invisibleball", function(d) { return !isValidBall(d); })
+
+                d3.selectAll(activeClassName)
+                    .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
+            }
+          }
+
+          var brushend = function() {
+            if (!d3.event.selection) {
+              leftX = -1;
+              rightX = -1;
+              topY = -1;
+              bottomY = -1;
+              d3.selectAll(".dot")
+                  .classed("visibleball", function(d) { return isValidBall(d); })
+                  .classed("invisibleball", function(d) { return !isValidBall(d); })
+
+              d3.selectAll(activeClassName)
+                  .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
+            }
+          }
+
           var isWicketBall = function(d) {
               return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           }
@@ -234,40 +269,7 @@ angular.module('myApp').directive('pitchChart', function() {
           var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
           var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
 
-          var brushstart = function() {
-              console.log("starting");
-          }
 
-          var brushmove = function() {
-              var e = d3.event.selection;
-              if (e) {
-                  leftX = e[0][0];
-                  rightX = e[1][0];
-                  topY = e[0][1];
-                  bottomY = e[1][1];
-                  d3.selectAll(".dot")
-                      .classed("visibleball", function(d) { return isValidBall(d); })
-                      .classed("invisibleball", function(d) { return !isValidBall(d); })
-
-                  d3.selectAll(activeClassName)
-                      .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
-              }
-          }
-
-          var brushend = function() {
-              if (!d3.event.selection) {
-                leftX = -1;
-                rightX = -1;
-                topY = -1;
-                bottomY = -1;
-                d3.selectAll(".dot")
-                    .classed("visibleball", function(d) { return isValidBall(d); })
-                    .classed("invisibleball", function(d) { return !isValidBall(d); })
-
-                d3.selectAll(activeClassName)
-                    .style("opacity", function(d) { return isValidBall(d) ? 1 : 0.1 });
-              }
-          }
 
           var brush = d3.brush()
               .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
@@ -349,9 +351,9 @@ angular.module('myApp').directive('pitchChart', function() {
               return d["landing_x"] != null && d["landing_y"] != null;
           });
 
-          var brushArea = ground.append("g")
+          /*var brushArea = ground.append("g")
               .attr("class", "brush")
-              .call(brush);
+              .call(brush);*/
 
           var balls = ground.selectAll(".dot")
               .data(validBalls);

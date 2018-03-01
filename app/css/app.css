@@ -449,10 +449,16 @@ td {
     display: none;
 }
 
-.visiblebar {
-    opacity: 1;
+.lasso .drawn {
+      fill-opacity:.05 ;
 }
 
-.invisiblebar {
-    opacity: 0.1;
+.lasso .loop_close {
+    fill:none;
+    stroke-dasharray: 4,4;
+}
+
+.lasso .origin {
+    fill:#3399FF;
+    fill-opacity:.5;
 }
