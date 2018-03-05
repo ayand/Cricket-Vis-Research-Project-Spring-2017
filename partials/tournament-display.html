@@ -11,7 +11,12 @@
             <br>
             <div class="player-list">
               <table>
-                  <tr style="cursor:pointer" ng-repeat="player in players" ng-style="selected.includes(player.id) ? playerStyling : normalStyling" ng-click="clickPlayer(player.id)">
+                  <tr style="cursor:pointer"
+                      ng-repeat="player in players"
+                      ng-style="selected.includes(player.id) ? playerStyling : normalStyling"
+                      ng-click="clickPlayer(player.id)"
+                      ng-mouseover="selectPlayer(player)"
+                      ng-mouseleave="selectPlayer(null)">
                       <td>
                         <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="60" alt="bowlerImage"/><br>
                       </td>
@@ -28,7 +33,12 @@
             </div>
             <br>
             <br>
-            <tournament-overview data="teamData" team="teamName" selected-players="selected" current-view="view"></tournament-overview>
+            <tournament-overview
+                data="teamData"
+                team="teamName"
+                selected-players="selected"
+                current-view="view"
+                current-player="selectedPlayer"></tournament-overview>
         </div>
     </div>
 

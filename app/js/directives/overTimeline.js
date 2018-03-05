@@ -157,15 +157,15 @@ angular.module('myApp').directive('overTimeline', function() {
         scope.$watch('min', function(newMin, oldMin) {
             scope.$watch('max', function(newMax, oldMax) {
 
-                lines.style("display", function(d) {
+                lines.style("opacity", function(d) {
                     var greaterThan = d.over1 >= newMin;
                     var lessThan = d.over2 <= newMax;
-                    return greaterThan && lessThan ? "block" : "none";
+                    return greaterThan && lessThan ? 1 : 0.1;
                 })
 
-                wicketBall.style("display", function(d) {
+                wicketBall.style("opacity", function(d) {
                     var o = Math.ceil(d.ovr);
-                    return (o >= newMin && o <= newMax) ? "block" : "none";
+                    return (o >= newMin && o <= newMax) ? 1 : 0.1;
                 })
             })
         })

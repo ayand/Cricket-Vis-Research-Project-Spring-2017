@@ -451,14 +451,17 @@ td {
 
 .lasso .drawn {
       fill-opacity:.05 ;
+      stroke: gold;
 }
 
 .lasso .loop_close {
     fill:none;
     stroke-dasharray: 4,4;
+    stroke: gold;
 }
 
 .lasso .origin {
-    fill:#3399FF;
+    fill:gold;
     fill-opacity:.5;
+    stroke: gold;
 }

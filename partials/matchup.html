@@ -1,8 +1,14 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
+  <h4>Analyzed Side:</h4>
+  <br>
+  <div class="btn-group">
+      <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+  </div>
   <br>
   <br>
-  <div align="center" class="row">
+  <player-graph graph="playerGraph" image-dict="images" player-dict="playerDict" side="selectedSide"></player-graph>
+  <!--<div align="center" class="row">
       <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
           <h4 align="center">Side Selection</h4>
           <div class="btn-group" ng-hide="selectBowlerFirst || selectBatsmanFirst">
@@ -71,10 +77,10 @@
           </uib-accordion>
         </div>
       </div>
-  </div>
+  </div>-->
   <br>
   <br>
-  <div ng-show="showVizes">
+  <!--<div ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
             <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="90" alt="batsmanImage"/><br>
@@ -109,5 +115,5 @@
             <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
         </div>
       </div>
-  </div>
+  </div>-->
 </div>

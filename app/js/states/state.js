@@ -167,7 +167,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.selectSide = function(side) {
               $scope.selectedSide = side;
           }
-          console.log($scope.teamData);
+
+          $scope.selectedPlayer = null;
+
+          $scope.selectPlayer = function(player) {
+              $scope.selectedPlayer = player;
+          }
         }
     })
     .state('home.matchup', {
@@ -183,24 +188,36 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }],
           games: ['GameService', function(GameService) {
               return GameService.getGames();
+          }],
+          playerGraph: ['GameService', function(GameService) {
+              return GameService.getPlayerGraph();
           }]
       },
       url: '/matchups',
       templateUrl: 'partials/matchup.html',
-      controller: function($scope, $state, players, playerDict, images, GameService, games) {
+      controller: function($scope, $state, players, playerDict, images, GameService, games, playerGraph) {
 
-          $scope.teams = d3.nest()
+          $scope.playerGraph = playerGraph;
+          $scope.images = images;
+          $scope.playerDict = playerDict;
+
+          $scope.sides = ["Batting", "Bowling"];
+          $scope.selectedSide = "Batting";
+
+          $scope.selectSide = function(side) {
+              $scope.selectedSide = side;
+          }
+
+          /*$scope.teams = d3.nest()
               .key(function(d) { return d.team; })
               .sortKeys(d3.ascending)
               .entries(players);
-
-          $scope.images = images;
 
           $scope.otherTeams = [];
 
           $scope.representedGames = [];
 
-          $scope.playerDict = playerDict;
+
           $scope.consideredBalls = [];
 
           $scope.showVizes = false;
@@ -347,7 +364,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               "background-color": "#cccccc",
               "border-left": "1px solid #bbbbbb",
               "border-right": "1px solid #bbbbbb"
-          };
+          };*/
 
       }
     })

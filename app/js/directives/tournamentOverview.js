@@ -34,7 +34,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
           data: "=",
           team: "=",
           selectedPlayers: "=",
-          currentView: "="
+          currentView: "=",
+          currentPlayer: "="
       },
       link: function(scope, element, attrs) {
           var getIndex = function(i) {
@@ -355,6 +356,22 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                       bowlingBalls.style("opacity", 0);
                                       battingOvers.style("opacity", 1);
                                       bowlingOvers.style("opacity", 1);
+                                  }
+                              })
+
+                              scope.$watch("currentPlayer", function(newVal, oldVal) {
+                                  if (newVal == null) {
+                                      d3.selectAll(".ball")
+                                          .style("stroke", "white")
+                                          .style("stroke-width", 1)
+                                  } else {
+                                      d3.selectAll(".ball")
+                                          .style("stroke", function(d) {
+                                              return (d.batsman == newVal.id || d.bowler == newVal.id) ? "orange" : "white";
+                                          })
+                                          .style("stroke-width", function(d) {
+                                              return (d.batsman == newVal.id || d.bowler == newVal.id) ? 3 : 1;
+                                          })
                                   }
                               })
       }
