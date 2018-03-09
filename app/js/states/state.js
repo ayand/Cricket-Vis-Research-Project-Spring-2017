@@ -195,7 +195,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       },
       url: '/matchups',
       templateUrl: 'partials/matchup.html',
-      controller: function($scope, $state, players, playerDict, images, GameService, games, playerGraph) {
+      controller: function($scope, $state, players, playerDict, images,
+          GameService, games, playerGraph, $location, $anchorScroll) {
 
           $scope.playerGraph = playerGraph;
           $scope.images = images;
@@ -203,10 +204,52 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           $scope.sides = ["Batting", "Bowling"];
           $scope.selectedSide = "Batting";
+          $scope.sortKey = "Alphabetical Order";
+
+          $scope.battingSortKeys = ["Alphabetical Order", "Runs Scored", "Balls Faced",
+              "Strike Rate"]
+
+          $scope.bowlingSortKeys = ["Alphabetical Order", "Runs Conceded",
+              "Overs Bowled", "Wickets Taken"]
+
+          $scope.sortKeys = $scope.battingSortKeys;
 
           $scope.selectSide = function(side) {
               $scope.selectedSide = side;
+              $scope.sortKey = "Alphabetical Order";
+              if (side == "Batting") {
+                  $scope.sortKeys = $scope.battingSortKeys;
+              } else {
+                  $scope.sortKeys = $scope.bowlingSortKeys;
+              }
           }
+
+          $scope.showVizes = false;
+          $scope.displayedBalls = [];
+          $scope.representedGames = [];
+          $scope.selectedBatsman = null;
+          $scope.selectedBowler = null;
+          $scope.currentGame = null;
+
+          $scope.seeGame = function(game) {
+              $scope.currentGame = game;
+          }
+
+          $scope.$on("playerCombo", function(event, data) {
+              console.log(data);
+              $scope.selectedBatsman = data.batsman;
+              $scope.selectedBowler = data.bowler;
+              GameService.getBallsByBatsman($scope.selectedBatsman).then(function(result) {
+                  $scope.displayedBalls = result.filter(function(d) {
+                      return d.bowler == $scope.selectedBowler;
+                  });
+                  var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
+                  $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
+                  $scope.showVizes = true;
+                  $location.hash('vizes');
+                  $anchorScroll();
+              })
+          })
 
           /*$scope.teams = d3.nest()
               .key(function(d) { return d.team; })

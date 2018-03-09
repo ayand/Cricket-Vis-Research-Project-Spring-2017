@@ -1,37 +1,114 @@
 angular.module('myApp').directive('playerGraph', function() {
+    var alphabeticalSort = function(a, b) {
+      var teams = ["Afghanistan", "Australia", "Bangladesh", "England", "India",
+          "Ireland", "New Zealand", "Pakistan", "Scotland", "South Africa",
+          "Sri Lanka", "United Arab Emirates", "West Indies", "Zimbabwe"];
+      var letterOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      var aName = a.name.split(" ");
+      var aLastName = aName[aName.length - 1];
+      var aFirst = aName[0].charAt(0);
+      var bName = b.name.split(" ");
+      var bLastName = bName[bName.length - 1];
+      var bFirst = bName[0].charAt(0)
+      if (bLastName == aLastName) {
+          return letterOrder.indexOf(aFirst) - letterOrder.indexOf(bFirst);
+      }
+      return ((aLastName > bLastName) ? 1 : -1)
+
+    }
+
     return {
         restrict: 'EA',
         scope: {
             graph: '=',
             playerDict: '=',
             imageDict: '=',
-            side: '='
+            side: '=',
+            sortKey: '='
         },
         link: function(scope, element, attrs) {
             var svg = d3.select(element[0])
                 .append("svg")
                 .attr("width", 1500)
                 .attr("height", 370);
-
+            console.log(scope.graph);
             console.log(scope.graph.edges.length);
 
-            var nodeTipText = function(d) {
-                /*var table = "<table>\
-                                <tr>\
-                                    <td><img height='50' src=" + scope.imageDict[scope.playerDict[d.id.toString()]["name"]] + "></td> \
-                                </tr>\
-                                <p>" + d.name + "</p>\
-                                <p>" + d.team + "</p>\
-                             </table>"*/
-
-                return "<img align='center' class='center-block' height='50' src=" + scope.imageDict[scope.playerDict[d.id.toString()]["name"]] + ">\
-                    <hr>\
-                    <p align='center'>" + d.name + "</p>\
-                    <p align='center'>" + d.team + "</p>";
+            var sortByKey = function(key) {
+                var teams = ["Afghanistan", "Australia", "Bangladesh", "England", "India",
+                    "Ireland", "New Zealand", "Pakistan", "Scotland", "South Africa",
+                    "Sri Lanka", "United Arab Emirates", "West Indies", "Zimbabwe"];
+                scope.graph.nodes.sort(function(a, b) {
+                  if (a.team == b.team) {
+                      if (a[key] == b[key]) {
+                          return alphabeticalSort(a, b);
+                      }
+                      return b[key] - a[key];
+                  }
+                  return teams.indexOf(a.team) - teams.indexOf(b.team);
+                })
             }
 
-            var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return nodeTipText(d); });
-            svg.call(tip);
+            var nodeTipText = function(d) {
+                var topSection = "<img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.id.toString()]["name"]] + "'>\
+                    <h4 align='center'>" + d.name + "</h4>\
+                    <h5 align='center'>" + d.team + "</h5>\n";
+                var runsScored = d.runs_scored;
+                var ballsFaced = d.balls_faced;
+                var strikeRate = d.strike_rate != -1 ? d.strike_rate.toFixed(3) : "N/A";
+                var oversBowled = d.overs_bowled;
+                var runsConceded = d.runs_conceded;
+                var wicketsTaken = d.wickets_taken;
+                var bottomSection = "<div class='row' style='padding-top:3px; padding-bottom:3px'>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6'>\
+                                            <strong>" + (scope.side == "Batting" ? "Runs Scored:" : "Runs Conceded:") + "</strong>\
+                                        </div>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6' style='text-align:right'>\
+                                            <strong>" + (scope.side == "Batting" ? runsScored : runsConceded) + "</strong>\
+                                        </div>\
+                                     </div>\
+                                     <div class='row' style='padding-top:3px; padding-bottom:3px'>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6'>\
+                                            <strong>" + (scope.side == "Batting" ? "Balls Faced:" : "Overs Bowled:") + "</strong>\
+                                        </div>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6' style='text-align:right'>\
+                                            <strong>" + (scope.side == "Batting" ? ballsFaced : oversBowled) + "</strong>\
+                                        </div>\
+                                     </div>\
+                                     <div class='row' style='padding-top:3px; padding-bottom:3px'>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6'>\
+                                            <strong>" + (scope.side == "Batting" ? "Strike Rate:" : "Wickets Taken:") + "</strong>\
+                                        </div>\
+                                        <div class='col-sm-6 col-md-6 col-lg-6' style='text-align:right'>\
+                                            <strong>" + (scope.side == "Batting" ? strikeRate : wicketsTaken) + "</strong>\
+                                        </div>\
+                                     </div>\
+                                    "
+                return topSection + bottomSection
+            }
+
+            var edgeTipText = function(d) {
+              return "<div align='center' class='row'>\
+                          <div class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>Batsman</strong>\
+                              <br>\
+                              <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.batsman.toString()]["name"]] + "'>\
+                              <strong>" + scope.playerDict[d.batsman.toString()]["name"] + "</strong>\
+                          </div>\
+                          <div class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>Bowler</strong>\
+                              <br>\
+                              <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.bowler.toString()]["name"]] + "'>\
+                              <strong>" + scope.playerDict[d.bowler.toString()]["name"] + "</strong>\
+                          </div>\
+                      </div>"
+            }
+
+            var nodeTip = d3.tip().attr('class', 'node-tip').html(function(d) { return nodeTipText(d); });
+            svg.call(nodeTip);
+
+            var edgeTip = d3.tip().attr('class', 'd3-tip').html(function(d) { return edgeTipText(d); });
+            svg.call(edgeTip);
 
             var teams = Array.from(new Set(scope.graph.nodes.map(function(d) {
                 return d.team;
@@ -80,7 +157,12 @@ angular.module('myApp').directive('playerGraph', function() {
             teamColors["Sri Lanka"] = "#000099";
 
             var selectedPlayer = null;
+            var selectedTeam = null;
+            var currentCombo = null;
             var relevantOpponents = [];
+
+            var temporaryPlayer = null;
+            var temporaryOpponents = [];
 
             var edges = svg.selectAll(".edge")
                 .data(scope.graph.edges)
@@ -103,8 +185,30 @@ angular.module('myApp').directive('playerGraph', function() {
                     return coordinateDict[team]["playerDict"][d.bowler.toString()]
                 })
                 .style("stroke", "#888888")
+                .style("stroke-width", 2)
                 .style("opacity", 0.5)
                 .style("display", "none")
+                .style("cursor", "pointer")
+                .on("mouseover", function(d) {
+                    d3.select(this).style("stroke", "orange");
+                    edgeTip.show(d);
+                })
+                .on("mouseout", function(d) {
+                    if (currentCombo != d) {
+                      d3.select(this).style("stroke", "#888888");
+                    }
+                    edgeTip.hide();
+                })
+                .on("click", function(d) {
+                    if (currentCombo != d) {
+                        currentCombo = d;
+                        d3.selectAll(".edge").style("stroke", function(e) {
+                            return (e == d) ? "orange" : "#888888";
+                        })
+                        scope.$emit("playerCombo", d);
+                    }
+
+                });
 
             var playerNodes = svg.selectAll(".playerNode")
                 .data(scope.graph.nodes)
@@ -114,8 +218,52 @@ angular.module('myApp').directive('playerGraph', function() {
                 .attr("cy", function(d) { return coordinateDict[d.team]["playerDict"][d.id.toString()] })
                 .attr("r", 4)
                 .attr("fill", function(d) { return teamColors[d.team]; })
-                .on("mouseover", tip.show)
-                .on("mouseout", tip.hide)
+                .on("mouseover", function(d) {
+                    if (selectedPlayer == null) {
+                      temporaryPlayer = d.id;
+
+                      temporaryOpponents = [];
+                      d3.selectAll(".edge")
+                          .style("display", function(edge) {
+                              var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
+                              var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
+                              if (d.id == relevantSide) {
+                                  temporaryOpponents.push(opponentSide);
+                              }
+                              return (d.id == relevantSide) ? 'block' : 'none';
+                          })
+
+                      d3.selectAll(".playerNode")
+                          .style("display", function(node) {
+                              return (node.id == temporaryPlayer || temporaryOpponents.includes(node.id)) ? "block" : "none";
+                          })
+                          .style("stroke", function(node) {
+                              return (node == d) ? "orange" : "none";
+                          })
+
+
+                      d3.selectAll(".playerName")
+                          .style("display", function(name) {
+                              return (name.id == temporaryPlayer || temporaryOpponents.includes(name.id)) ? "block" : "none";
+                          })
+
+                    }
+                    nodeTip.show(d);
+                })
+                .on("mouseout", function(d) {
+                    if (selectedPlayer == null) {
+                      temporaryPlayer = null;
+                      d3.select(".xAxis").selectAll("text")
+                          .style("font-weight", "normal")
+                          .style("fill", "black")
+                      temporaryOpponents = [];
+                      d3.selectAll(".edge").style("display", "none")
+                      d3.selectAll(".playerName").style("display", "block");
+                      d3.selectAll(".playerNode").style("display", "block")
+                          .style("stroke", "none");
+                    }
+                    nodeTip.hide();
+                })
                 .on("click", function(d) {
                     if (selectedPlayer != d.id) {
                       selectedPlayer = d.id;
@@ -146,6 +294,10 @@ angular.module('myApp').directive('playerGraph', function() {
                           })
                     } else {
                         selectedPlayer = null;
+                        selectedTeam = null;
+                        d3.select(".xAxis").selectAll("text")
+                            .style("font-weight", "normal")
+                            .style("fill", "black")
                         relevantOpponents = [];
                         d3.selectAll(".edge").style("display", "none")
                         d3.selectAll(".playerName").style("display", "block");
@@ -171,8 +323,111 @@ angular.module('myApp').directive('playerGraph', function() {
                 .style("font-weight", "bold")
                 .style("font-size", "10px")
 
+            d3.select(".xAxis").selectAll("text")
+                .style("cursor", "pointer")
+                .on("click", function(d) {
+                    if (selectedPlayer != null && d != scope.playerDict[selectedPlayer.toString()]["team"]) {
+                      if (selectedTeam != d) {
+                          selectedTeam = d;
+                          d3.select(".xAxis").selectAll("text")
+                              .style("font-weight", function(team) { return team == d ? "bold" : "normal" })
+                              .style("fill", function(team) { return team == d ? "orange" : "black" })
+
+                          playerNodes.style("display", function(node) {
+                              console.log("Changing display");
+                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id) && scope.playerDict[node.id.toString()]["team"] == d)) ? "block": "none"
+                          })
+
+                          playerNames.style("display", function(node) {
+                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id) && scope.playerDict[node.id.toString()]["team"] == d)) ? "block": "none"
+                          })
+
+                          edges.style("display", function(edge) {
+                                  var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
+                                  var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
+                                  return (selectedPlayer == relevantSide && scope.playerDict[opponentSide.toString()]["team"] == selectedTeam) ? 'block' : 'none';
+                              })
+                      } else {
+                          selectedTeam = null;
+                          d3.select(this)
+                              .style("font-weight", "normal")
+                              .style("fill", "black")
+
+                          playerNodes.style("display", function(node) {
+
+                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id))) ? "block": "none"
+                          })
+
+                          playerNames.style("display", function(node) {
+                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id))) ? "block": "none"
+                          })
+
+                          edges.style("display", function(edge) {
+                                  var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
+                                  var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
+                                  return (selectedPlayer == relevantSide) ? 'block' : 'none';
+                              })
+                      }
+                    }
+                })
+
+            var keyDict = {}
+            keyDict["Runs Scored"] = "runs_scored";
+            keyDict["Balls Faced"] = "balls_faced";
+            keyDict["Strike Rate"] = "strike_rate";
+            keyDict["Runs Conceded"] = "runs_conceded";
+            keyDict["Overs Bowled"] = "overs_bowled";
+            keyDict["Wickets Taken"] = "wickets_taken";
+
+            scope.$watch('sortKey', function(newVal, oldVal) {
+                console.log(newVal);
+                if (newVal != oldVal) {
+                  var tempDict = {};
+
+                  if (newVal != "Alphabetical Order") {
+                    sortByKey(keyDict[newVal]);
+                    var tempDivision = d3.nest()
+                        .key(function(d) { return d.team })
+                        .entries(scope.graph.nodes);
+
+                    tempDivision.forEach(function(d) {
+                        tempDict[d.key] = {
+                            "lastPosition": 30,
+                            "playerDict": {}
+                        };
+                        d.values.forEach(function(player) {
+                            tempDict[d.key]["playerDict"][player.id.toString()] = tempDict[d.key]["lastPosition"]
+                            tempDict[d.key]["lastPosition"] += 18;
+                        })
+                    })
+                  }
+                  edges.transition()
+                      .duration(1500)
+                      .attr("y1", function(d) {
+                          var team = scope.playerDict[d.batsman.toString()]["team"]
+                          return (newVal == "Alphabetical Order") ? coordinateDict[team]["playerDict"][d.batsman.toString()] : tempDict[team]["playerDict"][d.batsman.toString()]
+                      })
+                      .attr("y2", function(d) {
+                          var team = scope.playerDict[d.bowler.toString()]["team"]
+                          return (newVal == "Alphabetical Order") ? coordinateDict[team]["playerDict"][d.bowler.toString()] : tempDict[team]["playerDict"][d.bowler.toString()]
+                      })
+
+                  playerNodes.transition()
+                      .duration(1500)
+                      .attr("cy", function(d) { return (newVal == "Alphabetical Order") ? coordinateDict[d.team]["playerDict"][d.id.toString()] : tempDict[d.team]["playerDict"][d.id.toString()] })
+
+                  playerNames.transition()
+                      .duration(1500)
+                      .attr("y", function(d) { return (newVal == "Alphabetical Order") ? (coordinateDict[d.team]["playerDict"][d.id.toString()] + 3) : (tempDict[d.team]["playerDict"][d.id.toString()] + 3) })
+                }
+            })
+
             scope.$watch('side', function(newVal, oldVal) {
               if (selectedPlayer != null) {
+                selectedTeam = null;
+                d3.select(".xAxis").selectAll("text")
+                    .style("font-weight", "normal")
+                    .style("fill", "black")
                 relevantOpponents = [];
                 edges.style("display", function(edge) {
                         var relevantSide = (newVal == "Batting") ? edge.batsman : edge.bowler;

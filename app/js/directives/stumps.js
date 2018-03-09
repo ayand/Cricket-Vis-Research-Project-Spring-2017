@@ -246,6 +246,7 @@ angular.module('myApp').directive('stumps', function() {
                           return scope.dictionary[d.toString()]["hand"];
                       })));
                     }
+                    console.log(hands);
 
                     leftBat.style("opacity", 0);
                     rightBat.style("opacity", 0);
@@ -255,6 +256,9 @@ angular.module('myApp').directive('stumps', function() {
                         } else {
                             rightBat.style("opacity", 1);
                         }
+                    } else {
+                        leftBat.style("opacity", 1);
+                        rightBat.style("opacity", 1);
                     }
                   })
               })

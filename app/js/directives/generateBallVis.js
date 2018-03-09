@@ -882,7 +882,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                               return scope.dictionary[d.toString()]["hand"];
                           })));
                         }
-
+                        console.log(hands);
                         leftBat.style("opacity", 0);
                         rightBat.style("opacity", 0);
                         if (hands.length == 1) {
@@ -891,6 +891,9 @@ angular.module('myApp').directive('generateBallVis', function() {
                             } else {
                                 rightBat.style("opacity", 1);
                             }
+                        } else {
+                          leftBat.style("opacity", 1);
+                          rightBat.style("opacity", 1);
                         }
                         selectedZone = 0;
                         d3.selectAll(".dot")

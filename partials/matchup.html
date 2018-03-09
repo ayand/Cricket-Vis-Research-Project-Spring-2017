@@ -1,13 +1,50 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
-  <h4>Analyzed Side:</h4>
   <br>
-  <div class="btn-group">
-      <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+  <!--<table>
+      <th>
+        <td>Selected Side</td>
+        <td>Sort Order</td>
+      </th>
+      <tr>
+        <td>
+          <div class="btn-group">
+              <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+          </div>
+        </td>
+      </tr>
+  </table>-->
+  <div style="width:500px">
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <h4>Analyzed Side</h4>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <h4>Sorting Order</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+          <div class="btn-group">
+              <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <select ng-model="sortKey" class="form-control">
+                <option ng-repeat="key in sortKeys" value="{{ key }}">{{ key }}</option>
+            </select>
+        </div>
+    </div>
   </div>
+
   <br>
   <br>
-  <player-graph graph="playerGraph" image-dict="images" player-dict="playerDict" side="selectedSide"></player-graph>
+  <player-graph
+      graph="playerGraph"
+      image-dict="images"
+      player-dict="playerDict"
+      side="selectedSide"
+      sort-key="sortKey"></player-graph>
   <!--<div align="center" class="row">
       <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
           <h4 align="center">Side Selection</h4>
@@ -80,7 +117,7 @@
   </div>-->
   <br>
   <br>
-  <!--<div ng-show="showVizes">
+  <div id="vizes" ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
             <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="90" alt="batsmanImage"/><br>
@@ -115,5 +152,5 @@
             <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
         </div>
       </div>
-  </div>-->
+  </div>
 </div>
