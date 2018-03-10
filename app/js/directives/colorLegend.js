@@ -102,6 +102,7 @@ angular.module('myApp').directive('colorLegend', function() {
             .on("mouseover", function() {
                 //console.log("enter");
                 //console.log(d3.select(this)._groups[0][0].style.fill)
+                console.log("Hovering");
                 var color = d3.select(this)._groups[0][0].style.fill;
                 /*console.log("Color: " + color);
                 console.log(color == "rgb(204, 204, 204)")*/

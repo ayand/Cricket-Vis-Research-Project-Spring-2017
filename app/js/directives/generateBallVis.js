@@ -809,6 +809,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                       }
                     });
 
+            brushHighlight();
+
             var lasso = d3.lasso().closePathSelect(true)
                 .closePathDistance(100)
                 .items(groundBalls)
@@ -1041,6 +1043,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                                 .on("mouseout", function() {
                                     return;
                                 })
+
+                            brushHighlight();
                         });
                     });
                 });
