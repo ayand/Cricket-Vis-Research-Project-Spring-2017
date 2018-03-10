@@ -30,7 +30,7 @@ angular.module('myApp').directive('playerGraph', function() {
             var svg = d3.select(element[0])
                 .append("svg")
                 .attr("width", 1500)
-                .attr("height", 300);
+                .attr("height", 283);
             console.log(scope.graph);
             console.log(scope.graph.edges.length);
 
@@ -136,7 +136,7 @@ angular.module('myApp').directive('playerGraph', function() {
                 };
                 d.values.forEach(function(player) {
                     coordinateDict[d.key]["playerDict"][player.id.toString()] = coordinateDict[d.key]["lastPosition"]
-                    coordinateDict[d.key]["lastPosition"] += 14;
+                    coordinateDict[d.key]["lastPosition"] += 12.5;
                 })
             })
 
@@ -321,7 +321,7 @@ angular.module('myApp').directive('playerGraph', function() {
                     return firstInitial + ". " + lastName;
                 })
                 .style("font-weight", "bold")
-                .style("font-size", "10px")
+                .style("font-size", "9.5px")
 
             d3.select(".xAxis").selectAll("text")
                 .style("cursor", "pointer")
@@ -397,7 +397,7 @@ angular.module('myApp').directive('playerGraph', function() {
                         };
                         d.values.forEach(function(player) {
                             tempDict[d.key]["playerDict"][player.id.toString()] = tempDict[d.key]["lastPosition"]
-                            tempDict[d.key]["lastPosition"] += 14;
+                            tempDict[d.key]["lastPosition"] += 12.5;
                         })
                     })
                   }

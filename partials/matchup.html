@@ -53,7 +53,7 @@
                   <table class="table" cellpadding="10">
                       <tr ng-repeat="player in team.values" ng-style="((selectBatsmanFirst && selectedBatsman == player.id) || (selectBowlerFirst && selectedBowler == player.id)) ? selectedStyling: normalStyling">
                           <td>
-                            <img ng-src="{{images[player.name]}}" height="60" alt="batsman"/>
+                            <img ng-src="{{images[player.name]}}" height="45" alt="batsman"/>
                           </td>
                           <td>
                             <br>
@@ -80,7 +80,7 @@
                   <table class="table" cellpadding="10">
                       <tr ng-repeat="player in team.values" ng-style="((selectBatsmanSecond && selectedBatsman == player.id) || (selectBowlerSecond && selectedBowler == player.id)) ? selectedStyling: normalStyling">
                           <td>
-                            <img ng-src="{{images[player.name]}}" height="60" alt="bowler"/>
+                            <img ng-src="{{images[player.name]}}" height="45" alt="bowler"/>
                           </td>
                           <td>
                             <br>
@@ -102,18 +102,16 @@
       </div>
   </div>-->
   <br>
-  <br>
   <div id="vizes" ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="batsmanImage"/><br>
-          </div>
-          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="background-color:#cccccc">
-            <h4>{{ playerDict[selectedBatsman.toString()].name + " vs " + playerDict[selectedBowler.toString()].name }}</h4>
-            <h5>Number of balls: {{ displayedBalls.length }}</h5>
+            <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="45" alt="batsmanImage"/><br>
           </div>
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="left" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
+            <h4>{{ playerDict[selectedBowler.toString()].name + " bowled " + displayedBalls.length + " balls to " + playerDict[selectedBatsman.toString()].name }}</h4>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <img align="left" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="45" alt="bowlerImage"/><br>
           </div>
       </div>
       <br>
