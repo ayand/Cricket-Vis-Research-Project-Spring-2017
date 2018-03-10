@@ -672,8 +672,22 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       },
       url: '/innings/:number',
       templateUrl: 'partials/alternate-innings-2.html',
-      controller: function($scope, players, $stateParams, images, $uibModal) {
+      controller: function($scope, players, $stateParams, images, $uibModal,
+          $anchorScroll, $location) {
           $scope.imageDict = images;
+          $scope.isCollapsed = true;
+
+          $scope.changeCollapse = function() {
+              $scope.isCollapsed = !$scope.isCollapsed;
+              if (!$scope.isCollapsed) {
+                  $location.hash('playerStats');
+                  $anchorScroll();
+              } else {
+                  $location.hash('top');
+                  $anchorScroll();
+              }
+          }
+
           $scope.matchID = $scope.$parent.gameID;
           $scope.inning = parseInt($stateParams.number);
           $scope.maxOvers = ($scope.inning == 1) ? $scope.$parent.maxOvers1 : $scope.$parent.maxOvers2;

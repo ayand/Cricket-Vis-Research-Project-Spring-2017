@@ -1,26 +1,12 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
-  <br>
-  <!--<table>
-      <th>
-        <td>Selected Side</td>
-        <td>Sort Order</td>
-      </th>
-      <tr>
-        <td>
-          <div class="btn-group">
-              <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
-          </div>
-        </td>
-      </tr>
-  </table>-->
   <div style="width:500px">
     <div class="row">
         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-            <h4>Analyzed Side</h4>
+            <h5>Analyzed Side</h5>
         </div>
         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-            <h4>Sorting Order</h4>
+            <h5>Sorting Order</h5>
         </div>
     </div>
     <div class="row">
@@ -120,19 +106,19 @@
   <div id="vizes" ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="90" alt="batsmanImage"/><br>
+            <img align="right" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="batsmanImage"/><br>
           </div>
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="background-color:#cccccc">
-            <h3>{{ playerDict[selectedBatsman.toString()].name + " vs " + playerDict[selectedBowler.toString()].name }}</h3>
-            <h4>Number of balls: {{ displayedBalls.length }}</h4>
+            <h4>{{ playerDict[selectedBatsman.toString()].name + " vs " + playerDict[selectedBowler.toString()].name }}</h4>
+            <h5>Number of balls: {{ displayedBalls.length }}</h5>
           </div>
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="left" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="90" alt="bowlerImage"/><br>
+            <img align="left" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
           </div>
       </div>
       <br>
       <div align="center" class="row">
-          <h3>Games</h3>
+          <h4>Games</h4>
           <div class="btn-group">
             <label class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
           </div>
@@ -140,15 +126,15 @@
       <br>
       <div class="row">
         <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h3>Pitch Map</h3>
+            <h4>Pitch Map</h4>
             <pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>
         </div>
         <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h3>Stump Map</h3>
+            <h4>Stump Map</h4>
             <stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>
         </div>
         <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h3>Ground Map</h3>
+            <h4>Ground Map</h4>
             <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
         </div>
       </div>

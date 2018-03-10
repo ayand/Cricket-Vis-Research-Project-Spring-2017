@@ -1,16 +1,23 @@
 angular.module('myApp').directive('generateBallVis', function() {
-  var trueHeight = 451.2 * 1.2;
-  var trueWidth = 73.2 * 1.2;
-  var height = 402.4 * 1.2; // 442.64
-  var width = 61 * 1.2; // 67.1
-  var svgDimension = 580;
+  var svgDimension = 380;
+
+  var convertDimension = function(d) {
+      return ((d * svgDimension) / 580);
+  }
+
+  var trueHeight = convertDimension(541.44);
+  var trueWidth = convertDimension(87.84);
+  var height = convertDimension(482.88); // 442.64
+  var width = convertDimension(73.2);
   var pitchStartX = (svgDimension / 2) - (width / 2);
   var pitchStartY = (svgDimension / 2) - (height / 2);
   var trueX = (svgDimension / 2) - (trueWidth / 2);
   var trueY = (svgDimension / 2) - (trueHeight / 2);
-  var innerRadius = (svgDimension / 2) - 30;
+  var radiusDifference = convertDimension(30);
+  var innerRadius = (svgDimension / 2) - radiusDifference;
   var bottomEnd = (svgDimension / 2) - innerRadius;
   var topEnd = (svgDimension / 2) + innerRadius;
+   // 67.1
 
   var correctZone = function(zone) {
       if (zone <= 4) {
@@ -123,8 +130,9 @@ angular.module('myApp').directive('generateBallVis', function() {
         stumpX.domain([-1.5, 1.5]);
         stumpY.domain([0, 3]);
 
-        var groundX = d3.scaleLinear().range([bottomEnd + 10, topEnd - 10]).domain([0, 360]);
-        var groundY = d3.scaleLinear().range([topEnd - 10, bottomEnd + 10]).domain([0, 360]);
+        var groundExtension = convertDimension(10);
+        var groundX = d3.scaleLinear().range([bottomEnd + groundExtension, topEnd - groundExtension]).domain([0, 360]);
+        var groundY = d3.scaleLinear().range([topEnd - groundExtension, bottomEnd + groundExtension]).domain([0, 360]);
 
         var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
         pitchVis.call(tip);
@@ -154,84 +162,84 @@ angular.module('myApp').directive('generateBallVis', function() {
             .attr("x", trueX)
             .attr("y", trueY)
             .attr("width", trueWidth)
-            .attr("height", 48.8 * 1.2)
+            .attr("height", convertDimension(58.56))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("rect")
             .attr("x", trueX)
-            .attr("y", trueY + (402.4 * 1.2))
+            .attr("y", trueY + convertDimension(482.88))
             .attr("width", trueWidth)
-            .attr("height", 48.8 * 1.2)
+            .attr("height", convertDimension(58.56))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("rect")
-            .attr("x", trueX + (10.2 * 1.2))
+            .attr("x", trueX + convertDimension(12.24))
             .attr("y", trueY)
-            .attr("width", 52.8 * 1.2)
-            .attr("height", 24.4 * 1.2)
+            .attr("width", convertDimension(63.36))
+            .attr("height", convertDimension(29.28))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("rect")
-            .attr("x", trueX + (10.2 * 1.2))
-            .attr("y", trueY + (24.4 * 1.2))
-            .attr("width", 52.8 * 1.2)
-            .attr("height", 24.4 * 1.2)
+            .attr("x", trueX + convertDimension(12.24))
+            .attr("y", trueY + convertDimension(29.28))
+            .attr("width", convertDimension(63.36))
+            .attr("height", convertDimension(29.28))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("rect")
-            .attr("x", trueX + (10.2 * 1.2))
-            .attr("y", trueY + (402.4 * 1.2))
-            .attr("width", 52.8 * 1.2)
-            .attr("height", 24.4 * 1.2)
+            .attr("x", trueX + (convertDimension(12.24)))
+            .attr("y", trueY + convertDimension(482.88))
+            .attr("width", convertDimension(63.36))
+            .attr("height", convertDimension(29.28))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("rect")
-            .attr("x", trueX + (10.2 * 1.2))
-            .attr("y", trueY + (426.8 * 1.2))
-            .attr("width", 52.8 * 1.2)
-            .attr("height", 24.4 * 1.2)
+            .attr("x", trueX + (convertDimension(12.24)))
+            .attr("y", trueY + convertDimension(512.16))
+            .attr("width", convertDimension(63.36))
+            .attr("height", convertDimension(29.28))
             .style("stroke", "white")
             .style("fill-opacity", 0);
 
         pitch.append("circle")
             .attr("cx", (svgDimension / 2))
-            .attr("cy", (trueY + (24.4 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cy", (trueY + (convertDimension(29.28))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
         pitch.append("circle")
-            .attr("cx", (svgDimension / 2) - 9)
-            .attr("cy", (trueY + (24.4 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cx", (svgDimension / 2) - convertDimension(9))
+            .attr("cy", (trueY + (convertDimension(29.28))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
         pitch.append("circle")
-            .attr("cx", (svgDimension / 2) + 9)
-            .attr("cy", (trueY + (24.4 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cx", (svgDimension / 2) + convertDimension(9))
+            .attr("cy", (trueY + (convertDimension(29.28))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
         pitch.append("circle")
             .attr("cx", (svgDimension / 2))
-            .attr("cy", (trueY + (426.8 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cy", (trueY + (convertDimension(512.16))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
         pitch.append("circle")
-            .attr("cx", (svgDimension / 2) - 9)
-            .attr("cy", (trueY + (426.8 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cx", (svgDimension / 2) - convertDimension(9))
+            .attr("cy", (trueY + (convertDimension(512.16))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
         pitch.append("circle")
-            .attr("cx", (svgDimension / 2) + 9)
-            .attr("cy", (trueY + (426.8 * 1.2)))
-            .attr("r", 3 * 1.2)
+            .attr("cx", (svgDimension / 2) + convertDimension(9))
+            .attr("cy", (trueY + (convertDimension(512.16))))
+            .attr("r", convertDimension(3.6))
             .attr("fill", "#FAE3A1");
 
             var stumpWindow = stumpVis.append("g")
@@ -244,72 +252,72 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("fill", "#FFFFFF")
 
             stumpWindow.append("rect")
-                .attr("height", 137.46)
-                .attr("width", 7.366)
-                .attr("x", ((svgDimension / 2) - 3.683))
-                .attr("y", (svgDimension - 137.46))
-                .attr("rx", 4)
-                .attr("rx", 4)
+                .attr("height", convertDimension(137.46))
+                .attr("width", convertDimension(7.366))
+                .attr("x", ((svgDimension / 2) - convertDimension(3.683)))
+                .attr("y", (svgDimension - convertDimension(137.46)))
+                .attr("rx", convertDimension(4))
+                .attr("ry", convertDimension(4))
                 .attr("fill", "#FAE3A1");
 
             stumpWindow.append("rect")
-                .attr("height", 137.46)
-                .attr("width", 7.366)
-                .attr("x", ((svgDimension / 2) - 22.1366666667))
-                .attr("y", (svgDimension - 137.46))
-                .attr("rx", 4)
-                .attr("rx", 4)
+                .attr("height", convertDimension(137.46))
+                .attr("width", convertDimension(7.366))
+                .attr("x", ((svgDimension / 2) - convertDimension(22.1366666667)))
+                .attr("y", (svgDimension - convertDimension(137.46)))
+                .attr("rx", convertDimension(4))
+                .attr("ry", convertDimension(4))
                 .attr("fill", "#FAE3A1");
 
             stumpWindow.append("rect")
-                .attr("height", 137.46)
-                .attr("width", 7.366)
-                .attr("x", ((svgDimension / 2) + 14.7706666667))
-                .attr("y", (svgDimension - 137.46))
-                .attr("rx", 4)
-                .attr("rx", 4)
+                .attr("height", convertDimension(137.46))
+                .attr("width", convertDimension(7.366))
+                .attr("x", ((svgDimension / 2) + convertDimension(14.7706666667)))
+                .attr("y", (svgDimension - convertDimension(137.46)))
+                .attr("rx", convertDimension(4))
+                .attr("ry", convertDimension(4))
                 .attr("fill", "#FAE3A1");
 
             stumpWindow.append("rect")
-                .attr("width", 20)
-                .attr("height", 4)
+                .attr("width", convertDimension(20))
+                .attr("height", convertDimension(4))
                 .attr("x", (svgDimension / 2))
-                .attr("y", (svgDimension - 138.793333333))
-                .attr("rx", 3)
-                .attr("rx", 3)
+                .attr("y", (svgDimension - convertDimension(138.793333333)))
+                .attr("rx", convertDimension(3))
+                .attr("ry", convertDimension(3))
                 .attr("fill", "#683F16");
 
             stumpWindow.append("rect")
-                .attr("width", 20)
-                .attr("height", 4)
-                .attr("x", ((svgDimension / 2) - 20))
-                .attr("y", (svgDimension - 138.793333333))
-                .attr("rx", 3)
-                .attr("rx", 3)
+                .attr("width", convertDimension(20))
+                .attr("height", convertDimension(4))
+                .attr("x", ((svgDimension / 2) - convertDimension(20)))
+                .attr("y", (svgDimension - convertDimension(138.793333333)))
+                .attr("rx", convertDimension(3))
+                .attr("ry", convertDimension(3))
                 .attr("fill", "#683F16");
 
             var leftBat = stumpWindow.append("g")
                 .attr("class", "left-bat");
 
             leftBat.append("rect")
-                .attr("x", 50)
+                .attr("x", convertDimension(50))
                 .attr("y", 0)
-                .attr("width", 11.25)
-                .attr("height", 35)
+                .attr("width", convertDimension(11.25))
+                .attr("height", convertDimension(35))
                 .attr("fill", "#6F5E25");
 
             leftBat.append("rect")
-                .attr("x", 44.625)
-                .attr("y", 33)
-                .attr("width", 20)
-                .attr("height", 90)
-                .attr("rx", 4)
-                .attr("ry", 4)
+                .attr("x", convertDimension(44.625))
+                .attr("y", convertDimension(33))
+                .attr("width", convertDimension(20))
+                .attr("height", convertDimension(90))
+                .attr("rx", convertDimension(4))
+                .attr("ry", convertDimension(4))
                 .attr("fill", "#6F5E25");
 
             leftBat.append("text")
-                .attr("x", 49.625)
-                .attr("y", 80)
+                .attr("x", convertDimension(49.625))
+                .attr("y", convertDimension(80))
                 .attr("dy", ".35em")
                 .attr("font-family", "sans-serif")
                 .attr("fill", "white")
@@ -320,24 +328,24 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("class", "right-bat");
 
             rightBat.append("rect")
-                .attr("x", 518.75)
+                .attr("x", convertDimension(518.75))
                 .attr("y", 0)
-                .attr("width", 11.25)
-                .attr("height", 35)
+                .attr("width", convertDimension(11.25))
+                .attr("height", convertDimension(35))
                 .attr("fill", "#6F5E25");
 
             rightBat.append("rect")
-                .attr("x", 513.375)
-                .attr("y", 33)
-                .attr("width", 20)
-                .attr("height", 90)
-                .attr("rx", 4)
-                .attr("ry", 4)
+                .attr("x", convertDimension(513.375))
+                .attr("y", convertDimension(33))
+                .attr("width", convertDimension(20))
+                .attr("height", convertDimension(90))
+                .attr("rx", convertDimension(4))
+                .attr("ry", convertDimension(4))
                 .attr("fill", "#6F5E25");
 
             rightBat.append("text")
-                .attr("x", 519.375)
-                .attr("y", 80)
+                .attr("x", convertDimension(519.375))
+                .attr("y", convertDimension(80))
                 .attr("dy", ".35em")
                 .attr("font-family", "sans-serif")
                 .attr("fill", "white")
@@ -357,22 +365,22 @@ angular.module('myApp').directive('generateBallVis', function() {
             ground.append("circle")
                 .attr("cx", (svgDimension / 2))
                 .attr("cy", (svgDimension / 2))
-                .attr("r", innerRadius - 10)
+                .attr("r", innerRadius - convertDimension(10))
                 .attr("stroke", "white")
                 .style("fill-opacity", 0);
 
             ground.append("circle")
                 .attr("cx", (svgDimension / 2))
                 .attr("cy", (svgDimension / 2))
-                .attr("r", 91.44)
+                .attr("r", convertDimension(91.44))
                 .attr("stroke", "white")
                 .style("fill-opacity", 0);
 
             ground.append("rect")
-                .attr("height", 75.2)
-                .attr("width", 12.2)
-                .attr("x", (svgDimension / 2) - 6.1)
-                .attr("y", (svgDimension / 2) - 37.6)
+                .attr("height", convertDimension(75.2))
+                .attr("width", convertDimension(12.2))
+                .attr("x", (svgDimension / 2) - convertDimension(6.1))
+                .attr("y", (svgDimension / 2) - convertDimension(37.6))
                 .attr("fill", "#B07942");
 
                 var singleThing = [{ "amount": 1 }]
@@ -398,8 +406,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                         })
 
                     var arc1 = d3.arc()
-                      .outerRadius((svgDimension / 2) - 3)
-                      .innerRadius((svgDimension / 2) - 27);
+                      .outerRadius((svgDimension / 2) - convertDimension(3))
+                      .innerRadius((svgDimension / 2) - convertDimension(27));
 
                     var arcs1 = groundVis.selectAll("g.arc")
                       .data(zoneDonut(zones))
@@ -415,8 +423,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                       .attr("d", arc1);
 
                 var arc2 = d3.arc()
-                    .outerRadius((svgDimension / 2) + 175)
-                    .innerRadius((svgDimension / 2) - 3);
+                    .outerRadius((svgDimension / 2) + convertDimension(175))
+                    .innerRadius((svgDimension / 2) - convertDimension(3));
 
                 var arcs2 = groundVis.selectAll("g.arc")
                     .data(pie(singleThing))
@@ -432,18 +440,17 @@ angular.module('myApp').directive('generateBallVis', function() {
         var colors = ["#550000", "#770000", "#990000", "#CC0000", "#FF0000",
             "#FF5500", "#FF7700", "#FF9900"];
 
-        var idealRadius = 3 * 1.2;
+        var idealRadius = convertDimension(3.6);
 
         var lassoedItems = [];
         //var lasso = d3.lasso();
-        console.log(lasso);
 
         function zoom() {
             d3.select(this).attr("transform", d3.event.transform);
 
             var dots = pitchVis.selectAll(".dot");
             dots.attr("r", function() {
-                idealRadius = (2.5 / d3.event.transform.k) + 0.25
+                idealRadius = (convertDimension(3.6) / d3.event.transform.k) + convertDimension(0.25)
                 return idealRadius;
             });
         }
@@ -676,15 +683,6 @@ angular.module('myApp').directive('generateBallVis', function() {
             .on("start", brushstart)
             .on("brush", stumpBrushMove)
             .on("end", stumpBrushEnd);
-
-        /*var groundBrush = d3.brush()
-            .extent([[bottomEnd + 10, topEnd - 10], [topEnd - 10, bottomEnd + 10]])
-            .on("start", brushstart)
-            .on("brush", groundBrushMove)
-            .on("end", groundBrushEnd);*/
-
-            console.log(bottomEnd + 10)
-            console.log(topEnd - 10)
 
         var validPitchBalls = scope.balls.filter(function(d) {
             return d["landing_x"] != null && d["landing_y"] != null;

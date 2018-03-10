@@ -8,7 +8,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
   var pitchStartY = (svgDimension / 2) - (height / 2);
   var trueX = (svgDimension / 2) - (trueWidth / 2);
   var trueY = (svgDimension / 2) - (trueHeight / 2);
-  var idealRadius = 3 * 1.2;
+  var idealRadius = 3.6;
 
   return {
       restrict: 'EA',
