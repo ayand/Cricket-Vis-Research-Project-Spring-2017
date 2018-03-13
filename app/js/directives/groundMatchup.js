@@ -1,6 +1,9 @@
 angular.module('myApp').directive('groundMatchup', function() {
-    var svgDimension = 580;
-    var innerRadius = (svgDimension / 2) - 30;
+    var svgDimension = 380;
+    var convertDimension = function(d) {
+        return ((d * svgDimension) / 580);
+    }
+    var innerRadius = (svgDimension / 2) - convertDimension(30);
     var bottomEnd = (svgDimension / 2) - innerRadius;
     var topEnd = (svgDimension / 2) + innerRadius;
 
@@ -53,26 +56,26 @@ angular.module('myApp').directive('groundMatchup', function() {
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
               .attr("cy", (svgDimension / 2))
-              .attr("r", innerRadius - 10)
+              .attr("r", innerRadius - convertDimension(10))
               .attr("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
               .attr("cy", (svgDimension / 2))
-              .attr("r", 91.44)
+              .attr("r", convertDimension(91.44))
               .attr("stroke", "white")
               .style("fill-opacity", 0);
 
           ground.append("rect")
-              .attr("height", 75.2)
-              .attr("width", 12.2)
-              .attr("x", (svgDimension / 2) - 6.1)
-              .attr("y", (svgDimension / 2) - 37.6)
+              .attr("height", convertDimension(75.2))
+              .attr("width", convertDimension(12.2))
+              .attr("x", (svgDimension / 2) - convertDimension(6.1))
+              .attr("y", (svgDimension / 2) - convertDimension(37.6))
               .attr("fill", "#B07942");
 
-          var ballX = d3.scaleLinear().range([bottomEnd + 10, topEnd - 10]).domain([0, 360]);
-          var ballY = d3.scaleLinear().range([topEnd - 10, bottomEnd + 10]).domain([0, 360]);
+          var ballX = d3.scaleLinear().range([bottomEnd + convertDimension(10), topEnd - convertDimension(10)]).domain([0, 360]);
+          var ballY = d3.scaleLinear().range([topEnd - convertDimension(10), bottomEnd + convertDimension(10)]).domain([0, 360]);
 
           var isWicketBall = function(d) {
               return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
@@ -178,8 +181,8 @@ angular.module('myApp').directive('groundMatchup', function() {
                   })
 
               var arc1 = d3.arc()
-                .outerRadius((svgDimension / 2) - 3)
-                .innerRadius((svgDimension / 2) - 27);
+                .outerRadius((svgDimension / 2) - convertDimension(3))
+                .innerRadius((svgDimension / 2) - convertDimension(27));
 
               var arcs1 = vis.selectAll("g.arc")
                 .data(zoneDonut(zones))
@@ -231,8 +234,8 @@ angular.module('myApp').directive('groundMatchup', function() {
                 })
 
           var arc2 = d3.arc()
-              .outerRadius((svgDimension / 2) + 175)
-              .innerRadius((svgDimension / 2) - 3);
+              .outerRadius((svgDimension / 2) + convertDimension(175))
+              .innerRadius((svgDimension / 2) - convertDimension(3));
 
           var arcs2 = vis.selectAll("g.arc")
               .data(pie(singleThing))
@@ -246,7 +249,7 @@ angular.module('myApp').directive('groundMatchup', function() {
               .attr("d", arc2);
 
               var selectedZone = 0;
-              var idealRadius = 2.5;
+              var idealRadius = convertDimension(2.5);
 
               scope.$watch('game', function(newVal, oldVal) {
                   if (newVal == null) {

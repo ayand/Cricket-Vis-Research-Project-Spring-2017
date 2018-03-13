@@ -1,14 +1,24 @@
 angular.module('myApp').directive('pitchMatchup', function() {
-  var trueHeight = 451.2 * 1.2;
-  var trueWidth = 73.2 * 1.2;
-  var height = 402.4 * 1.2; // 442.64
-  var width = 61 * 1.2; // 67.1
-  var svgDimension = 580;
+  var svgDimension = 380;
+
+  var convertDimension = function(d) {
+      return ((d * svgDimension) / 580);
+  }
+
+  var trueHeight = convertDimension(541.44);
+  var trueWidth = convertDimension(87.84);
+  var height = convertDimension(482.88); // 442.64
+  var width = convertDimension(73.2);
   var pitchStartX = (svgDimension / 2) - (width / 2);
   var pitchStartY = (svgDimension / 2) - (height / 2);
   var trueX = (svgDimension / 2) - (trueWidth / 2);
   var trueY = (svgDimension / 2) - (trueHeight / 2);
-  var idealRadius = 3.6;
+  var radiusDifference = convertDimension(30);
+  var innerRadius = (svgDimension / 2) - radiusDifference;
+  var bottomEnd = (svgDimension / 2) - innerRadius;
+  var topEnd = (svgDimension / 2) + innerRadius;
+  var idealRadius = convertDimension(3.6);
+
 
   return {
       restrict: 'EA',
@@ -72,7 +82,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
 
                   var dots = vis.selectAll(".dot");
                   dots.attr("r", function() {
-                      idealRadius = (2.5 / d3.event.transform.k) + 0.25
+                      idealRadius = (convertDimension(3.6) / d3.event.transform.k) + 0.25
                       return idealRadius;
                   });
               }
@@ -146,92 +156,92 @@ angular.module('myApp').directive('pitchMatchup', function() {
               .attr("height", trueHeight)
               .attr("fill", "#B07942");
 
-          ground.append("rect")
-              .attr("x", trueX)
-              .attr("y", trueY)
-              .attr("width", trueWidth)
-              .attr("height", 48.8 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
+              ground.append("rect")
+                  .attr("x", trueX)
+                  .attr("y", trueY)
+                  .attr("width", trueWidth)
+                  .attr("height", convertDimension(58.56))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
-          ground.append("rect")
-              .attr("x", trueX)
-              .attr("y", trueY + (402.4 * 1.2))
-              .attr("width", trueWidth)
-              .attr("height", 48.8 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
+              ground.append("rect")
+                  .attr("x", trueX)
+                  .attr("y", trueY + convertDimension(482.88))
+                  .attr("width", trueWidth)
+                  .attr("height", convertDimension(58.56))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
-          ground.append("rect")
-              .attr("x", trueX + (10.2 * 1.2))
-              .attr("y", trueY)
-              .attr("width", 52.8 * 1.2)
-              .attr("height", 24.4 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
+              ground.append("rect")
+                  .attr("x", trueX + convertDimension(12.24))
+                  .attr("y", trueY)
+                  .attr("width", convertDimension(63.36))
+                  .attr("height", convertDimension(29.28))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
-          ground.append("rect")
-              .attr("x", trueX + (10.2 * 1.2))
-              .attr("y", trueY + (24.4 * 1.2))
-              .attr("width", 52.8 * 1.2)
-              .attr("height", 24.4 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
+              ground.append("rect")
+                  .attr("x", trueX + convertDimension(12.24))
+                  .attr("y", trueY + convertDimension(29.28))
+                  .attr("width", convertDimension(63.36))
+                  .attr("height", convertDimension(29.28))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
-          ground.append("rect")
-              .attr("x", trueX + (10.2 * 1.2))
-              .attr("y", trueY + (402.4 * 1.2))
-              .attr("width", 52.8 * 1.2)
-              .attr("height", 24.4 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
+              ground.append("rect")
+                  .attr("x", trueX + (convertDimension(12.24)))
+                  .attr("y", trueY + convertDimension(482.88))
+                  .attr("width", convertDimension(63.36))
+                  .attr("height", convertDimension(29.28))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
-          ground.append("rect")
-              .attr("x", trueX + (10.2 * 1.2))
-              .attr("y", trueY + (426.8 * 1.2))
-              .attr("width", 52.8 * 1.2)
-              .attr("height", 24.4 * 1.2)
-              .style("stroke", "white")
-              .style("fill-opacity", 0);
-
-          ground.append("circle")
-              .attr("cx", (svgDimension / 2))
-              .attr("cy", (trueY + (24.4 * 1.2)))
-              .attr("r", 3 * 1.2)
-              .attr("fill", "#FAE3A1");
-
-          ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 9)
-              .attr("cy", (trueY + (24.4 * 1.2)))
-              .attr("r", 3 * 1.2)
-              .attr("fill", "#FAE3A1");
-
-          ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 9)
-              .attr("cy", (trueY + (24.4 * 1.2)))
-              .attr("r", 3 * 1.2)
-              .attr("fill", "#FAE3A1");
+              ground.append("rect")
+                  .attr("x", trueX + (convertDimension(12.24)))
+                  .attr("y", trueY + convertDimension(512.16))
+                  .attr("width", convertDimension(63.36))
+                  .attr("height", convertDimension(29.28))
+                  .style("stroke", "white")
+                  .style("fill-opacity", 0);
 
           ground.append("circle")
               .attr("cx", (svgDimension / 2))
-              .attr("cy", (trueY + (426.8 * 1.2)))
-              .attr("r", 3 * 1.2)
+              .attr("cy", (trueY + (convertDimension(29.28))))
+              .attr("r", convertDimension(3.6))
               .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) - 9)
-              .attr("cy", (trueY + (426.8 * 1.2)))
-              .attr("r", 3 * 1.2)
+              .attr("cx", (svgDimension / 2) - convertDimension(9))
+              .attr("cy", (trueY + (convertDimension(29.28))))
+              .attr("r", convertDimension(3.6))
               .attr("fill", "#FAE3A1");
 
           ground.append("circle")
-              .attr("cx", (svgDimension / 2) + 9)
-              .attr("cy", (trueY + (426.8 * 1.2)))
-              .attr("r", 3 * 1.2)
+              .attr("cx", (svgDimension / 2) + convertDimension(9))
+              .attr("cy", (trueY + (convertDimension(29.28))))
+              .attr("r", convertDimension(3.6))
+              .attr("fill", "#FAE3A1");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2))
+              .attr("cy", (trueY + (convertDimension(512.16))))
+              .attr("r", convertDimension(3.6))
+              .attr("fill", "#FAE3A1");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) - convertDimension(9))
+              .attr("cy", (trueY + (convertDimension(512.16))))
+              .attr("r", convertDimension(3.6))
+              .attr("fill", "#FAE3A1");
+
+          ground.append("circle")
+              .attr("cx", (svgDimension / 2) + convertDimension(9))
+              .attr("cy", (trueY + (convertDimension(512.16))))
+              .attr("r", convertDimension(3.6))
               .attr("fill", "#FAE3A1");
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
+          var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))])
           ballX.domain([-1.525, 1.525]);
           ballY.domain([-1, 20.12]);
 

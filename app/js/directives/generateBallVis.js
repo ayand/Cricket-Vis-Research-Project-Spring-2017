@@ -121,7 +121,7 @@ angular.module('myApp').directive('generateBallVis', function() {
         var bottomGroundY = -1;
 
         var pitchX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
-        var pitchY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (20 * 1.2), ((svgDimension / 2) + (height / 2))])
+        var pitchY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))])
         pitchX.domain([-1.525, 1.525]);
         pitchY.domain([-1, 20.12]);
 
@@ -316,12 +316,13 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("fill", "#6F5E25");
 
             leftBat.append("text")
-                .attr("x", convertDimension(49.625))
+                .attr("x", convertDimension(54.625))
                 .attr("y", convertDimension(80))
                 .attr("dy", ".35em")
                 .attr("font-family", "sans-serif")
                 .attr("fill", "white")
                 .style("font-weight", "bold")
+                .style("text-anchor", "middle")
                 .text("L");
 
             var rightBat = stumpWindow.append("g")
@@ -344,12 +345,13 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("fill", "#6F5E25");
 
             rightBat.append("text")
-                .attr("x", convertDimension(519.375))
+                .attr("x", convertDimension(523.375))
                 .attr("y", convertDimension(80))
                 .attr("dy", ".35em")
                 .attr("font-family", "sans-serif")
                 .attr("fill", "white")
                 .style("font-weight", "bold")
+                .style("text-anchor", "middle")
                 .text("R");
 
             var ground = groundVis.append("g")

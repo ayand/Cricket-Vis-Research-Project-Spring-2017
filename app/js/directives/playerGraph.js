@@ -90,16 +90,30 @@ angular.module('myApp').directive('playerGraph', function() {
             var edgeTipText = function(d) {
               return "<div align='center' class='row'>\
                           <div class='col-sm-6 col-md-6 col-lg-6'>\
-                              <strong>Batsman</strong>\
-                              <br>\
+                              <h4>Batsman</h4>\
                               <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.batsman.toString()]["name"]] + "'>\
-                              <strong>" + scope.playerDict[d.batsman.toString()]["name"] + "</strong>\
+                              <h5>" + scope.playerDict[d.batsman.toString()]["name"] + "</h5>\
                           </div>\
                           <div class='col-sm-6 col-md-6 col-lg-6'>\
-                              <strong>Bowler</strong>\
-                              <br>\
+                              <h4>Bowler</h4>\
                               <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.bowler.toString()]["name"]] + "'>\
-                              <strong>" + scope.playerDict[d.bowler.toString()]["name"] + "</strong>\
+                              <h5>" + scope.playerDict[d.bowler.toString()]["name"] + "</h5>\
+                          </div>\
+                      </div>\
+                      <div align='center' class='row' style='border-top: 1 px solid white'>\
+                          <div align='left' class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>Number of Balls:</strong>\
+                          </div>\
+                          <div align='right' class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>" + d.number_of_balls + "</strong>\
+                          </div>\
+                      </div>\
+                      <div class='row' style='border-top: 1 px solid white'>\
+                          <div align='left' class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>Runs Scored:</strong>\
+                          </div>\
+                          <div align='right' class='col-sm-6 col-md-6 col-lg-6'>\
+                              <strong>" + d.runs_scored + "</strong>\
                           </div>\
                       </div>"
             }
@@ -107,7 +121,7 @@ angular.module('myApp').directive('playerGraph', function() {
             var nodeTip = d3.tip().attr('class', 'node-tip').html(function(d) { return nodeTipText(d); });
             svg.call(nodeTip);
 
-            var edgeTip = d3.tip().attr('class', 'd3-tip').html(function(d) { return edgeTipText(d); });
+            var edgeTip = d3.tip().attr('class', 'edge-tip').html(function(d) { return edgeTipText(d); });
             svg.call(edgeTip);
 
             var teams = Array.from(new Set(scope.graph.nodes.map(function(d) {

@@ -1,5 +1,9 @@
 angular.module('myApp').directive('stumpMatchup', function() {
-    var svgDimension = 580;
+    var svgDimension = 380;
+
+    var convertDimension = function(d) {
+        return ((d * svgDimension) / 580);
+    }
 
     return {
         restrict: 'EA',
@@ -56,7 +60,7 @@ angular.module('myApp').directive('stumpMatchup', function() {
                       return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
                   }
 
-                  var idealRadius = 3;
+                  var idealRadius = convertDimension(3.6);
 
                   var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
                   vis.call(tip);
@@ -107,103 +111,105 @@ angular.module('myApp').directive('stumpMatchup', function() {
               .attr("fill", "#FFFFFF")
 
           window.append("rect")
-              .attr("height", 137.46)
-              .attr("width", 7.366)
-              .attr("x", ((svgDimension / 2) - 3.683))
-              .attr("y", (svgDimension - 137.46))
-              .attr("rx", 4)
-              .attr("rx", 4)
+              .attr("height", convertDimension(137.46))
+              .attr("width", convertDimension(7.366))
+              .attr("x", ((svgDimension / 2) - convertDimension(3.683)))
+              .attr("y", (svgDimension - convertDimension(137.46)))
+              .attr("rx", convertDimension(4))
+              .attr("ry", convertDimension(4))
               .attr("fill", "#FAE3A1");
 
           window.append("rect")
-              .attr("height", 137.46)
-              .attr("width", 7.366)
-              .attr("x", ((svgDimension / 2) - 22.1366666667))
-              .attr("y", (svgDimension - 137.46))
-              .attr("rx", 4)
-              .attr("rx", 4)
+              .attr("height", convertDimension(137.46))
+              .attr("width", convertDimension(7.366))
+              .attr("x", ((svgDimension / 2) - convertDimension(22.1366666667)))
+              .attr("y", (svgDimension - convertDimension(137.46)))
+              .attr("rx", convertDimension(4))
+              .attr("ry", convertDimension(4))
               .attr("fill", "#FAE3A1");
 
           window.append("rect")
-              .attr("height", 137.46)
-              .attr("width", 7.366)
-              .attr("x", ((svgDimension / 2) + 14.7706666667))
-              .attr("y", (svgDimension - 137.46))
-              .attr("rx", 4)
-              .attr("rx", 4)
+              .attr("height", convertDimension(137.46))
+              .attr("width", convertDimension(7.366))
+              .attr("x", ((svgDimension / 2) + convertDimension(14.7706666667)))
+              .attr("y", (svgDimension - convertDimension(137.46)))
+              .attr("rx", convertDimension(4))
+              .attr("ry", convertDimension(4))
               .attr("fill", "#FAE3A1");
 
           window.append("rect")
-              .attr("width", 20)
-              .attr("height", 4)
+              .attr("width", convertDimension(20))
+              .attr("height", convertDimension(4))
               .attr("x", (svgDimension / 2))
-              .attr("y", (svgDimension - 138.793333333))
-              .attr("rx", 3)
-              .attr("rx", 3)
+              .attr("y", (svgDimension - convertDimension(138.793333333)))
+              .attr("rx", convertDimension(3))
+              .attr("ry", convertDimension(3))
               .attr("fill", "#683F16");
 
           window.append("rect")
-              .attr("width", 20)
-              .attr("height", 4)
-              .attr("x", ((svgDimension / 2) - 20))
-              .attr("y", (svgDimension - 138.793333333))
-              .attr("rx", 3)
-              .attr("rx", 3)
+              .attr("width", convertDimension(20))
+              .attr("height", convertDimension(4))
+              .attr("x", ((svgDimension / 2) - convertDimension(20)))
+              .attr("y", (svgDimension - convertDimension(138.793333333)))
+              .attr("rx", convertDimension(3))
+              .attr("ry", convertDimension(3))
               .attr("fill", "#683F16");
 
           var leftBat = window.append("g")
               .attr("class", "left-bat");
 
           leftBat.append("rect")
-              .attr("x", 50)
+              .attr("x", convertDimension(50))
               .attr("y", 0)
-              .attr("width", 11.25)
-              .attr("height", 35)
+              .attr("width", convertDimension(11.25))
+              .attr("height", convertDimension(35))
               .attr("fill", "#6F5E25");
 
           leftBat.append("rect")
-              .attr("x", 44.625)
-              .attr("y", 33)
-              .attr("width", 20)
-              .attr("height", 90)
-              .attr("rx", 4)
-              .attr("ry", 4)
+              .attr("x", convertDimension(44.625))
+              .attr("y", convertDimension(33))
+              .attr("width", convertDimension(20))
+              .attr("height", convertDimension(90))
+              .attr("rx", convertDimension(4))
+              .attr("ry", convertDimension(4))
               .attr("fill", "#6F5E25");
 
           leftBat.append("text")
-              .attr("x", 49.625)
-              .attr("y", 80)
+              .attr("x", convertDimension(54.625))
+              .attr("y", convertDimension(80))
               .attr("dy", ".35em")
               .attr("font-family", "sans-serif")
               .attr("fill", "white")
               .style("font-weight", "bold")
+              .style("text-anchor", "middle")
               .text("L");
 
           var rightBat = window.append("g")
               .attr("class", "right-bat");
 
           rightBat.append("rect")
-              .attr("x", 518.75)
+              .attr("x", convertDimension(518.75))
               .attr("y", 0)
-              .attr("width", 11.25)
-              .attr("height", 35)
+              .attr("width", convertDimension(11.25))
+              .attr("height", convertDimension(35))
               .attr("fill", "#6F5E25");
 
           rightBat.append("rect")
-              .attr("x", 513.375)
-              .attr("y", 33)
-              .attr("width", 20)
-              .attr("height", 90)
-              .attr("rx", 4)
-              .attr("ry", 4)
+              .attr("x", convertDimension(513.375))
+              .attr("y", convertDimension(33))
+              .attr("width", convertDimension(20))
+              .attr("height", convertDimension(90))
+              .attr("rx", convertDimension(4))
+              .attr("ry", convertDimension(4))
               .attr("fill", "#6F5E25");
 
           rightBat.append("text")
-              .attr("x", 519.375)
-              .attr("y", 80)
+              .attr("x", convertDimension(523.375))
+              .attr("y", convertDimension(80))
               .attr("dy", ".35em")
               .attr("font-family", "sans-serif")
               .attr("fill", "white")
+              .style("text-anchor", "middle")
               .style("font-weight", "bold")
               .text("R");
 
