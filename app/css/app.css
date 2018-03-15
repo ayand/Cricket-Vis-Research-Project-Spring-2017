@@ -485,3 +485,15 @@ td {
     fill-opacity:.5;
     stroke: gold;
 }
+
+.overLine {
+    fill: none;
+    stroke: #5b138e;
+    stroke-width: 2px;
+}
+
+.horizontalLine {
+    fill: none;
+    stroke: black;
+    stroke-width: 2px;
+}

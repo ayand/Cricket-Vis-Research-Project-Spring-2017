@@ -43,6 +43,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
           currentPlayer: "="
       },
       link: function(scope, element, attrs) {
+          var games = scope.data.batting_balls.map(function(d) { return parseInt(d.key) });
+
           var getIndex = function(i) {
               if (i > 0 && specialCases.includes(scope.team)) {
                   return i + 1;
@@ -85,6 +87,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
               .domain([0, 1, 2, 3, 4, 5, 6,7, 8])
               .range([50, 1160])
               .paddingInner([0.05]);
+
+          var blankSpace = 55.5 / 8;
 
               vis.append("text")
                   .attr("x", 55)
@@ -345,13 +349,26 @@ angular.module('myApp').directive('tournamentOverview', function() {
                           var maxScore = d3.max(finalScores);
                           var maxLength = d3.max(numBalls);
 
-                          //var ballHeight = 365 / maxScore;
-
                           var allBallStuff = vis.selectAll(".allBalls");
 
+                          var batPoint1 = null;
+                          var batPoint2 = null;
+                          var bowlPoint1 = null;
+                          var bowlPoint2 = null;
 
                           var battingRunScale = d3.scaleLinear().domain([0, maxScore]).range([405, 40]);
                           var bowlingRunScale = d3.scaleLinear().domain([0, maxScore]).range([495, 860]);
+                          var overScale = d3.scaleLinear().domain([1, 50]).range([0, matchScale.bandwidth()])
+
+                          var overLine = d3.line()
+                              .x(function(d) { return overScale(parseInt(d.key)) })
+                              .y(function(d) {
+                                  if (d.value.side == "bat") {
+                                      return battingRunScale(d.value.maxScore);
+                                  } else {
+                                      return bowlingRunScale(d.value.maxScore);
+                                  }
+                              })
 
                           var batBallHeightDict = {}
                           var bowlBallHeightDict = {}
@@ -366,8 +383,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               bowlBallHeightDict[key] = barHeight / bowlLengthDict[key]["length"]
                           }
 
-                          console.log(batBallHeightDict)
-
                           var scoreProgression = vis.append("g");
 
                           var batScoreProgression = scoreProgression.selectAll(".batScore")
@@ -378,40 +393,185 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   return "translate("+[matchScale(getIndex(i)),0]+")"
                               });
 
-                          var batScoreLevel = batScoreProgression.selectAll(".ball")
+                          batScoreProgression.selectAll(".vertLine")
                               .data(function(d) {
-                                  return d.values.filter(function(ball) { return !isDotBall(ball) })
+                                return d3.nest()
+                                    .key(function(ball) { return Math.ceil(ball.ovr) })
+                                    .rollup(function(leaves) { return {
+                                          "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
+                                          "side": "bat",
+                                          "game": parseInt(leaves[0].game)
+                                    }})
+                                    .entries(d.values)
                               })
-                              .enter().append("rect")
-                              .attr("class", "ball")
-                              .attr("width", matchScale.bandwidth())
-                              .attr("height", function(d) { return batBallHeightDict[d.game] })
-                              .attr("y", function(d, i) {
-                                  var difference = batLengthDict[d.game]["length"] - (i + 1)
-                                  return battingRunScale(batLengthDict[d.game]["score"]) + (difference * batBallHeightDict[d.game])
+                              .enter().append("line")
+                              .attr("class", "vertLine")
+                              .attr("x1", function(d) { return overScale(parseInt(d.key)) })
+                              .attr("y1", battingRunScale(0))
+                              .attr("x2", function(d) { return overScale(parseInt(d.key)) })
+                              .attr("y2", function(d) { return battingRunScale(d.value.maxScore) })
+                              .style("stroke", "#BC9CD3")
+                              .style("stroke-dasharray", "10,10")
+                              .style("cursor", "pointer")
+                              .on("mouseover", function(d) {
+                                  var x = overScale(parseInt(d.key))
+                                  var index = getIndex(games.indexOf(d.value.game))
+                                  var pointX = x + (matchScale.bandwidth() * index) + (blankSpace * index) + 50
+                                  batPoint1 = { x: pointX, y: battingRunScale(d.value.maxScore)}
+                                  batPoint2 = { x: 50, y: battingRunScale(d.value.maxScore) }
+
+                                  d3.selectAll(".vertLine")
+                                      .style("opacity", function(point) {
+                                          if (point == d || (point.key == d.key && point.value.game == d.value.game)) {
+                                              return 1;
+                                          }
+                                          return 0.1;
+                                      })
+                                      .each(function(point) {
+                                          if (point != d && point.key == d.key && point.value.game == d.value.game) {
+                                              bowlPoint1 = { x: pointX, y: bowlingRunScale(point.value.maxScore)}
+                                              bowlPoint2 = { x: 50, y: bowlingRunScale(point.value.maxScore) }
+                                          }
+                                      })
+
+
+                                  vis.append("line")
+                                      .attr("class", "horizontalLine")
+                                      .attr("x1", batPoint1.x)
+                                      .attr("y1", batPoint1.y)
+                                      .attr("x2", batPoint2.x)
+                                      .attr("y2", batPoint2.y)
+
+                                  if (bowlPoint1 != null) {
+                                    vis.append("line")
+                                        .attr("class", "horizontalLine")
+                                        .attr("x1", bowlPoint1.x)
+                                        .attr("y1", bowlPoint1.y)
+                                        .attr("x2", bowlPoint2.x)
+                                        .attr("y2", bowlPoint2.y)
+                                  }
+
                               })
-                              .attr("fill", function(d) { return decideColor(d); })
+                              .on("mouseout", function(d) {
+                                  batPoint1 = null;
+                                  batPoint2 = null;
+                                  bowlPoint1 = null;
+                                  bowlPoint2 = null;
 
-                              var bowlScoreProgression = scoreProgression.selectAll(".bowlScore")
-                                  .data(scope.data.bowling_balls)
-                                  .enter().append("g")
-                                  .attr("class", "batScore")
-                                  .attr("transform", function(d, i) {
-                                      return "translate("+[matchScale(getIndex(i)),0]+")"
-                                  });
+                                  vis.selectAll(".horizontalLine").remove();
+                                  d3.selectAll(".vertLine").style("opacity", 1);
+                              })
 
-                              var bowlScoreLevel = bowlScoreProgression.selectAll(".ball")
+                          batScoreProgression.selectAll(".overLine")
+                              .data(function(d) {
+                                  return [
+                                    d3.nest()
+                                        .key(function(ball) { return Math.ceil(ball.ovr) })
+                                        .rollup(function(leaves) { return {
+                                              "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
+                                              "side": "bat",
+                                              "game": parseInt(leaves[0].game)
+                                        }})
+                                        .entries(d.values)
+                                  ];
+                              })
+                              .enter().append("path")
+                              .attr("class", "overLine")
+                              .attr("d", overLine)
+
+                          var bowlScoreProgression = scoreProgression.selectAll(".bowlScore")
+                              .data(scope.data.bowling_balls)
+                              .enter().append("g")
+                              .attr("class", "batScore")
+                              .attr("transform", function(d, i) {
+                                  return "translate("+[matchScale(getIndex(i)),0]+")"
+                              });
+
+                              bowlScoreProgression.selectAll(".vertLine")
                                   .data(function(d) {
-                                      return d.values.filter(function(ball) { return !isDotBall(ball) })
+                                    return d3.nest()
+                                        .key(function(ball) { return Math.ceil(ball.ovr) })
+                                        .rollup(function(leaves) { return {
+                                              "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
+                                              "side": "bowl",
+                                              "game": parseInt(leaves[0].game)
+                                        }})
+                                        .entries(d.values)
                                   })
-                                  .enter().append("rect")
-                                  .attr("class", "ball")
-                                  .attr("width", matchScale.bandwidth())
-                                  .attr("height", function(d) { return bowlBallHeightDict[d.game] })
-                                  .attr("y", function(d, i) {
-                                      return 495 + (i * bowlBallHeightDict[d.game])
+                                  .enter().append("line")
+                                  .attr("class", "vertLine")
+                                  .attr("x1", function(d) { return overScale(parseInt(d.key)) })
+                                  .attr("y1", bowlingRunScale(0))
+                                  .attr("x2", function(d) { return overScale(parseInt(d.key)) })
+                                  .attr("y2", function(d) { return bowlingRunScale(d.value.maxScore) })
+                                  .style("stroke", "#BC9CD3")
+                                  .style("stroke-dasharray", "10,10")
+                                  .style("cursor", "pointer")
+                                  .on("mouseover", function(d) {
+                                      var x = overScale(parseInt(d.key))
+                                      var index = getIndex(games.indexOf(d.value.game))
+                                      var pointX = x + (matchScale.bandwidth() * index) + (blankSpace * index) + 50
+                                      bowlPoint1 = { x: pointX, y: bowlingRunScale(d.value.maxScore)}
+                                      bowlPoint2 = { x: 50, y: bowlingRunScale(d.value.maxScore) }
+
+                                      d3.selectAll(".vertLine")
+                                          .style("opacity", function(point) {
+                                              if (point == d || (point.key == d.key && point.value.game == d.value.game)) {
+                                                  return 1;
+                                              }
+                                              return 0.1;
+                                          })
+                                          .each(function(point) {
+                                              if (point != d && point.key == d.key && point.value.game == d.value.game) {
+                                                  batPoint1 = { x: pointX, y: battingRunScale(point.value.maxScore)}
+                                                  batPoint2 = { x: 50, y: battingRunScale(point.value.maxScore) }
+                                              }
+                                          })
+
+
+                                      vis.append("line")
+                                          .attr("class", "horizontalLine")
+                                          .attr("x1", bowlPoint1.x)
+                                          .attr("y1", bowlPoint1.y)
+                                          .attr("x2", bowlPoint2.x)
+                                          .attr("y2", bowlPoint2.y)
+
+                                      if (batPoint1 != null) {
+                                        vis.append("line")
+                                            .attr("class", "horizontalLine")
+                                            .attr("x1", batPoint1.x)
+                                            .attr("y1", batPoint1.y)
+                                            .attr("x2", batPoint2.x)
+                                            .attr("y2", batPoint2.y)
+                                      }
+
                                   })
-                                  .attr("fill", function(d) { return decideColor(d); })
+                                  .on("mouseout", function(d) {
+                                      batPoint1 = null;
+                                      batPoint2 = null;
+                                      bowlPoint1 = null;
+                                      bowlPoint2 = null;
+
+                                      vis.selectAll(".horizontalLine").remove();
+                                      d3.selectAll(".vertLine").style("opacity", 1);
+                                  })
+
+                              bowlScoreProgression.selectAll(".overLine")
+                                  .data(function(d) {
+                                      return [
+                                        d3.nest()
+                                            .key(function(ball) { return Math.ceil(ball.ovr) })
+                                            .rollup(function(leaves) { return {
+                                                  "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
+                                                  "side": "bowl",
+                                                  "game": parseInt(leaves[0].game)
+                                            }})
+                                            .entries(d.values)
+                                      ];
+                                  })
+                                  .enter().append("path")
+                                  .attr("class", "overLine")
+                                  .attr("d", overLine)
 
                               scoreProgression.append("g")
                                   .attr("class", "batScoreAxis")

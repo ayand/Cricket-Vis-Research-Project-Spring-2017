@@ -137,6 +137,14 @@ angular.module('myApp').directive('playerGraph', function() {
                 .attr("transform", "translate(0, 20)")
                 .call(d3.axisTop(teamScale));
 
+            d3.select(".xAxis")
+                .selectAll("line")
+                .style("display", "none")
+
+            d3.select(".xAxis")
+                .selectAll("text")
+                .style("font-weight", "bold")
+
             var coordinateDict = {}
 
             var teamDivision = d3.nest()
@@ -268,7 +276,6 @@ angular.module('myApp').directive('playerGraph', function() {
                     if (selectedPlayer == null) {
                       temporaryPlayer = null;
                       d3.select(".xAxis").selectAll("text")
-                          .style("font-weight", "normal")
                           .style("fill", "black")
                       temporaryOpponents = [];
                       d3.selectAll(".edge").style("display", "none")
@@ -310,7 +317,6 @@ angular.module('myApp').directive('playerGraph', function() {
                         selectedPlayer = null;
                         selectedTeam = null;
                         d3.select(".xAxis").selectAll("text")
-                            .style("font-weight", "normal")
                             .style("fill", "black")
                         relevantOpponents = [];
                         d3.selectAll(".edge").style("display", "none")
@@ -344,7 +350,6 @@ angular.module('myApp').directive('playerGraph', function() {
                       if (selectedTeam != d) {
                           selectedTeam = d;
                           d3.select(".xAxis").selectAll("text")
-                              .style("font-weight", function(team) { return team == d ? "bold" : "normal" })
                               .style("fill", function(team) { return team == d ? "orange" : "black" })
 
                           playerNodes.style("display", function(node) {
@@ -364,7 +369,6 @@ angular.module('myApp').directive('playerGraph', function() {
                       } else {
                           selectedTeam = null;
                           d3.select(this)
-                              .style("font-weight", "normal")
                               .style("fill", "black")
 
                           playerNodes.style("display", function(node) {
@@ -440,7 +444,6 @@ angular.module('myApp').directive('playerGraph', function() {
               if (selectedPlayer != null) {
                 selectedTeam = null;
                 d3.select(".xAxis").selectAll("text")
-                    .style("font-weight", "normal")
                     .style("fill", "black")
                 relevantOpponents = [];
                 edges.style("display", function(edge) {
