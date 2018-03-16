@@ -411,7 +411,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               .attr("x2", function(d) { return overScale(parseInt(d.key)) })
                               .attr("y2", function(d) { return battingRunScale(d.value.maxScore) })
                               .style("stroke", "#BC9CD3")
-                              .style("stroke-dasharray", "10,10")
                               .style("cursor", "pointer")
                               .on("mouseover", function(d) {
                                   var x = overScale(parseInt(d.key))
@@ -505,7 +504,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .attr("x2", function(d) { return overScale(parseInt(d.key)) })
                                   .attr("y2", function(d) { return bowlingRunScale(d.value.maxScore) })
                                   .style("stroke", "#BC9CD3")
-                                  .style("stroke-dasharray", "10,10")
                                   .style("cursor", "pointer")
                                   .on("mouseover", function(d) {
                                       var x = overScale(parseInt(d.key))
