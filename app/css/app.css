@@ -114,11 +114,11 @@ div.player-list {
 }
 
 .inactiveball {
-    opacity: 0.1;
+    fill-opacity: 0.1;
 }
 
 .activeball {
-    opacity: 1;
+    fill-opacity: 1;
 }
 
 .jumbotron {

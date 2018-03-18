@@ -591,12 +591,14 @@ angular.module('myApp').directive('generateBallVis', function() {
           d3.selectAll(activeClassName)
               .style("opacity", function(d) { return isValidBall(d) && isSelectedBall(d) ? 1 : 0.1 })
               .on("mouseover", function(d) {
-                  if (isSelectedBall(d)) {
+                  if (isValidBall(d) && isSelectedBall(d)) {
                       ballMouseover(d);
                   }
               })
               .on("mouseout", function() {
-                  ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                  if (isValidBall(d) && isSelectedBall(d)) {
+                      ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                  }
               })
               .classed("brushedBar", function(d) { return isValidBall(d) && isSelectedBall(d); })
         }
@@ -776,10 +778,6 @@ angular.module('myApp').directive('generateBallVis', function() {
                     return d["x"] != null && d["y"] != null;
                 });
 
-                /*var groundBrushArea = ground.append("g")
-                    .attr("class", "brush")
-                    .call(groundBrush);*/
-
                 var groundBalls = ground.selectAll(".dot")
                     .data(validGroundBalls)
                     .enter().append("circle")
@@ -928,7 +926,10 @@ angular.module('myApp').directive('generateBallVis', function() {
                                 })
                                 .on("mouseover", function(d) {
                                   if (isValidBall(d)  && isSelectedBall(d)) {
+                                      console.log("True")
                                       ballMouseover(d);
+                                  } else {
+                                      console.log("False")
                                   }
                                 })
                                 .on("mouseout", function(d) {
