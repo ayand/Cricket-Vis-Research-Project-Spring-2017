@@ -31,8 +31,6 @@ angular.module('myApp').directive('playerGraph', function() {
                 .append("svg")
                 .attr("width", 1500)
                 .attr("height", 283);
-            console.log(scope.graph);
-            console.log(scope.graph.edges.length);
 
             var sortByKey = function(key) {
                 var teams = ["Afghanistan", "Australia", "Bangladesh", "England", "India",

@@ -207,7 +207,7 @@ td {
 .rzslider {
   position: relative;
   display: inline-block;
-  width: 100%;
+  width: 560px;
   height: 4px;
   margin: 35px 0 15px 0;
   vertical-align: middle;

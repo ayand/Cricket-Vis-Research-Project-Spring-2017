@@ -671,21 +671,45 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         }]
       },
       url: '/innings/:number',
-      templateUrl: 'partials/alternate-innings-2.html',
+      templateUrl: 'partials/alternate-innings-3.html',
       controller: function($scope, players, $stateParams, images, $uibModal,
           $anchorScroll, $location) {
           $scope.imageDict = images;
-          $scope.isCollapsed = true;
+          $scope.playerViews = ["Player Stats", "Player Graph"]
+          $scope.currentPlayerView = null;
+          $scope.isCollapsed1 = true;
+          $scope.isCollapsed2 = true;
 
-          $scope.changeCollapse = function() {
-              $scope.isCollapsed = !$scope.isCollapsed;
-              if (!$scope.isCollapsed) {
-                  $location.hash('playerStats');
-                  $anchorScroll();
+          $scope.changeCollapse = function(view) {
+              if (view == "Player Stats") {
+                  $scope.isCollapsed1 = !$scope.isCollapsed1;
+                  $scope.isCollapsed2 = true;
+                  if (!$scope.isCollapsed1) {
+                      $location.hash('playerStats');
+                      $anchorScroll();
+                  } else {
+                      $location.hash('top');
+                      $anchorScroll();
+                  }
               } else {
-                  $location.hash('top');
-                  $anchorScroll();
+                  $scope.isCollapsed2 = !$scope.isCollapsed2;
+                  $scope.isCollapsed1 = true;
+                  if (!$scope.isCollapsed2) {
+                      $location.hash('playerGraph');
+                      $anchorScroll();
+                  } else {
+                      $location.hash('top');
+                      $anchorScroll();
+                  }
               }
+              if (!$scope.isCollapsed1) {
+                  $scope.currentPlayerView = "Player Stats";
+              } else if (!$scope.isCollapsed2) {
+                  $scope.currentPlayerView = "Player Graph";
+              } else {
+                  $scope.currentPlayerView = null;
+              }
+
           }
 
           $scope.matchID = $scope.$parent.gameID;

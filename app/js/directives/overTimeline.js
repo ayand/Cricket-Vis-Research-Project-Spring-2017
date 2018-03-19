@@ -1,7 +1,12 @@
 angular.module('myApp').directive('overTimeline', function() {
-  var height = 475;
-  var width = 720;
-  var margin = 60;
+  var height = 350;
+
+  var convertDimension = function(d) {
+      return ((d * height) / 475)
+  }
+
+  var width = convertDimension(720);
+  var margin = convertDimension(60);
 
   var teamColors = {};
   teamColors["India"] = "#0080FF";
@@ -35,7 +40,7 @@ angular.module('myApp').directive('overTimeline', function() {
         var maxScore = d3.max(scope.balls, function(d) { return d.cumul_runs; })
 
         var runScale = d3.scaleLinear().domain([0, maxScore]).range([height - margin, margin]);
-        var overScale = d3.scaleLinear().domain([1, 50]).range([margin, width - 225]);
+        var overScale = d3.scaleLinear().domain([1, 50]).range([margin, width - convertDimension(225)]);
 
         vis.append("g")
             .attr("class", "yAxis")
@@ -72,9 +77,6 @@ angular.module('myApp').directive('overTimeline', function() {
             data[i].lines = lineSegments;
         }
 
-        console.log("Data:");
-        console.log(data);
-
         var inning = vis.selectAll(".innings")
             .data(data)
             .enter().append("g")
@@ -83,7 +85,7 @@ angular.module('myApp').directive('overTimeline', function() {
             .style("stroke", function(d) { return teamColors[d.key] });
 
         var lines = inning.selectAll(".segment")
-            .data(function(d) { console.log(d); return d.lines; })
+            .data(function(d) { return d.lines; })
             .enter().append("line")
             .attr("class", "segment")
             .attr("x1", function(d) { return overScale(d.over1); })
@@ -104,10 +106,10 @@ angular.module('myApp').directive('overTimeline', function() {
             .data(function(d) { return d.value.wickets; })
             .enter().append("circle")
             .attr("class", "wicketBall")
-            .attr("r", 3)
+            .attr("r", convertDimension(3))
             .attr("transform", function(d, i) {
                 var direction = d.inning == 1 ? -1 : 1;
-                var y = direction * i * 7;
+                var y = direction * i * convertDimension(7);
                 return "translate("+[0,y]+")";
             })
             .attr("fill", "#F45333")
@@ -120,7 +122,7 @@ angular.module('myApp').directive('overTimeline', function() {
             .data(teamNames)
             .enter().append("g")
             .attr("class", "legend")
-            .attr("transform", function(d, i) { return "translate("+[width - 220, margin + (i * 50)]+")" })
+            .attr("transform", function(d, i) { return "translate("+[width - convertDimension(220), margin + (i * convertDimension(50))]+")" })
             .on("mouseover", function(d) {
                 inning.style("opacity", function(i) {
                     return i.key == d ? 1 : 0.1;
@@ -132,25 +134,25 @@ angular.module('myApp').directive('overTimeline', function() {
             .style("cursor", "pointer");
 
         legend.append("circle")
-            .attr("cx", 50)
-            .attr("cy", 22)
-            .attr("r", 10)
+            .attr("cx", convertDimension(50))
+            .attr("cy", convertDimension(22))
+            .attr("r", convertDimension(10))
             .attr("fill", function(d) { return teamColors[d]; })
 
         legend.append("text")
-            .attr("x", 70)
-            .attr("y", 27)
+            .attr("x", convertDimension(70))
+            .attr("y", convertDimension(27))
             .text(function(d) { return d; })
-            .style("font-size", 15)
+            .style("font-size", convertDimension(15))
 
         vis.append("text")
-            .attr("x", 30)
-            .attr("y", 45)
+            .attr("x", convertDimension(30))
+            .attr("y", convertDimension(45))
             .text("Score");
 
         vis.append("text")
-            .attr("x", width - 225)
-            .attr("y", height - 20)
+            .attr("x", width - convertDimension(225))
+            .attr("y", height - convertDimension(20))
             .text("Over")
             .style("text-anchor", "end");
 
@@ -169,8 +171,6 @@ angular.module('myApp').directive('overTimeline', function() {
                 })
             })
         })
-
-        console.log("Successful");
 
       }
   }

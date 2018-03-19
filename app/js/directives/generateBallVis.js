@@ -1,5 +1,5 @@
 angular.module('myApp').directive('generateBallVis', function() {
-  var svgDimension = 380;
+  var svgDimension = 330;
 
   var convertDimension = function(d) {
       return ((d * svgDimension) / 580);
@@ -595,7 +595,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                       ballMouseover(d);
                   }
               })
-              .on("mouseout", function() {
+              .on("mouseout", function(d) {
                   if (isValidBall(d) && isSelectedBall(d)) {
                       ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
                   }

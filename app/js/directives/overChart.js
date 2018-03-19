@@ -2,10 +2,15 @@
 
 angular.module('myApp')
 .directive('overChart', function() {
-  var margin = 20;
-  var height = 450;
-  var width = 720;
-  var ballBuffer = 2;
+
+  var height = 350;
+
+  var convertDimension = function(d) {
+      return ((d * height) / 450);
+  }
+  var width = convertDimension(720);
+  var ballBuffer = convertDimension(2);
+  var margin = convertDimension(20);
 
   return {
     restrict: 'E',
@@ -21,11 +26,6 @@ angular.module('myApp')
         .append("svg")
           .attr("width", width)
           .attr("height", height);
-
-      //var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
-
-
-
 
       var overNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
           21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,
@@ -77,22 +77,22 @@ angular.module('myApp')
 
       var barHeight = function(d) {
         if (d.runs_batter <= 1) {
-            return 12;
+            return convertDimension(12);
         } else if (d.runs_batter == 2) {
-            return 24;
+            return convertDimension(24);
         } else if (d.runs_batter == 3) {
-            return 36;
+            return convertDimension(36);
         } else if (d.runs_batter == 4) {
-            return 48;
+            return convertDimension(48);
         } else if (d.runs_batter == 5) {
-            return 60;
+            return convertDimension(60);
         } else {
-            return 72;
+            return convertDimension(72);
         }
       }
 
       var tooltipText = function(d) {
-          var overNumber = Math.floor(d.ovr) + 1;
+          var overNumber = Math.ceil(d.ovr);
           var ballNumber = (d.ovr * 10) % 10;
           var batsman = d.batsman_name;
           var bowler = d.bowler_name;
@@ -137,17 +137,13 @@ angular.module('myApp')
             return decideColor(d);
           })
           .attr("x", function(d) {
-              return overs(Math.floor(d.ovr) + 1);
+              return overs(Math.ceil(d.ovr));
           })
-          .attr("rx", function(d) {
-              return 4;
-          })
-          .attr("ry", function(d) {
-              return 4;
-          })
+          .attr("rx", convertDimension(4))
+          .attr("ry", convertDimension(4))
           .attr("width", overs.bandwidth())
           .attr("y", function(d) {
-              var overNumber = Math.floor(d.ovr) + 1;
+              var overNumber = Math.ceil(d.ovr);
               var bottomBoundary = bottomBoundaries[overNumber.toString()];
               var height = barHeight(d);
               var startingPoint = bottomBoundary - height + ballBuffer;
@@ -172,31 +168,17 @@ angular.module('myApp')
                 scope.$watch('max', function(newMax, oldMax) {
 
                   d3.selectAll("." + className)
-                      .classed("visiblebar", function(d) { var over = Math.floor(d.ovr) + 1; return (over >= newMin && over <= newMax) })
-                      .classed("invisiblebar", function(d) { var over = Math.floor(d.ovr) + 1; return !(over >= newMin && over <= newMax) })
-
-                  /*d3.selectAll('.' + className).style("opacity", function(d) {
-                          //console.log('i: ' + i);
-                          //console.log('changing');
-                          var over = Math.floor(d.ovr) + 1;
-                          if (over >= newMin && over <= newMax) {
-                              //console.log('not fading');
-                              return 1;
-                          } else {
-                              //console.log('fading');
-                              return 0.2;
-                          }
-                      })*/
+                      .classed("visiblebar", function(d) { var over = Math.ceil(d.ovr); return (over >= newMin && over <= newMax) })
+                      .classed("invisiblebar", function(d) { var over = Math.ceil(d.ovr); return !(over >= newMin && over <= newMax) })
                 })
             })
 
             scope.$watch('hoverswitch', function(newVal, oldVal) {
-                //console.log(newVal);
                 if (newVal) {
                   d3.selectAll('.' + className)
                     .on("mouseover", function(d) {
                         console.log("Hovering!")
-                        var over = Math.floor(d.ovr) + 1;
+                        var over = Math.ceil(d.ovr);
                         if (over >= scope.min && over <= scope.max) {
                           d3.selectAll('.visiblebar')
                               .style("opacity", function(ball) {
@@ -207,20 +189,12 @@ angular.module('myApp')
                                   }
                               });
 
-                          /*d3.selectAll('.dot').style('opacity',function(dot){
-                              if(d==dot || d.inning != dot.inning){
-                                  return 1;
-                              }else{
-                                  return 0.2;
-                              }
-                          });*/
                           tip.html(tooltipText(d)).show();
                         }
                     })
                     .on("mouseout", function() {
                         d3.selectAll('.visiblebar')
                           .style("opacity", 1);
-                        //d3.selectAll(".dot").style("opacity", 1);
                         tip.hide();
                     });
                 } else {

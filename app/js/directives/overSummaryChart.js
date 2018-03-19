@@ -1,7 +1,11 @@
 angular.module('myApp').directive('overSummaryChart', function() {
-  var margin = 20;
-  var height = 450;
-  var width = 720;
+  var height = 350;
+
+  var convertDimension = function(d) {
+      return ((d * height) / 450)
+  }
+  var margin = convertDimension(20);
+  var width = convertDimension(720);
 
   return {
     restrict: 'E',
@@ -79,10 +83,10 @@ angular.module('myApp').directive('overSummaryChart', function() {
                   return overs(i + 1);
               })
               .attr("y", function(d) {
-                  return height - margin - (12 * d[1])
+                  return height - margin - (convertDimension(12) * d[1])
               })
               .attr("height", function(d) {
-                  return (12 * (d[1] - d[0]))
+                  return (convertDimension(12) * (d[1] - d[0]))
               })
               .attr("width", overs.bandwidth())
               .on("mouseover", function(d, i) {

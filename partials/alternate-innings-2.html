@@ -11,7 +11,12 @@
     <h3 align="center">{{ "Inning " + inning}}</h3>
   </div>
   <div align="right" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-      <button class="btn btn-primary" ng-click="changeCollapse()">See Player Stats</button>
+    <div class="btn-group">
+        <button ng-repeat="view in playerViews" class="btn btn-small" ng-click="changeCollapse(view)" ng-class="currentPlayerView == view ? 'btn-success' : 'btn-default'">{{ view }}</button>
+    </div>
+      <!--<div class="btn-group">
+        <button class="btn btn-primary" ng-click="changeCollapse()">Player Stats</button>
+      </div>-->
   </div>
 </div>
 <generate-ball-vis
@@ -37,7 +42,7 @@
   </div>
   <!--<div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
     <h3>Pitch Map</h3>
-    <pitch-chart
+    <strongitch-chart
       balls="inningBalls"
       batsmen="currentBatsmen"
       bowlers="currentBowlers"
@@ -60,7 +65,7 @@
     <ground-chart balls="inningBalls" batsmen="currentBatsmen" bowlers="currentBowlers" min="slider.minimumOver" max="slider.maximumOver" dictionary="$parent.playerDict"></ground-chart>
   </div>-->
 </div>
-<div id="playerStats" class="row" uib-collapse="isCollapsed">
+<div id="playerStats" class="row" uib-collapse="isCollapsed1">
   <h3 align="center">Player Stats for Overs {{ slider.minimumOver }} - {{ (slider.maximumOver < maxOvers) ? slider.maximumOver : maxOvers }}</h3>
   <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <h3 align="center">{{ battingTeam + " Batsmen" }}</h3>
@@ -80,9 +85,9 @@
           <tr align="center">
             <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="40" alt="batsmanImage"/><br>
-              <p uib-tooltip="Runs Scored (Balls Faced)">R: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }} ({{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }})</p>
-              <p uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</p>
-              <p uib-tooltip="Form">F:  {{ (batsman.form != -1) ? batsman.form.toFixed(2) : "-" }}</p>
+              <strong uib-tooltip="Runs Scored (Balls Faced)">R: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }} ({{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }})</strong><br>
+              <strong uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</strong><br>
+              <strong uib-tooltip="Form">F:  {{ (batsman.form != -1) ? batsman.form.toFixed(2) : "-" }}</strong><br>
             </td>
           </tr>
         </tbody>
@@ -106,14 +111,28 @@
           <tr align="center">
             <td ng-class="activeBowlers.includes(bowlers[$index].id) ? '' : 'active'" align="center" ng-repeat="bowler in bowlers" ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index], $parent.playerDict, imageDict, matchID)" height="40" alt="bowlerImage"/><br>
-              <p uib-tooltip="Runs Conceded (Extras Conceded)">RC: {{ (bowler.runs_conceded != -1) ? (bowler.runs_conceded + bowler.extras_conceded).toString() : "-" }} ({{ (bowler.extras_conceded != -1) ? bowler.extras_conceded.toString() : "-" }})</p>
-              <p uib-tooltip="Overs Bowled">OB: {{ (bowler.overs_bowled != -1) ? bowler.overs_bowled.toString() : "-" }}</p>
-              <p uib-tooltip="Wickets Taken">W:  {{ (bowler.wickets_taken != -1) ? bowler.wickets_taken.toString() : "-" }}</p>
+              <strong uib-tooltip="Runs Conceded (Extras Conceded)">RC: {{ (bowler.runs_conceded != -1) ? (bowler.runs_conceded + bowler.extras_conceded).toString() : "-" }} ({{ (bowler.extras_conceded != -1) ? bowler.extras_conceded.toString() : "-" }})</strong><br>
+              <strong uib-tooltip="Overs Bowled">OB: {{ (bowler.overs_bowled != -1) ? bowler.overs_bowled.toString() : "-" }}</strong><br>
+              <strong uib-tooltip="Wickets Taken">W:  {{ (bowler.wickets_taken != -1) ? bowler.wickets_taken.toString() : "-" }}</strong><br>
             </td>
           </tr>
         </tbody>
     </table>
   </div>
 </div>
+<div class="row" id="playerGraph" uib-collapse="isCollapsed2">
+  <h3 align="center">Player Graph for Overs {{ slider.minimumOver }} - {{ (slider.maximumOver < maxOvers) ? slider.maximumOver : maxOvers }}</h3>
+  <br>
+  <div align='center' class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <bipartite-graph
+        balls="inningBalls"
+        batsmen="activeBatsmen"
+        bowlers="activeBowlers"
+        min="slider.minimumOver"
+        max="slider.maximumOver"
+        player-dict="$parent.playerDict"
+        image-dict="imageDict">
+    </bipartite-graph>
+  </div>
 <br>
 <br>

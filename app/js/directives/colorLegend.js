@@ -1,13 +1,18 @@
 angular.module('myApp').directive('colorLegend', function() {
-    var width = 1500;
-    var height = 80;
+    var height = 60;
+
+    var convertDimension = function(d) {
+        return ((d * height) / 80)
+    }
+
+    var width = convertDimension(1500);
 
     var isWicketBall = function(d) {
         return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
     }
 
     var inOverRange = function(d, min, max) {
-        var over = Math.floor(d.ovr) + 1;
+        var over = Math.ceil(d.ovr);
         return over >= min && over <= max;
     }
 
@@ -73,8 +78,8 @@ angular.module('myApp').directive('colorLegend', function() {
 
           var ballTypes = ["Non-Boundary", "Boundary", "Extra", "Wicket", "Dot Ball"];
 
-          var dataL = 50;
-          var offset = 270;
+          var dataL = convertDimension(50);
+          var offset = convertDimension(270);
 
           var legendItem = legend.selectAll('.legend')
             .data(ballTypes)
@@ -92,21 +97,15 @@ angular.module('myApp').directive('colorLegend', function() {
           })
 
           legendItem.append('circle')
-            .attr("cx", 145)
-            .attr("cy", 40)
-            .attr("r", 12.5)
+            .attr("cx", convertDimension(145))
+            .attr("cy", convertDimension(40))
+            .attr("r", convertDimension(12.5))
             .style("fill", function (d, i) {
                 return legendColors(i)
             })
             .style("cursor","pointer")
             .on("mouseover", function() {
-                //console.log("enter");
-                //console.log(d3.select(this)._groups[0][0].style.fill)
-                console.log("Hovering");
                 var color = d3.select(this)._groups[0][0].style.fill;
-                /*console.log("Color: " + color);
-                console.log(color == "rgb(204, 204, 204)")*/
-                //d3.selectAll(".dot").style('opacity', 0.2)
                 d3.selectAll(".brushedBall").style("opacity", function(d) {
                     if (decideColor(d) == color) {
                         return 1;
@@ -152,56 +151,10 @@ angular.module('myApp').directive('colorLegend', function() {
                             return 0.2;
                         }
                     });
-
-                    /*var zoneColors = [];
-                    d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                        zoneColors.push(e.attributes.fill.value);
-                    });
-
-                    d3.selectAll(activeClassName).style("opacity", function(d) {
-                        var overCondition = inOverRange(d, activeMin, activeMax);
-                        var batsmanCondition = true;
-                        if (scope.batsmen.length != 0) {
-                            batsmanCondition = scope.batsmen.includes(d.batsman);
-                        }
-                        var bowlerCondition = true;
-                        if (scope.bowlers.length != 0) {
-                            bowlerCondition = scope.bowlers.includes(d.bowler);
-                        }
-                        var zoneCondition = true;
-                        if (d.z == 0) {
-                            zoneCondition = !zoneColors.includes("gray");
-                        } else {
-                            zoneCondition = (zoneColors[correctZone(d.z) - 1] != "gray");
-                        }
-                        if (overCondition && batsmanCondition && bowlerCondition && zoneCondition && decideColor(d) == color) {
-                            return 1;
-                        } else {
-                            return 0.2;
-                        }
-                    })*/
                 }
-
-
             })
             .on("mouseout", function() {
                 d3.selectAll(".brushedBall").style("opacity", 1);
-
-                /*d3.selectAll(".ballBar1").style("opacity", function(d) {
-                    if (inOverRange(d, scope.min1, scope.max1)) {
-                        return 1;
-                    } else {
-                        return 0.2;
-                    }
-                })
-
-                d3.selectAll(".ballBar2").style("opacity", function(d) {
-                    if (inOverRange(d, scope.min2, scope.max2)) {
-                        return 1;
-                    } else {
-                        return 0.2;
-                    }
-                })*/
 
                 if (!(scope.inning === 1 || scope.inning === 2)) {
                   d3.selectAll(".ballBar1").style("opacity", 1)
@@ -217,46 +170,18 @@ angular.module('myApp').directive('colorLegend', function() {
 
                   d3.selectAll(".brushedBar").style("opacity", 1);
 
-                  /*var zoneColors = [];
-                  d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                      zoneColors.push(e.attributes.fill.value);
-                  });
-                  //console.log(zoneColors);
-
-                  d3.selectAll(activeClassName).style("opacity", function(d) {
-                      var overCondition = inOverRange(d, activeMin, activeMax);
-                      var batsmanCondition = true;
-                      if (scope.batsmen.length != 0) {
-                          batsmanCondition = scope.batsmen.includes(d.batsman);
-                      }
-                      var bowlerCondition = true;
-                      if (scope.bowlers.length != 0) {
-                          bowlerCondition = scope.bowlers.includes(d.bowler);
-                      }
-                      var zoneCondition = true;
-                      if (d.z == 0) {
-                          zoneCondition = !zoneColors.includes("gray");
-                      } else {
-                          zoneCondition = (zoneColors[correctZone(d.z) - 1] != "gray");
-                      }
-                      if (overCondition && batsmanCondition && bowlerCondition && zoneCondition) {
-                          return 1;
-                      } else {
-                          return 0.2;
-                      }
-                  })*/
                 }
             })
 
           legendItem.append('text')
-              .attr("x", 175)
-              .attr("y", 50)
+              .attr("x", convertDimension(175))
+              .attr("y", convertDimension(50))
               .text(function (d, i) {
                 return d;
               })
               .attr("class", "textselected")
               .style("text-anchor", "start")
-              .style("font-size", 22.5)
+              .style("font-size", convertDimension(22.5))
         }
     }
 })
