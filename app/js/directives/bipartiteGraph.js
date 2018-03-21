@@ -41,7 +41,7 @@ angular.module('myApp').directive('bipartiteGraph', function() {
             return ((aLastName > bLastName) ? 1 : -1)
           }
 
-          var width = 500;
+          var width = 400;
 
           var convertDimension = function(d) {
               return ((d * width) / 550)
@@ -109,7 +109,6 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     .attr("class", "edge")
                     .attr("x1", convertDimension(195))
                     .attr("y1", function(d) {
-                        console.log(locationDict[d.batsman.toString()])
                         return locationDict[d.batsman.toString()];
                     })
                     .attr("x2", convertDimension(355))
@@ -150,6 +149,7 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     })
                     .style("text-anchor", "end")
                     .style("font-weight", "bold")
+                    .style("font-size", "11px")
 
                 var allBowlers = vis.selectAll(".bowler")
                     .data(newBowlers)
@@ -175,7 +175,6 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     .attr("cx", convertDimension(355))
                     .attr("r", 4)
                     .attr("fill", function(d) {
-                        console.log("Bowler")
                         return teamColors[scope.playerDict[d.toString()]["team"]]
                     })
 
@@ -187,33 +186,56 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     })
                     .style("text-anchor", "start")
                     .style("font-weight", "bold")
+                    .style("font-size", "11px")
 
             scope.$watchCollection('min', function(newMin, oldMin) {
                 scope.$watchCollection('max', function(newMax, oldMax) {
-                    /*var filteredBalls = scope.balls.filter(function(d) {
-                        var over = Math.ceil(d.ovr);
-                        return over >= newMin && over <= newMax;
-                    });
-
-                    var currentBatsmen = Array.from(new Set(filteredBalls.map(function(d) {
+                    /*var activeBatsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                        var o = Math.ceil(d.ovr);
+                        return o >= newMin && o <= newMax;
+                    }).map(function(d) {
                         return d.batsman;
-                    })))
+                    })))*/
 
-                    var currentBowlers = Array.from(new Set(filteredBalls.map(function(d) {
+                    var filteredBalls = scope.balls.filter(function(d) {
+                        var o = Math.ceil(d.ovr);
+                        return o >= newMin && o <= newMax;
+                    })
+
+                    var batsmen = Array.from(new Set(filteredBalls.map(function(d) {
+                        return d.batsman;
+                    })));
+
+                    var bowlers = Array.from(new Set(filteredBalls.map(function(d) {
                         return d.bowler;
-                    })))
+                    })));
+
+                    var interactionDict = {}
+
+                    filteredBalls.forEach(function(d) {
+                        if (interactionDict[d.batsman.toString()] == null) {
+                            interactionDict[d.batsman.toString()] = []
+                        }
+                        if (!interactionDict[d.batsman.toString()].includes(d.bowler)) {
+                            interactionDict[d.batsman.toString()].push(d.bowler);
+                        }
+                    })
 
                     allBatsmen.style("display", function(d) {
-                        return currentBatsmen.includes(d) ? "block" : "none";
+                        return batsmen.includes(d) ? "block" : "none";
                     })
 
                     allBowlers.style("display", function(d) {
-                        return currentBowlers.includes(d) ? "block" : "none";
+                        return bowlers.includes(d) ? "block" : "none";
                     })
 
                     edgeLines.style("display", function(d) {
-                        return (currentBatsmen.includes(d.batsman) && currentBowlers.includes(d.bowler)) ? "block" : "none"
-                    })*/
+                        var condition1 = interactionDict[d.batsman.toString()] != null;
+                        if (condition1) {
+                            return interactionDict[d.batsman.toString()].includes(d.bowler) ? "block" : "none"
+                        }
+                        return "none";
+                    })
                 })
             })
         }

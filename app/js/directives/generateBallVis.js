@@ -46,16 +46,12 @@ angular.module('myApp').directive('generateBallVis', function() {
           bowlers: '=',
           min: '=',
           max: '=',
-          dictionary: '=',
-          zoneColors: '='
+          dictionary: '='
       },
       link: function(scope, element, attrs) {
         var selectedZone = 0;
         var zoneColors = [];
-
-        scope.$watchCollection('zoneColors', function(newZones, oldZones) {
-            zoneColors = newZones;
-        })
+        console.log(zoneColors);
 
         var pitchVis = d3.select("#pitch")
           .append("svg")
@@ -584,8 +580,10 @@ angular.module('myApp').directive('generateBallVis', function() {
                       ballMouseover(d);
                   }
               })
-              .on("mouseout", function() {
-                  ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+              .on("mouseout", function(d) {
+                if (isValidBall(d) && isSelectedBall(d)) {
+                    ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                }
               })
 
           d3.selectAll(activeClassName)
@@ -731,6 +729,16 @@ angular.module('myApp').directive('generateBallVis', function() {
                   }
               }
             })
+            .on("mouseover", function(d) {
+                if (isValidBall(d) && isSelectedBall(d)) {
+                    ballMouseover(d);
+                }
+            })
+            .on("mouseout", function(d) {
+                if (isValidBall(d) && isSelectedBall(d)) {
+                    ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                }
+            })
 
             var validStumpBalls = scope.balls.filter(function(d) {
                 return d["ended_x"] != null && d["ended_y"] != null
@@ -773,6 +781,16 @@ angular.module('myApp').directive('generateBallVis', function() {
                       }
                   }
                 })
+                .on("mouseover", function(d) {
+                    if (isValidBall(d) && isSelectedBall(d)) {
+                        ballMouseover(d);
+                    }
+                })
+                .on("mouseout", function(d) {
+                    if (isValidBall(d) && isSelectedBall(d)) {
+                        ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                    }
+                })
 
                 var validGroundBalls = scope.balls.filter(function(d) {
                     return d["x"] != null && d["y"] != null;
@@ -807,7 +825,17 @@ angular.module('myApp').directive('generateBallVis', function() {
                               }
                           }
                       }
-                    });
+                    })
+                    .on("mouseover", function(d) {
+                        if (isValidBall(d) && isSelectedBall(d)) {
+                            ballMouseover(d);
+                        }
+                    })
+                    .on("mouseout", function(d) {
+                        if (isValidBall(d) && isSelectedBall(d)) {
+                            ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                        }
+                    })
 
             brushHighlight();
 
@@ -821,237 +849,255 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             ground.call(lasso);
 
-            scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
-                scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
-                  scope.$watch('min', function(newMin, oldMin) {
-                      scope.$watch('max', function(newMax, oldMax) {
-
-                        var consideredBalls = scope.balls.filter(function(dot) {
-                            var batsmanCondition = true;
-                            if (newBatsmen.length != 0) {
-                                batsmanCondition = newBatsmen.includes(dot.batsman);
-                            }
-                            var bowlerCondition = true;
-                            if (newBowlers.length != 0) {
-                                bowlerCondition = newBowlers.includes(dot.bowler);
-                            }
-                            var over = Math.floor(dot.ovr) + 1;
-                            var overCondition = ((over >= newMin) && (over <= newMax));
-                            return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
-                        });
-
-                        var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
-                        consideredBalls.forEach(function(d) {
-                            var zone = correctZone(d.z) - 1;
-                            zoneScores[zone] += d.runs_w_extras;
-                        });
-
-                        var scoreSet = Array.from(new Set(zoneScores));
-                        scoreSet.sort(function(a, b) {
-                            return a - b;
+            d3.selectAll(".zone-path").on("click", function(d, index) {
+                if (selectedZone == d.data.zone) {
+                    selectedZone = 0;
+                    d3.selectAll(".zone-path")
+                        .attr("fill", function(path, i) {
+                            return zoneColors[i];
+                        })
+                        .style('stroke', '#CCCCCC');
+                    d3.selectAll(".dot")
+                        .classed("visibleball",function(d){
+                            return isValidBall(d);
+                        })
+                        .classed("invisibleball", function(d) {
+                            return !isValidBall(d);
+                        })
+                        .style("opacity", function(d) {
+                            return isSelectedBall(d) ? 1 : 0.1
                         })
 
-                        var list = scoreSet.length - 1;
-
-                        //console.log("Resetting zone colors");
-                        var zColors = [];
-                        d3.selectAll(".zone-path")
-                            .attr("fill", function(d, i) {
-                                var score = zoneScores[i];
-                                zColors.push(colorScales[list][scoreSet.indexOf(score)])
-                                return colorScales[list][scoreSet.indexOf(score)];
-                            })
-                            .style("stroke", "#CCCCCC")
-
-                        scope.$emit('zoneColors', zColors);
-
-                        var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
-                            var over = Math.floor(d.ovr) + 1;
-                            return over >= newMin && over <= newMax;
-                        }).map(function(d) {
-                            return d.batsman;
-                        })))
-                        if (newBatsmen.length != 0) {
-                            batsmen = batsmen.filter(function(d) {
-                                return newBatsmen.includes(d);
-                            });
-                        }
-                        var hands = [];
-                        if (newBatsmen.length != 0) {
-                          var hands = Array.from(new Set(batsmen.map(function(d) {
-                              return scope.dictionary[d.toString()]["hand"];
-                          })));
-                        }
-                        console.log(hands);
-                        leftBat.style("opacity", 0);
-                        rightBat.style("opacity", 0);
-                        if (hands.length == 1) {
-                            if (hands[0] == "Left") {
-                                leftBat.style("opacity", 1);
+                } else {
+                    if (selectedZone == 0 || zoneColors.length == 0) {
+                      zoneColors = [];
+                      d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                          zoneColors.push(e.attributes.fill.value);
+                      });
+                    }
+                    selectedZone = d.data.zone;
+                    d3.selectAll(".zone-path")
+                        .attr("fill", function(path, i) {
+                            if (selectedZone == path.data.zone) {
+                                return zoneColors[i];
                             } else {
-                                rightBat.style("opacity", 1);
+                                return 'gray';
                             }
-                        } else {
+                        })
+                        .style("stroke", "black");
+
+                    d3.selectAll(".dot")
+                    .classed("visibleball",function(d){
+                        return isValidBall(d);
+                    })
+                    .classed("invisibleball", function(d) {
+                        return !isValidBall(d);
+                    })
+                    .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1 })
+
+                }
+            });
+
+            scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+                scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
+
+                  var consideredBalls = scope.balls.filter(function(dot) {
+                      var batsmanCondition = true;
+                      if (newBatsmen.length != 0) {
+                          batsmanCondition = newBatsmen.includes(dot.batsman);
+                      }
+                      var bowlerCondition = true;
+                      if (newBowlers.length != 0) {
+                          bowlerCondition = newBowlers.includes(dot.bowler);
+                      }
+                      var over = Math.floor(dot.ovr) + 1;
+                      var overCondition = ((over >= scope.min) && (over <= scope.max));
+                      return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
+                  });
+
+                  var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+                  consideredBalls.forEach(function(d) {
+                      var zone = correctZone(d.z) - 1;
+                      zoneScores[zone] += d.runs_w_extras;
+                  });
+
+                  var scoreSet = Array.from(new Set(zoneScores));
+                  scoreSet.sort(function(a, b) {
+                      return a - b;
+                  })
+
+                  var list = scoreSet.length - 1;
+
+                  //console.log("Resetting zone colors");
+                  var zColors = [];
+                  d3.selectAll(".zone-path")
+                      .attr("fill", function(d, i) {
+                          var score = zoneScores[i];
+                          zColors.push(colorScales[list][scoreSet.indexOf(score)])
+                          return colorScales[list][scoreSet.indexOf(score)];
+                      })
+                      .style("stroke", "#CCCCCC")
+
+                  scope.$emit('zoneColors', zColors);
+
+                  var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over >= scope.min && over <= scope.max;
+                  }).map(function(d) {
+                      return d.batsman;
+                  })))
+                  if (newBatsmen.length != 0) {
+                      batsmen = batsmen.filter(function(d) {
+                          return newBatsmen.includes(d);
+                      });
+                  }
+                  var hands = [];
+                  if (newBatsmen.length != 0) {
+                    var hands = Array.from(new Set(batsmen.map(function(d) {
+                        return scope.dictionary[d.toString()]["hand"];
+                    })));
+                  }
+                  leftBat.style("opacity", 0);
+                  rightBat.style("opacity", 0);
+                  if (hands.length == 1) {
+                      if (hands[0] == "Left") {
                           leftBat.style("opacity", 1);
+                      } else {
                           rightBat.style("opacity", 1);
-                        }
-                        selectedZone = 0;
-                        d3.selectAll(".dot")
-                            .on("mouseover", function(d) {
-                                if (isSelectedBall(d)) {
-                                    ballMouseover(d);
-                                }
-                            })
-                            .on("mouseout", function(d) {
-                                if (isSelectedBall(d)) {
-                                    ballMouseout(newMin, newMax, newBatsmen, newBowlers);
-                                }
-                            })
-                            .classed("visibleball",function(d){
-                                return isValidBall(d);
-                            })
-                            .classed("invisibleball", function(d) {
-                              return !isValidBall(d);
-                            })
-                            .style("opacity", function(d) {
-                                return isSelectedBall(d) ? 1 : 0.1;
-                            });
+                      }
+                  } else {
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 1);
+                  }
+                  selectedZone = 0;
+                  d3.selectAll(".dot")
+                      .classed("visibleball",function(d){
+                          return isValidBall(d);
+                      })
+                      .classed("invisibleball", function(d) {
+                        return !isValidBall(d);
+                      })
+                      .style("opacity", function(d) {
+                          return isSelectedBall(d) ? 1 : 0.1;
+                      });
 
-                            d3.selectAll(activeClassName)
-                                .style("opacity", function(ball) {
-                                    if (isValidBall(ball) && isSelectedBall(ball)) {
-                                       return 1;
-                                    }
-                                    return 0.1;
-                                })
-                                .on("mouseover", function(d) {
-                                  if (isValidBall(d)  && isSelectedBall(d)) {
-                                      console.log("True")
-                                      ballMouseover(d);
+                      if (selectedZone != 0) {
+                          zoneColors = [];
+                          d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                              zoneColors.push(e.attributes.fill.value);
+                          });
+                          d3.selectAll(".zone-path")
+                              .attr("fill", function(path, i) {
+                                  if (selectedZone == path.data.zone) {
+                                      return zoneColors[i];
                                   } else {
-                                      console.log("False")
+                                      return 'gray';
                                   }
-                                })
-                                .on("mouseout", function(d) {
-                                  if (isValidBall(d)  && isSelectedBall(d)) {
-                                    ballMouseout(newMin, newMax, newBatsmen, newBowlers);
-                                  }
-                                });
+                          })
+                      }
 
-                            if (selectedZone != 0) {
-                                zoneColors = [];
-                                d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                                    zoneColors.push(e.attributes.fill.value);
-                                });
-                                d3.selectAll(".zone-path")
-                                    .attr("fill", function(path, i) {
-                                        if (selectedZone == path.data.zone) {
-                                            return zoneColors[i];
-                                        } else {
-                                            return 'gray';
-                                        }
-                                })
-                            }
-
-                            d3.selectAll(".zone-path").on("click", function(d, index) {
-                                if (selectedZone == d.data.zone) {
-                                    selectedZone = 0;
-                                    d3.selectAll(".zone-path")
-                                        .attr("fill", function(path, i) {
-                                          console.log("Changing color")
-                                            return zoneColors[i];
-                                        })
-                                        .style('stroke', '#CCCCCC');
-                                    d3.selectAll(".dot")
-                                        .classed("visibleball",function(d){
-                                            return isValidBall(d);
-                                        })
-                                        .classed("invisibleball", function(d) {
-                                            return !isValidBall(d);
-                                        })
-                                        .style("opacity", function(d) {
-                                            return isSelectedBall(d) ? 1 : 0.1
-                                        })
-
-                                    d3.selectAll(activeClassName)
-                                      .style("opacity",function(d){
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                            return 1;
-                                        }
-                                        return 0.1;
-                                      })
-                                      .on("mouseover", function(d) {
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                            ballMouseover(d);
-                                        } else {
-                                            return;
-                                        }
-                                      })
-                                      .on("mouseout", function(d) {
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                          ballMouseout(newMin, newMax, newBatsmen, newBowlers);
-                                        }
-                                      });
-                                } else {
-                                    if (selectedZone == 0 || zoneColors.length == 0) {
-                                      zoneColors = [];
-                                      d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                                          zoneColors.push(e.attributes.fill.value);
-                                      });
-                                    }
-                                    selectedZone = d.data.zone;
-                                    d3.selectAll(".zone-path")
-                                        .attr("fill", function(path, i) {
-                                            if (selectedZone == path.data.zone) {
-                                                return zoneColors[i];
-                                            } else {
-                                                return 'gray';
-                                            }
-                                    })
-                                    .style("stroke", "black");
-                                    d3.selectAll(".dot")
-                                    .classed("visibleball",function(d){
-                                        return isValidBall(d);
-                                    })
-                                    .classed("invisibleball", function(d) {
-                                        return !isValidBall(d);
-                                    })
-                                    .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1 })
-
-                                    d3.selectAll(activeClassName)
-                                      .style("opacity",function(d){
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                            return 1;
-                                        }
-                                        return 0.1;
-                                      })
-                                      .on("mouseover", function(d) {
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                            console.log("Hovering!")
-                                            ballMouseover(d);
-                                        }
-                                      })
-                                      .on("mouseout", function(d) {
-                                        if (isValidBall(d) && isSelectedBall(d)) {
-                                          ballMouseout(newMin, newMax, newBatsmen, newBowlers);
-                                        }
-                                      });
-                                }
-                            });
-
-                            d3.selectAll(inactiveClassName)
-                                .on("mouseover", function(d) {
-                                    return;
-                                })
-                                .on("mouseout", function() {
-                                    return;
-                                })
-
-                            brushHighlight();
-                        });
-                    });
+                      brushHighlight();
                 });
             });
+
+            scope.$watch('min', function(newMin, oldMin) {
+                scope.$watch('max', function(newMax, oldMax) {
+
+                  var consideredBalls = scope.balls.filter(function(dot) {
+                      var batsmanCondition = true;
+                      if (scope.batsmen.length != 0) {
+                          batsmanCondition = scope.batsmen.includes(dot.batsman);
+                      }
+                      var bowlerCondition = true;
+                      if (scope.bowlers.length != 0) {
+                          bowlerCondition = scope.bowlers.includes(dot.bowler);
+                      }
+                      var over = Math.floor(dot.ovr) + 1;
+                      var overCondition = ((over >= newMin) && (over <= newMax));
+                      return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
+                  });
+
+                  var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+                  consideredBalls.forEach(function(d) {
+                      var zone = correctZone(d.z) - 1;
+                      zoneScores[zone] += d.runs_w_extras;
+                  });
+
+                  var scoreSet = Array.from(new Set(zoneScores));
+                  scoreSet.sort(function(a, b) {
+                      return a - b;
+                  })
+
+                  var list = scoreSet.length - 1;
+
+                  //console.log("Resetting zone colors");
+                  var zColors = [];
+                  d3.selectAll(".zone-path")
+                      .attr("fill", function(d, i) {
+                          var score = zoneScores[i];
+                          zColors.push(colorScales[list][scoreSet.indexOf(score)])
+                          return colorScales[list][scoreSet.indexOf(score)];
+                      })
+                      .style("stroke", "#CCCCCC")
+
+                  var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                      var over = Math.floor(d.ovr) + 1;
+                      return over >= newMin && over <= newMax;
+                  }).map(function(d) {
+                      return d.batsman;
+                  })))
+                  if (scope.batsmen.length != 0) {
+                      batsmen = batsmen.filter(function(d) {
+                          return scope.batsmen.includes(d);
+                      });
+                  }
+                  var hands = [];
+                  if (scope.batsmen.length != 0) {
+                    var hands = Array.from(new Set(batsmen.map(function(d) {
+                        return scope.dictionary[d.toString()]["hand"];
+                    })));
+                  }
+                  leftBat.style("opacity", 0);
+                  rightBat.style("opacity", 0);
+                  if (hands.length == 1) {
+                      if (hands[0] == "Left") {
+                          leftBat.style("opacity", 1);
+                      } else {
+                          rightBat.style("opacity", 1);
+                      }
+                  } else {
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 1);
+                  }
+                  selectedZone = 0;
+                  d3.selectAll(".dot")
+                      .classed("visibleball",function(d){
+                          return isValidBall(d);
+                      })
+                      .classed("invisibleball", function(d) {
+                        return !isValidBall(d);
+                      })
+                      .style("opacity", function(d) {
+                          return isSelectedBall(d) ? 1 : 0.1;
+                      });
+
+                      if (selectedZone != 0) {
+                          zoneColors = [];
+                          d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                              zoneColors.push(e.attributes.fill.value);
+                          });
+                          d3.selectAll(".zone-path")
+                              .attr("fill", function(path, i) {
+                                  if (selectedZone == path.data.zone) {
+                                      return zoneColors[i];
+                                  } else {
+                                      return 'gray';
+                                  }
+                          })
+                      }
+                      brushHighlight();
+                  });
+              });
       }
   }
 })

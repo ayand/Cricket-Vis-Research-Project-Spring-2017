@@ -671,7 +671,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         }]
       },
       url: '/innings/:number',
-      templateUrl: 'partials/alternate-innings-3.html',
+      templateUrl: 'partials/alternate-innings-4.html',
       controller: function($scope, players, $stateParams, images, $uibModal,
           $anchorScroll, $location) {
           $scope.imageDict = images;
@@ -725,12 +725,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               return d.inning == $scope.inning;
           });
 
-          $scope.zoneColors = [];
+          /*$scope.zoneColors = [];
 
           $scope.$on('zoneColors', function(event, data) {
               //console.log(data);
               $scope.zoneColors = data;
-          })
+          })*/
 
           $scope.batsmanIDs = Array.from(new Set($scope.inningBalls.map(function(d) {
               return d.batsman;
