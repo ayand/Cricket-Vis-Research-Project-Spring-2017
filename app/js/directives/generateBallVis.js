@@ -116,6 +116,8 @@ angular.module('myApp').directive('generateBallVis', function() {
         var topGroundY = -1;
         var bottomGroundY = -1;
 
+        var selectedHand = null;
+
         var pitchX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
         var pitchY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))])
         pitchX.domain([-1.525, 1.525]);
@@ -292,63 +294,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("ry", convertDimension(3))
                 .attr("fill", "#683F16");
 
-            var leftBat = stumpWindow.append("g")
-                .attr("class", "left-bat");
 
-            leftBat.append("rect")
-                .attr("x", convertDimension(50))
-                .attr("y", 0)
-                .attr("width", convertDimension(11.25))
-                .attr("height", convertDimension(35))
-                .attr("fill", "#6F5E25");
-
-            leftBat.append("rect")
-                .attr("x", convertDimension(44.625))
-                .attr("y", convertDimension(33))
-                .attr("width", convertDimension(20))
-                .attr("height", convertDimension(90))
-                .attr("rx", convertDimension(4))
-                .attr("ry", convertDimension(4))
-                .attr("fill", "#6F5E25");
-
-            leftBat.append("text")
-                .attr("x", convertDimension(54.625))
-                .attr("y", convertDimension(80))
-                .attr("dy", ".35em")
-                .attr("font-family", "sans-serif")
-                .attr("fill", "white")
-                .style("font-weight", "bold")
-                .style("text-anchor", "middle")
-                .text("L");
-
-            var rightBat = stumpWindow.append("g")
-                .attr("class", "right-bat");
-
-            rightBat.append("rect")
-                .attr("x", convertDimension(518.75))
-                .attr("y", 0)
-                .attr("width", convertDimension(11.25))
-                .attr("height", convertDimension(35))
-                .attr("fill", "#6F5E25");
-
-            rightBat.append("rect")
-                .attr("x", convertDimension(513.375))
-                .attr("y", convertDimension(33))
-                .attr("width", convertDimension(20))
-                .attr("height", convertDimension(90))
-                .attr("rx", convertDimension(4))
-                .attr("ry", convertDimension(4))
-                .attr("fill", "#6F5E25");
-
-            rightBat.append("text")
-                .attr("x", convertDimension(523.375))
-                .attr("y", convertDimension(80))
-                .attr("dy", ".35em")
-                .attr("font-family", "sans-serif")
-                .attr("fill", "white")
-                .style("font-weight", "bold")
-                .style("text-anchor", "middle")
-                .text("R");
 
             var ground = groundVis.append("g")
 
@@ -441,6 +387,7 @@ angular.module('myApp').directive('generateBallVis', function() {
         var idealRadius = convertDimension(3.6);
 
         var lassoedItems = [];
+
         //var lasso = d3.lasso();
 
         function zoom() {
@@ -470,7 +417,16 @@ angular.module('myApp').directive('generateBallVis', function() {
           var overCondition = ((over >= scope.min) && (over <= scope.max));
           var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
 
-          return batsmanCondition && bowlerCondition && overCondition && zoneCondition;
+          var handCondition = true;
+          if (selectedHand != null) {
+              if (selectedHand == "right") {
+                  handCondition = d.bat_right_handed == "y";
+              } else {
+                  handCondition = d.bat_right_handed != "y";
+              }
+          }
+          return batsmanCondition && bowlerCondition && overCondition
+              && zoneCondition && handCondition;
         }
 
         var isSelectedBall = function(d) {
@@ -647,6 +603,16 @@ angular.module('myApp').directive('generateBallVis', function() {
           }
         }
 
+        var stumpBrush = d3.brush()
+            .extent([[0, 0], [svgDimension, svgDimension]])
+            .on("start", brushstart)
+            .on("brush", stumpBrushMove)
+            .on("end", stumpBrushEnd);
+
+            var stumpBrushArea = stumpWindow.append("g")
+                .attr("class", "brush")
+                .call(stumpBrush);
+
         var lasso_start = function() {
             console.log("Lasso starting");
         }
@@ -674,17 +640,123 @@ angular.module('myApp').directive('generateBallVis', function() {
           brushHighlight();
         }
 
+        var leftBat = stumpWindow.append("g")
+            .attr("class", "left-bat")
+            .style("cursor", "pointer");
+
+        leftBat.append("rect")
+            .attr("x", convertDimension(50))
+            .attr("y", 0)
+            .attr("width", convertDimension(11.25))
+            .attr("height", convertDimension(35))
+            .attr("fill", "#6F5E25");
+
+        leftBat.append("rect")
+            .attr("x", convertDimension(44.625))
+            .attr("y", convertDimension(33))
+            .attr("width", convertDimension(20))
+            .attr("height", convertDimension(90))
+            .attr("rx", convertDimension(4))
+            .attr("ry", convertDimension(4))
+            .attr("fill", "#6F5E25");
+
+        leftBat.append("text")
+            .attr("x", convertDimension(54.625))
+            .attr("y", convertDimension(80))
+            .attr("dy", ".35em")
+            .attr("font-family", "sans-serif")
+            .attr("fill", "white")
+            .style("font-weight", "bold")
+            .style("text-anchor", "middle")
+            .text("L");
+
+        var rightBat = stumpWindow.append("g")
+            .attr("class", "right-bat")
+            .style("cursor", "pointer");
+
+        rightBat.append("rect")
+            .attr("x", convertDimension(518.75))
+            .attr("y", 0)
+            .attr("width", convertDimension(11.25))
+            .attr("height", convertDimension(35))
+            .attr("fill", "#6F5E25");
+
+        rightBat.append("rect")
+            .attr("x", convertDimension(513.375))
+            .attr("y", convertDimension(33))
+            .attr("width", convertDimension(20))
+            .attr("height", convertDimension(90))
+            .attr("rx", convertDimension(4))
+            .attr("ry", convertDimension(4))
+            .attr("fill", "#6F5E25");
+
+        rightBat.append("text")
+            .attr("x", convertDimension(523.375))
+            .attr("y", convertDimension(80))
+            .attr("dy", ".35em")
+            .attr("font-family", "sans-serif")
+            .attr("fill", "white")
+            .style("font-weight", "bold")
+            .style("text-anchor", "middle")
+            .text("R");
+
+        leftBat.on("click", function() {
+            if (selectedHand != "left") {
+                selectedHand = "left"
+                leftBat.style("opacity", 1);
+                rightBat.style("opacity", 0.1);
+            } else {
+                selectedHand = null;
+                leftBat.style("opacity", 1);
+                rightBat.style("opacity", 1);
+            }
+
+            d3.selectAll(".dot")
+                .classed("visibleball",function(d){
+                    return isValidBall(d);
+                })
+                .classed("invisibleball", function(d) {
+                  return !isValidBall(d);
+                })
+                .style("opacity", function(d) {
+                    return isSelectedBall(d) ? 1 : 0.1;
+                });
+
+            brushHighlight();
+        })
+
+        rightBat.on("click", function() {
+            if (selectedHand != "right") {
+                selectedHand = "right"
+                rightBat.style("opacity", 1);
+                leftBat.style("opacity", 0.1);
+            } else {
+                selectedHand = null;
+                leftBat.style("opacity", 1);
+                rightBat.style("opacity", 1);
+            }
+
+            d3.selectAll(".dot")
+                .classed("visibleball",function(d){
+                    return isValidBall(d);
+                })
+                .classed("invisibleball", function(d) {
+                  return !isValidBall(d);
+                })
+                .style("opacity", function(d) {
+                    return isSelectedBall(d) ? 1 : 0.1;
+                });
+
+            brushHighlight();
+        })
+
         var pitchBrush = d3.brush()
             .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
             .on("start", brushstart)
             .on("brush", pitchBrushMove)
             .on("end", pitchBrushEnd);
 
-        var stumpBrush = d3.brush()
-            .extent([[0, 0], [svgDimension, svgDimension]])
-            .on("start", brushstart)
-            .on("brush", stumpBrushMove)
-            .on("end", stumpBrushEnd);
+
 
         var validPitchBalls = scope.balls.filter(function(d) {
             return d["landing_x"] != null && d["landing_y"] != null;
@@ -745,9 +817,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     && d["ended_x"] >= -2 && d["ended_x"] <= 2 && d["ended_y"] <= 4;
             });
 
-            var stumpBrushArea = stumpWindow.append("g")
-                .attr("class", "brush")
-                .call(stumpBrush);
+
 
             var stumpBalls = stumpWindow.selectAll(".dot")
                 .data(validStumpBalls);
@@ -901,6 +971,8 @@ angular.module('myApp').directive('generateBallVis', function() {
             scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
                 scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
 
+                  selectedHand = null;
+
                   var consideredBalls = scope.balls.filter(function(dot) {
                       var batsmanCondition = true;
                       if (newBatsmen.length != 0) {
@@ -948,21 +1020,21 @@ angular.module('myApp').directive('generateBallVis', function() {
                   }
                   var hands = [];
                   if (newBatsmen.length != 0) {
-                    var hands = Array.from(new Set(batsmen.map(function(d) {
+                    hands = Array.from(new Set(batsmen.map(function(d) {
                         return scope.dictionary[d.toString()]["hand"];
                     })));
                   }
-                  leftBat.style("opacity", 0);
-                  rightBat.style("opacity", 0);
+                  leftBat.style("display", "none");
+                  rightBat.style("display", "none");
                   if (hands.length == 1) {
                       if (hands[0] == "Left") {
-                          leftBat.style("opacity", 1);
+                          leftBat.style("display", "block");
                       } else {
-                          rightBat.style("opacity", 1);
+                          rightBat.style("display", "block");
                       }
                   } else {
-                    leftBat.style("opacity", 1);
-                    rightBat.style("opacity", 1);
+                    leftBat.style("display", "block");
+                    rightBat.style("display", "block");
                   }
                   selectedZone = 0;
                   d3.selectAll(".dot")
@@ -997,26 +1069,29 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
-
-                  var consideredBalls = scope.balls.filter(function(dot) {
-                      var batsmanCondition = true;
-                      if (scope.batsmen.length != 0) {
-                          batsmanCondition = scope.batsmen.includes(dot.batsman);
-                      }
-                      var bowlerCondition = true;
-                      if (scope.bowlers.length != 0) {
-                          bowlerCondition = scope.bowlers.includes(dot.bowler);
-                      }
-                      var over = Math.floor(dot.ovr) + 1;
-                      var overCondition = ((over >= newMin) && (over <= newMax));
-                      return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
-                  });
+                  selectedHand = null;
+                  var distinctBatsmen = new Set();
 
                   var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
-                  consideredBalls.forEach(function(d) {
-                      var zone = correctZone(d.z) - 1;
-                      zoneScores[zone] += d.runs_w_extras;
-                  });
+
+                  scope.balls.forEach(function(dot) {
+                    var batsmanCondition = true;
+                    if (scope.batsmen.length != 0) {
+                        batsmanCondition = scope.batsmen.includes(dot.batsman);
+                    }
+                    var bowlerCondition = true;
+                    if (scope.bowlers.length != 0) {
+                        bowlerCondition = scope.bowlers.includes(dot.bowler);
+                    }
+                    var over = Math.floor(dot.ovr) + 1;
+                    var overCondition = ((over >= newMin) && (over <= newMax));
+                    if (batsmanCondition && bowlerCondition && overCondition
+                        && (dot.z != 0)) {
+                        var zone = correctZone(dot.z) - 1;
+                        zoneScores[zone] += dot.runs_w_extras;
+                        distinctBatsmen.add(dot.batsman);
+                    }
+                  })
 
                   var scoreSet = Array.from(new Set(zoneScores));
                   scoreSet.sort(function(a, b) {
@@ -1031,35 +1106,24 @@ angular.module('myApp').directive('generateBallVis', function() {
                           return colorScales[list][scoreSet.indexOf(score)];
                       })
                       .style("stroke", "#CCCCCC")
+                      .style("cursor", "pointer")
 
-                  var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
-                      var over = Math.floor(d.ovr) + 1;
-                      return over >= newMin && over <= newMax;
-                  }).map(function(d) {
-                      return d.batsman;
-                  })))
-                  if (scope.batsmen.length != 0) {
-                      batsmen = batsmen.filter(function(d) {
-                          return scope.batsmen.includes(d);
-                      });
-                  }
-                  var hands = [];
-                  if (scope.batsmen.length != 0) {
-                    var hands = Array.from(new Set(batsmen.map(function(d) {
-                        return scope.dictionary[d.toString()]["hand"];
-                    })));
-                  }
-                  leftBat.style("opacity", 0);
-                  rightBat.style("opacity", 0);
+                  var batsmen = Array.from(distinctBatsmen)
+                  var hands = Array.from(new Set(batsmen.map(function(d) {
+                      return scope.dictionary[d.toString()]["hand"];
+                  })));
+                  leftBat.style("display", "none");
+                  rightBat.style("display", "none");
+                  console.log(hands);
                   if (hands.length == 1) {
                       if (hands[0] == "Left") {
-                          leftBat.style("opacity", 1);
+                          leftBat.style("display", "block");
                       } else {
-                          rightBat.style("opacity", 1);
+                          rightBat.style("display", "block");
                       }
                   } else {
-                    leftBat.style("opacity", 1);
-                    rightBat.style("opacity", 1);
+                    leftBat.style("display", "block");
+                    rightBat.style("display", "block");
                   }
                   selectedZone = 0;
                   d3.selectAll(".dot")

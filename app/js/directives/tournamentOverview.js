@@ -107,6 +107,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
 
               var overScores = [];
 
+              var overLengths = [];
+
               scope.data.batting_balls.forEach(function(d) {
                 var overs = d3.nest()
                     .key(function(ball) { return Math.floor(ball.ovr) })
@@ -116,6 +118,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                     overScores.push(d3.max(d.values, function(v) { return v.cumul_runs; }))
                 })
                 maxBattingSize[d.key] = matchScale.bandwidth() / maxOverLength;
+                overLengths.push(maxOverLength)
               })
 
               scope.data.bowling_balls.forEach(function(d) {
@@ -127,7 +130,11 @@ angular.module('myApp').directive('tournamentOverview', function() {
                     overScores.push(d3.max(d.values, function(v) { return v.cumul_runs; }))
                 })
                 maxBowlingSize[d.key] = matchScale.bandwidth() / maxOverLength;
+                overLengths.push(maxOverLength)
               })
+
+              var maxOverLength = d3.max(overLengths);
+              var finalBallWidth = matchScale.bandwidth() / maxOverLength;
 
               var scoreRange = d3.extent(overScores);
 
@@ -252,10 +259,9 @@ angular.module('myApp').directive('tournamentOverview', function() {
                           .attr("y", function(d) { return battingScale(Math.ceil(d.ovr)); })
                           .attr("x", function(d) {
                               var ballWithinOver = d.ball_within_over - 1;
-                              var ballWidth = maxBattingSize[d.game];
-                              return ballWithinOver * ballWidth;
+                              return ballWithinOver * finalBallWidth;
                           })
-                          .attr("width", function(d) { return maxBattingSize[d.game] })
+                          .attr("width", function(d) { return finalBallWidth })
                           .attr("height", function(d) { return battingScale.bandwidth(); })
                           .attr("fill", function(d) { return decideColor(d); })
                           .style("stroke", "white")
@@ -279,10 +285,9 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .attr("y", function(d) { return bowlingScale(Math.ceil(d.ovr)); })
                                   .attr("x", function(d) {
                                       var ballWithinOver = d.ball_within_over - 1;
-                                      var ballWidth = maxBowlingSize[d.game];
-                                      return ballWithinOver * ballWidth;
+                                      return ballWithinOver * finalBallWidth;
                                   })
-                                  .attr("width", function(d) { return maxBowlingSize[d.game] })
+                                  .attr("width", function(d) { return finalBallWidth })
                                   .attr("height", function(d) { return bowlingScale.bandwidth(); })
                                   .attr("fill", function(d) { return decideColor(d); })
                                   .style("stroke", "white")
