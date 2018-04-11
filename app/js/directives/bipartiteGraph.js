@@ -125,14 +125,6 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                         return "translate(" + [0, locationDict[d.toString()]] + ")"
                     })
                     .style("cursor", "pointer")
-                    .on("mouseover", function(d) {
-                        edgeLines.style("opacity", function(edge) {
-                            return (edge.batsman == d) ? 1 : 0.1;
-                        })
-                    })
-                    .on("mouseout", function(d) {
-                        edgeLines.style("opacity", 1)
-                    })
 
                 allBatsmen.append("circle")
                     .attr("cx", convertDimension(195))
@@ -162,14 +154,6 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                         return "translate(" + [0, locationDict[d.toString()]] + ")"
                     })
                     .style("cursor", "pointer")
-                    .on("mouseover", function(d) {
-                        edgeLines.style("opacity", function(edge) {
-                            return (edge.bowler == d) ? 1 : 0.1;
-                        })
-                    })
-                    .on("mouseout", function(d) {
-                        edgeLines.style("opacity", 1)
-                    })
 
                 allBowlers.append("circle")
                     .attr("cx", convertDimension(355))
@@ -221,12 +205,24 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                         }
                     })
 
-                    allBatsmen.style("display", function(d) {
+                    /*allBatsmen.style("display", function(d) {
                         return batsmen.includes(d) ? "block" : "none";
                     })
 
                     allBowlers.style("display", function(d) {
                         return bowlers.includes(d) ? "block" : "none";
+                    })*/
+
+                    allBatsmen.classed("activePlayer", function(d) {
+                        return batsmen.includes(d);
+                    }).classed("inactivePlayer", function(d) {
+                        return !batsmen.includes(d);
+                    })
+
+                    allBowlers.classed("activePlayer", function(d) {
+                        return bowlers.includes(d);
+                    }).classed("inactivePlayer", function(d) {
+                        return !bowlers.includes(d);
                     })
 
                     edgeLines.style("display", function(d) {

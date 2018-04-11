@@ -80,8 +80,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
               overs.push(i);
           }
 
-          var battingScale = d3.scaleBand().domain(overs).range([405, 40]);
-          var bowlingScale = d3.scaleBand().domain(overs).range([495, 860]);
+          var firstInningScale = d3.scaleBand().domain(overs).range([405, 40]);
+          var secondInningScale = d3.scaleBand().domain(overs).range([495, 860]);
 
           var matchScale = d3.scaleBand()
               .domain([0, 1, 2, 3, 4, 5, 6,7, 8])
@@ -94,13 +94,13 @@ angular.module('myApp').directive('tournamentOverview', function() {
                   .attr("x", 55)
                   .attr("y", 20)
                   .style("text-anchor", "end")
-                  .text("Batting");
+                  .text("Inning 1");
 
               vis.append("text")
                   .attr("x", 55)
                   .attr("y", 890)
                   .style("text-anchor", "end")
-                  .text("Bowling");
+                  .text("Inning 2");
 
               var maxBattingSize = {};
               var maxBowlingSize = {};
@@ -159,7 +159,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                       .attr("height", 860)
                       .attr("width", matchScale.bandwidth())
                       .attr("fill", function(d) {
-                          return d.winning_team == scope.team ? '#96BBF7' : "#FF5050";
+                          return d.winning_team == scope.team ? 'white' : "#FF5050";
                       })
                       .style("opacity", 0.3)
 
@@ -256,13 +256,19 @@ angular.module('myApp').directive('tournamentOverview', function() {
                           .enter().append("rect")
                           .attr("class", "ball")
                           .classed("activeball", true)
-                          .attr("y", function(d) { return battingScale(Math.ceil(d.ovr)); })
+                          .attr("y", function(d) {
+                              if (d.inning == 1) {
+                                  return firstInningScale(Math.ceil(d.ovr));
+                              } else {
+                                  return secondInningScale(Math.ceil(d.ovr));
+                              }
+                          })
                           .attr("x", function(d) {
                               var ballWithinOver = d.ball_within_over - 1;
                               return ballWithinOver * finalBallWidth;
                           })
                           .attr("width", function(d) { return finalBallWidth })
-                          .attr("height", function(d) { return battingScale.bandwidth(); })
+                          .attr("height", function(d) { return firstInningScale.bandwidth(); })
                           .attr("fill", function(d) { return decideColor(d); })
                           .style("stroke", "white")
 
@@ -282,13 +288,19 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .enter().append("rect")
                                   .attr("class", "ball")
                                   .classed("activeball", true)
-                                  .attr("y", function(d) { return bowlingScale(Math.ceil(d.ovr)); })
+                                  .attr("y", function(d) {
+                                    if (d.inning == 1) {
+                                        return firstInningScale(Math.ceil(d.ovr));
+                                    } else {
+                                        return secondInningScale(Math.ceil(d.ovr));
+                                    }
+                                  })
                                   .attr("x", function(d) {
                                       var ballWithinOver = d.ball_within_over - 1;
                                       return ballWithinOver * finalBallWidth;
                                   })
                                   .attr("width", function(d) { return finalBallWidth })
-                                  .attr("height", function(d) { return bowlingScale.bandwidth(); })
+                                  .attr("height", function(d) { return secondInningScale.bandwidth(); })
                                   .attr("fill", function(d) { return decideColor(d); })
                                   .style("stroke", "white")
 
@@ -296,13 +308,13 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               .attr("class", "batAxis")
                               .classed("allBalls", true)
                               .attr("transform", "translate(50,0)")
-                              .call(d3.axisLeft(battingScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
+                              .call(d3.axisLeft(firstInningScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
 
                           vis.append("g")
                               .attr("class", "bowlAxis")
                               .classed("allBalls", true)
                               .attr("transform", "translate(50,0)")
-                              .call(d3.axisLeft(bowlingScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
+                              .call(d3.axisLeft(secondInningScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
 
                           vis.append("line")
                               .attr("x1", 50)
@@ -370,30 +382,34 @@ angular.module('myApp').directive('tournamentOverview', function() {
                           var bowlPoint1 = null;
                           var bowlPoint2 = null;
 
-                          var battingRunScale = d3.scaleLinear().domain([0, maxScore]).range([385, 40]);
-                          var bowlingRunScale = d3.scaleLinear().domain([0, maxScore]).range([515, 860]);
+                          var firstInningRunScale = d3.scaleLinear().domain([0, maxScore]).range([385, 40]);
+                          var secondInningRunScale = d3.scaleLinear().domain([0, maxScore]).range([515, 860]);
                           var overScale = d3.scaleLinear().domain([1, 50]).range([10, matchScale.bandwidth() - 10])
+
+                          var decideY = function(i, score) {
+                              if (i == 1) {
+                                  return firstInningRunScale(score);
+                              } else {
+                                  return secondInningRunScale(score);
+                              }
+                          }
 
                           var overLine = d3.line()
                               .x(function(d) { return overScale(parseInt(d.key)) })
                               .y(function(d) {
-                                  if (d.value.side == "bat") {
-                                      return battingRunScale(d.value.maxScore);
-                                  } else {
-                                      return bowlingRunScale(d.value.maxScore);
-                                  }
+                                  return decideY(d.value.inning, d.value.maxScore)
                               })
 
                           var batBallHeightDict = {}
                           var bowlBallHeightDict = {}
 
                           for (key in batLengthDict) {
-                              var barHeight = battingRunScale(0) - battingRunScale(batLengthDict[key]["score"]);
+                              var barHeight = firstInningRunScale(0) - firstInningRunScale(batLengthDict[key]["score"]);
                               batBallHeightDict[key] = barHeight / batLengthDict[key]["length"]
                           }
 
                           for (key in bowlLengthDict) {
-                              var barHeight = bowlingRunScale(bowlLengthDict[key]["score"]) - bowlingRunScale(0)
+                              var barHeight = secondInningRunScale(bowlLengthDict[key]["score"]) - secondInningRunScale(0)
                               bowlBallHeightDict[key] = barHeight / bowlLengthDict[key]["length"]
                           }
 
@@ -412,6 +428,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                 return d3.nest()
                                     .key(function(ball) { return Math.ceil(ball.ovr) })
                                     .rollup(function(leaves) { return {
+                                          "inning": leaves[0].inning,
                                           "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
                                           "side": "bat",
                                           "game": parseInt(leaves[0].game)
@@ -421,17 +438,21 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               .enter().append("line")
                               .attr("class", "vertLine")
                               .attr("x1", function(d) { return overScale(parseInt(d.key)) })
-                              .attr("y1", battingRunScale(0))
+                              .attr("y1", function(d) {
+                                  return decideY(d.value.inning, 0)
+                              })
                               .attr("x2", function(d) { return overScale(parseInt(d.key)) })
-                              .attr("y2", function(d) { return battingRunScale(d.value.maxScore) })
+                              .attr("y2", function(d) {
+                                  return decideY(d.value.inning, d.value.maxScore)
+                              })
                               .style("stroke", "#BC9CD3")
                               .style("cursor", "pointer")
                               .on("mouseover", function(d) {
                                   var x = overScale(parseInt(d.key))
                                   var index = getIndex(games.indexOf(d.value.game))
                                   var pointX = x + (matchScale.bandwidth() * index) + (blankSpace * index) + 50
-                                  batPoint1 = { x: pointX, y: battingRunScale(d.value.maxScore)}
-                                  batPoint2 = { x: 50, y: battingRunScale(d.value.maxScore) }
+                                  batPoint1 = { x: pointX, y:  decideY(d.value.inning, d.value.maxScore)}
+                                  batPoint2 = { x: 50, y:  decideY(d.value.inning, d.value.maxScore) }
 
                                   d3.selectAll(".vertLine")
                                       .style("opacity", function(point) {
@@ -442,8 +463,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                       })
                                       .each(function(point) {
                                           if (point != d && point.key == d.key && point.value.game == d.value.game) {
-                                              bowlPoint1 = { x: pointX, y: bowlingRunScale(point.value.maxScore)}
-                                              bowlPoint2 = { x: 50, y: bowlingRunScale(point.value.maxScore) }
+                                              bowlPoint1 = { x: pointX, y: decideY(point.value.inning, point.value.maxScore)}
+                                              bowlPoint2 = { x: 50, y: decideY(point.value.inning, point.value.maxScore) }
                                           }
                                       })
 
@@ -481,6 +502,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                     d3.nest()
                                         .key(function(ball) { return Math.ceil(ball.ovr) })
                                         .rollup(function(leaves) { return {
+                                              "inning": leaves[0].inning,
                                               "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
                                               "side": "bat",
                                               "game": parseInt(leaves[0].game)
@@ -492,7 +514,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               .attr("class", "overLine")
                               .attr("d", overLine)
 
-                              var batWicket = batScoreProgression.selectAll(".wicket")
+                              /*var batWicket = batScoreProgression.selectAll(".wicket")
                                   .data(function(d) {
                                       return d3.nest()
                                           .key(function(ball) { return Math.ceil(ball.ovr) })
@@ -505,7 +527,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .enter().append("g")
                                   .attr("class", "wicket")
                                   .attr("transform", function(d) {
-                                      return "translate(" + [overScale(parseInt(d.key)), battingRunScale(d.value.maxScore)] +")"
+                                      return "translate(" + [overScale(parseInt(d.key)), firstInningRunScale(d.value.maxScore)] +")"
                                   })
 
                               batWicket.selectAll(".wicketBall")
@@ -518,7 +540,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                       return "translate("+[0,y]+")";
                                   })
                                   .attr("fill", "#F45333")
-                                  .style("stroke", "#F45333")
+                                  .style("stroke", "#F45333")*/
 
                               batScoreProgression.append("g")
                                   .attr("transform", "translate(0, 405)")
@@ -539,6 +561,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                     return d3.nest()
                                         .key(function(ball) { return Math.ceil(ball.ovr) })
                                         .rollup(function(leaves) { return {
+                                              "inning": leaves[0].inning,
                                               "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
                                               "side": "bowl",
                                               "game": parseInt(leaves[0].game)
@@ -548,17 +571,19 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .enter().append("line")
                                   .attr("class", "vertLine")
                                   .attr("x1", function(d) { return overScale(parseInt(d.key)) })
-                                  .attr("y1", bowlingRunScale(0))
+                                  .attr("y1", function(d) {
+                                      return decideY(d.value.inning, 0)
+                                  })
                                   .attr("x2", function(d) { return overScale(parseInt(d.key)) })
-                                  .attr("y2", function(d) { return bowlingRunScale(d.value.maxScore) })
+                                  .attr("y2", function(d) { return decideY(d.value.inning, d.value.maxScore) })
                                   .style("stroke", "#BC9CD3")
                                   .style("cursor", "pointer")
                                   .on("mouseover", function(d) {
                                       var x = overScale(parseInt(d.key))
                                       var index = getIndex(games.indexOf(d.value.game))
                                       var pointX = x + (matchScale.bandwidth() * index) + (blankSpace * index) + 50
-                                      bowlPoint1 = { x: pointX, y: bowlingRunScale(d.value.maxScore)}
-                                      bowlPoint2 = { x: 50, y: bowlingRunScale(d.value.maxScore) }
+                                      bowlPoint1 = { x: pointX, y: decideY(d.value.inning, d.value.maxScore)}
+                                      bowlPoint2 = { x: 50, y: decideY(d.value.inning, d.value.maxScore) }
 
                                       d3.selectAll(".vertLine")
                                           .style("opacity", function(point) {
@@ -569,8 +594,8 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                           })
                                           .each(function(point) {
                                               if (point != d && point.key == d.key && point.value.game == d.value.game) {
-                                                  batPoint1 = { x: pointX, y: battingRunScale(point.value.maxScore)}
-                                                  batPoint2 = { x: 50, y: battingRunScale(point.value.maxScore) }
+                                                  batPoint1 = { x: pointX, y: decideY(point.value.inning, point.value.maxScore)}
+                                                  batPoint2 = { x: 50, y: decideY(point.value.inning, point.value.maxScore) }
                                               }
                                           })
 
@@ -608,6 +633,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                         d3.nest()
                                             .key(function(ball) { return Math.ceil(ball.ovr) })
                                             .rollup(function(leaves) { return {
+                                                  "inning": leaves[0].inning,
                                                   "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
                                                   "side": "bowl",
                                                   "game": parseInt(leaves[0].game)
@@ -619,7 +645,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .attr("class", "overLine")
                                   .attr("d", overLine)
 
-                                  var bowlWicket = bowlScoreProgression.selectAll(".wicket")
+                                  /*var bowlWicket = bowlScoreProgression.selectAll(".wicket")
                                       .data(function(d) {
                                           var data = d3.nest()
                                               .key(function(ball) { return Math.ceil(ball.ovr) })
@@ -633,7 +659,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                       .enter().append("g")
                                       .attr("class", "wicket")
                                       .attr("transform", function(d) {
-                                          return "translate(" + [overScale(parseInt(d.key)), bowlingRunScale(d.value.maxScore)] +")"
+                                          return "translate(" + [overScale(parseInt(d.key)), secondInningRunScale(d.value.maxScore)] +")"
                                       })
 
                                   bowlWicket.selectAll(".wicketBall")
@@ -646,7 +672,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                           return "translate("+[0,y]+")";
                                       })
                                       .attr("fill", "#F45333")
-                                      .style("stroke", "#F45333")
+                                      .style("stroke", "#F45333")*/
 
                                   bowlScoreProgression.append("g")
                                       .attr("transform", "translate(0, 495)")
@@ -657,12 +683,12 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               scoreProgression.append("g")
                                   .attr("class", "batScoreAxis")
                                   .attr("transform", "translate(50, 0)")
-                                  .call(d3.axisLeft(battingRunScale))
+                                  .call(d3.axisLeft(firstInningRunScale))
 
                               scoreProgression.append("g")
                                   .attr("class", "bowlScoreAxis")
                                   .attr("transform", "translate(50, 0)")
-                                  .call(d3.axisLeft(bowlingRunScale))
+                                  .call(d3.axisLeft(secondInningRunScale))
 
                               allBallStuff.style("display", "block");
                               scoreProgression.style("display", "none");

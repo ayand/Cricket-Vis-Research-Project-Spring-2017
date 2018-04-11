@@ -83,7 +83,7 @@
     <table>
         <tbody>
           <tr align="center">
-            <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
+            <td ng-class="getClass(batsmen[$index].id)" align="center" ng-repeat="batsman in batsmen" ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling">
               <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="40" alt="batsmanImage"/><br>
               <strong uib-tooltip="Runs Scored (Balls Faced)">R: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }} ({{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }})</strong><br>
               <strong uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</strong><br>

@@ -51,7 +51,6 @@ angular.module('myApp').directive('generateBallVis', function() {
       link: function(scope, element, attrs) {
         var selectedZone = 0;
         var zoneColors = [];
-        console.log(zoneColors);
 
         var pitchVis = d3.select("#pitch")
           .append("svg")
@@ -457,6 +456,15 @@ angular.module('myApp').directive('generateBallVis', function() {
               && groundCondition;
         }
 
+        var tempPlayer = null;
+
+        var belongsToPlayer = function(ball) {
+            if (tempPlayer != null) {
+                return ball.batsman == tempPlayer || ball.bowler == tempPlayer;
+            }
+            return true;
+        }
+
         var activeClassName = (scope.balls[0].inning == 1) ? ".ballBar1" : ".ballBar2";
         var inactiveClassName = (scope.balls[0].inning == 1) ? ".ballBar2" : ".ballBar1";
 
@@ -529,7 +537,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
         var brushHighlight = function() {
           d3.selectAll(".visibleball")
-              .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1; })
+              .style("opacity", function(d) { return isSelectedBall(d) && belongsToPlayer(d) ? 1 : 0.1; })
               .classed("brushedBall", function(d) { return isSelectedBall(d); })
               .on("mouseover", function(d) {
                   if (isSelectedBall(d)) {
@@ -543,7 +551,7 @@ angular.module('myApp').directive('generateBallVis', function() {
               })
 
           d3.selectAll(activeClassName)
-              .style("opacity", function(d) { return isValidBall(d) && isSelectedBall(d) ? 1 : 0.1 })
+              .style("opacity", function(d) { return isValidBall(d) && isSelectedBall(d) && belongsToPlayer(d) ? 1 : 0.1 })
               .on("mouseover", function(d) {
                   if (isValidBall(d) && isSelectedBall(d)) {
                       ballMouseover(d);
@@ -558,7 +566,6 @@ angular.module('myApp').directive('generateBallVis', function() {
         }
 
         var brushstart = function() {
-            console.log("Starting")
         }
 
         var pitchBrushMove = function() {
@@ -614,11 +621,9 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .call(stumpBrush);
 
         var lasso_start = function() {
-            console.log("Lasso starting");
         }
 
         var lasso_draw = function() {
-            console.log("Drawing");
         }
 
         var lasso_end = function() {
@@ -711,6 +716,14 @@ angular.module('myApp').directive('generateBallVis', function() {
                 rightBat.style("opacity", 1);
             }
 
+            var validBatsmen = new Set(scope.balls.filter(function(d) {
+                return isValidBall(d);
+            }).map(function(d) {
+                return d.batsman;
+            }))
+
+            scope.$emit('batsmen', validBatsmen);
+
             d3.selectAll(".dot")
                 .classed("visibleball",function(d){
                     return isValidBall(d);
@@ -735,6 +748,14 @@ angular.module('myApp').directive('generateBallVis', function() {
                 leftBat.style("opacity", 1);
                 rightBat.style("opacity", 1);
             }
+
+            var validBatsmen = new Set(scope.balls.filter(function(d) {
+                return isValidBall(d);
+            }).map(function(d) {
+                return d.batsman;
+            }))
+
+            scope.$emit('batsmen', validBatsmen);
 
             d3.selectAll(".dot")
                 .classed("visibleball",function(d){
@@ -971,7 +992,7 @@ angular.module('myApp').directive('generateBallVis', function() {
             scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
                 scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
 
-                  selectedHand = null;
+                  //selectedHand = null;
 
                   var consideredBalls = scope.balls.filter(function(dot) {
                       var batsmanCondition = true;
@@ -1024,17 +1045,21 @@ angular.module('myApp').directive('generateBallVis', function() {
                         return scope.dictionary[d.toString()]["hand"];
                     })));
                   }
-                  leftBat.style("display", "none");
-                  rightBat.style("display", "none");
-                  if (hands.length == 1) {
-                      if (hands[0] == "Left") {
-                          leftBat.style("display", "block");
-                      } else {
-                          rightBat.style("display", "block");
-                      }
-                  } else {
-                    leftBat.style("display", "block");
-                    rightBat.style("display", "block");
+                  if (selectedHand == null) {
+                    leftBat.style("display", "none");
+                    rightBat.style("display", "none");
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 1);
+                    if (hands.length == 1) {
+                        if (hands[0] == "Left") {
+                            leftBat.style("display", "block");
+                        } else {
+                            rightBat.style("display", "block");
+                        }
+                    } else {
+                      leftBat.style("display", "block");
+                      rightBat.style("display", "block");
+                    }
                   }
                   selectedZone = 0;
                   d3.selectAll(".dot")
@@ -1114,7 +1139,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                   })));
                   leftBat.style("display", "none");
                   rightBat.style("display", "none");
-                  console.log(hands);
+                  leftBat.style("opacity", 1);
+                  rightBat.style("opacity", 1);
                   if (hands.length == 1) {
                       if (hands[0] == "Left") {
                           leftBat.style("display", "block");
@@ -1152,6 +1178,30 @@ angular.module('myApp').directive('generateBallVis', function() {
                           })
                       }
                       brushHighlight();
+
+                      d3.selectAll(".activePlayer")
+                          .on("mouseover", function(d) {
+                              tempPlayer = d;
+                              d3.selectAll(".edge")
+                                  .style("opacity", function(edge) {
+                                      return edge.batsman == d || edge.bowler == d ? 1 : 0.1
+                                  })
+                              brushHighlight();
+                          })
+                          .on("mouseout", function(d) {
+                              tempPlayer = null;
+                              d3.selectAll(".edge")
+                                  .style("opacity", 1)
+                              brushHighlight();
+                          })
+
+                      d3.selectAll(".inactivePlayer")
+                          .on("mouseover", function(d) {
+                              return;
+                          })
+                          .on("mouseout", function(d) {
+                              return;
+                          })
                   });
               });
       }

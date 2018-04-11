@@ -497,3 +497,11 @@ td {
     stroke: black;
     stroke-width: 2px;
 }
+
+.activePlayer {
+    opacity: 1;
+}
+
+.inactivePlayer {
+    opacity: 0.2;
+}
