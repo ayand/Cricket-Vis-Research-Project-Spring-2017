@@ -257,16 +257,20 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       resolve: {
         games: ['GameService', function(GameService) {
             return GameService.getGames();
-        }]
+        }],
+        players: ['GameService', function(GameService) {
+            return GameService.getPlayerList();
+        }],
       },
       url: '/matches',
       templateUrl: 'partials/home.html',
-      controller: function($scope, $http, $state, games) {
+      controller: function($scope, $http, $state, games, players) {
           $scope.team1 = null;
           $scope.team2 = null;
           $scope.date = null;
           $scope.ground = null;
           $scope.games = games;
+          $scope.players = players;
 
           $scope.selectMatch = function(match) {
               $scope.team1 = match.team1_name;
@@ -290,11 +294,15 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           flags: ['GameService', function(GameService) {
               return GameService.getFlagImages();
+          }],
+
+          partnerships: ['GameService', '$stateParams', function(GameService, $stateParams) {
+              return GameService.getPartnerships($stateParams.id)
           }]
       },
       url: '/match/:id',
       templateUrl: 'partials/alternate-match-2.html',
-      controller: function($scope, balls, players, flags, $state, $stateParams, GameService) {
+      controller: function($scope, balls, players, flags, partnerships, $state, $stateParams, GameService) {
           $scope.showLegend = true;
           $scope.hover = true;
           $scope.gameID = $stateParams.id;
@@ -302,6 +310,19 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.playerDict = players;
           $scope.flags = flags;
           $scope.showBalls = true;
+          $scope.partnerships = [];
+          $scope.showTimeline = true;
+          /*$scope.partnerships = partnerships;
+          console.log("PARTNERSHIPS:")
+          console.log($scope.partnerships)*/
+
+          $scope.seeTimeline = function() {
+              $scope.showTimeline = true;
+          }
+
+          $scope.seePartnerships = function() {
+              $scope.showTimeline = false;
+          }
 
           GameService.getGames().then(function(data) {
               var relevantGame = data.filter(function(d) { return d.match_id == $stateParams.id })[0];
@@ -490,6 +511,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
               $scope.showLegend = false;
               $scope.hover = false;
+              $scope.showTimeline = true;
               $state.go('home.matches.match.innings', { number: inning });
           }
 
@@ -500,6 +522,100 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.seeOvers = function() {
               $scope.showBalls = false;
           }
+
+          $scope.partnerships = partnerships;
+          console.log("PARTNERSHIPS:")
+          console.log(partnerships);
+          $scope.firstPartnerships = $scope.partnerships.filter(function(d) {
+              return d.team == $scope.firstBattingTeam;
+          })
+
+          $scope.secondPartnerships = $scope.partnerships.filter(function(d) {
+              return d.team != $scope.firstBattingTeam;
+          })
+
+          $scope.firstBatsmen = Array.from(new Set(
+              $scope.allBalls.filter(d => d.inning == 1)
+                  .map(d => d.batsman_name)
+              ))
+
+          $scope.firstNonStrikers = Array.from(new Set(
+              $scope.allBalls.filter(d => d.inning == 1)
+                  .map(d => d.non_striker)
+              ))
+
+          $scope.firstBatsmenAlphabetical = $scope.firstBatsmen.concat($scope.firstNonStrikers)
+
+          $scope.firstBatsmenAlphabetical.sort(function(a, b) {
+            var letterOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            var aName = a.split(" ");
+            var aLastName = aName[aName.length - 1];
+            var aFirst = aName[0].charAt(0);
+            var bName = b.split(" ");
+            var bLastName = bName[bName.length - 1];
+            var bFirst = bName[0].charAt(0)
+            if (bLastName == aLastName) {
+                return letterOrder.indexOf(aFirst) - letterOrder.indexOf(bFirst);
+            }
+            return ((aLastName > bLastName) ? 1 : -1)
+
+          })
+
+          $scope.secondBatsmen = Array.from(new Set(
+              $scope.allBalls.filter(d => d.inning == 2)
+                  .map(d => d.batsman_name)
+              ))
+
+          $scope.secondNonStrikers = Array.from(new Set(
+              $scope.allBalls.filter(d => d.inning == 2)
+                  .map(d => d.non_striker)
+              ))
+
+          $scope.secondBatsmenAlphabetical = $scope.secondBatsmen.concat($scope.secondNonStrikers)
+
+          $scope.secondBatsmenAlphabetical.sort(function(a, b) {
+            var letterOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            var aName = a.split(" ");
+            var aLastName = aName[aName.length - 1];
+            var aFirst = aName[0].charAt(0);
+            var bName = b.split(" ");
+            var bLastName = bName[bName.length - 1];
+            var bFirst = bName[0].charAt(0)
+            if (bLastName == aLastName) {
+                return letterOrder.indexOf(aFirst) - letterOrder.indexOf(bFirst);
+            }
+            return ((aLastName > bLastName) ? 1 : -1)
+
+          })
+
+          console.log("First batsmen: ");
+          console.log($scope.firstBatsmenAlphabetical)
+
+          console.log("Second batsmen: ");
+          console.log($scope.secondBatsmenAlphabetical)
+
+          console.log("First partnerships:")
+          console.log($scope.firstPartnerships)
+          console.log("Second partnerships:")
+          console.log($scope.secondPartnerships)
+
+          /*GameService.getPartnerships($stateParams.id).then(function(data) {
+              $scope.partnerships = data;
+              console.log("PARTNERSHIPS:")
+              console.log(data);
+              $scope.firstPartnerships = $scope.partnerships.filter(function(d) {
+                  return d.team == $scope.firstBattingTeam;
+              })
+
+              $scope.secondPartnerships = $scope.partnerships.filter(function(d) {
+                  return d.team != $scope.firstBattingTeam;
+              })
+              console.log("First partnerships:")
+              console.log($scope.firstPartnerships)
+              console.log("Second partnerships:")
+              console.log($scope.secondPartnerships)
+          })*/
+
       }
     })
     .state('home.matches.match.innings', {

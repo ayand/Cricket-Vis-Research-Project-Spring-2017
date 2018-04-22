@@ -41,23 +41,34 @@
       </div>
       <div ng-show="showBalls">
         <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
+        <br>
+        <br>
       </div>
       <div ng-show="!showBalls">
         <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
+        <br>
+        <br>
       </div>
     </div>
     <div ng-show="showSlider2">
         <br>
         <br>
         <br>
-        <br>
-        <h4>Timeline for Innings 1 and 2</h4>
-        <br>
-        <br>
+        <label class="btn btn-small" ng-class="showTimeline ? 'btn-success' : btn-default" ng-click="seeTimeline()">Timeline</label>
+        <label class="btn btn-small" ng-class="!showTimeline ? 'btn-success' : btn-default" ng-click="seePartnerships()">Partnerships</label>
         <br>
         <br>
+        <h4 ng-show="showTimeline">Timeline for Innings 1 and 2</h4>
+        <h4 ng-hide="showTimeline">Partnerships for Inning 2</h4>
         <br>
-        <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
+        <br>
+        <br>
+        <div ng-show="showTimeline">
+            <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
+        </div>
+        <div ng-hide="showTimeline">
+            <partnership-matrix partnerships="secondPartnerships" batsmen="secondBatsmenAlphabetical"></partnership-matrix>
+        </div>
     </div>
     <div align="center" ng-show="showLeftComparison">
       <table style="width:720px" align="center" class="table">
@@ -83,23 +94,34 @@
       </div>
       <div ng-show="showBalls">
         <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
+        <br>
+        <br>
       </div>
       <div ng-show="!showBalls">
         <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
+        <br>
+        <br>
       </div>
     </div>
     <div ng-show="showSlider1">
         <br>
         <br>
         <br>
-        <br>
-        <h4>Timeline for Inning 1</h4>
-        <br>
-        <br>
+        <label class="btn btn-small" ng-class="showTimeline ? 'btn-success' : btn-default" ng-click="seeTimeline()">Timeline</label>
+        <label class="btn btn-small" ng-class="!showTimeline ? 'btn-success' : btn-default" ng-click="seePartnerships()">Partnerships</label>
         <br>
         <br>
+        <h4 ng-show="showTimeline">Timeline for Inning 1</h4>
+        <h4 ng-hide="showTimeline">Partnerships for Inning 1</h4>
         <br>
-        <over-timeline balls="firstInning" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-timeline>
+        <br>
+        <br>
+        <div ng-show="showTimeline">
+            <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
+        </div>
+        <div ng-hide="showTimeline">
+            <partnership-matrix partnerships="firstPartnerships" batsmen="firstBatsmenAlphabetical"></partnership-matrix>
+        </div>
     </div>
     <div align="center" ng-show="showRightComparison">
       <table style="width:720px" align="center" class="table">
