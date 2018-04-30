@@ -5,11 +5,6 @@
   </h2>
   <h4>{{ result }}</h4>
   <br>
-  <!--<h3>Inning Analysis</h3>
-  <div class='btn-group'>
-    <label class="btn btn-default btn-sm" ng-click="seeInning(1)">Inning 1 </label>
-    <label class="btn btn-default btn-sm" ng-click="seeInning(2)">Inning 2</label>
-  </div>-->
   <h3>Skyline of Overs</h3>
   <label class="btn btn-default" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
   <label class="btn btn-default" ng-click="seeOvers()">Over Summary</label>
@@ -67,7 +62,7 @@
             <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
         </div>
         <div ng-hide="showTimeline">
-            <partnership-matrix partnerships="secondPartnerships" batsmen="secondBatsmenAlphabetical"></partnership-matrix>
+            <partnership-matrix partnerships="secondPartnerships" batsmen="secondBatsmenAlphabetical" balls="secondInning" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></partnership-matrix>
         </div>
     </div>
     <div align="center" ng-show="showLeftComparison">
@@ -120,7 +115,7 @@
             <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
         </div>
         <div ng-hide="showTimeline">
-            <partnership-matrix partnerships="firstPartnerships" batsmen="firstBatsmenAlphabetical"></partnership-matrix>
+            <partnership-matrix partnerships="firstPartnerships" batsmen="firstBatsmenAlphabetical" balls="firstInning" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></partnership-matrix>
         </div>
     </div>
     <div align="center" ng-show="showRightComparison">

@@ -117,6 +117,9 @@ angular.module('myApp').directive('generateBallVis', function() {
 
         var selectedHand = null;
 
+        var batsman1 = null;
+        var batsman2 = null;
+
         var pitchX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
         var pitchY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))])
         pitchX.domain([-1.525, 1.525]);
@@ -424,8 +427,16 @@ angular.module('myApp').directive('generateBallVis', function() {
                   handCondition = d.bat_right_handed != "y";
               }
           }
+
+          var partnershipCondition = true;
+          if (batsman1 != null) {
+                var condition1 = (batsman1 == d.batsman_name && batsman2 == d.non_striker);
+                var condition2 = (batsman1 == d.non_striker && batsman2 == d.batsman_name);
+                partnershipCondition = condition1 || condition2;
+          }
+
           return batsmanCondition && bowlerCondition && overCondition
-              && zoneCondition && handCondition;
+              && zoneCondition && handCondition && partnershipCondition;
         }
 
         var isSelectedBall = function(d) {
@@ -959,6 +970,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                             return isSelectedBall(d) ? 1 : 0.1
                         })
 
+                        brushHighlight();
+
                 } else {
                     if (selectedZone == 0 || zoneColors.length == 0) {
                       zoneColors = [];
@@ -985,7 +998,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         return !isValidBall(d);
                     })
                     .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1 })
-
+                    brushHighlight();
                 }
             });
 
@@ -1095,6 +1108,10 @@ angular.module('myApp').directive('generateBallVis', function() {
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
                   selectedHand = null;
+                  batsman1 = null;
+                  batsman2 = null;
+                  d3.selectAll(".partnership").style("stroke-width", "1px")
+                      .style("stroke", "black");
                   var distinctBatsmen = new Set();
 
                   var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -1202,8 +1219,52 @@ angular.module('myApp').directive('generateBallVis', function() {
                           .on("mouseout", function(d) {
                               return;
                           })
+
+                          d3.selectAll(".partnership")
+                              .on("click", function(d) {
+                                  if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
+                                      d3.selectAll(".partnership").style("stroke-width", "1px")
+                                          .style("stroke", "black")
+                                      batsman1 = null;
+                                      batsman2 = null;
+
+                                      d3.selectAll(".dot")
+                                          .classed("visibleball",function(d){
+                                              return isValidBall(d);
+                                          })
+                                          .classed("invisibleball", function(d) {
+                                            return !isValidBall(d);
+                                          })
+                                          .style("opacity", function(d) {
+                                              return isSelectedBall(d) ? 1 : 0.1;
+                                          });
+                                      brushHighlight();
+                                  } else {
+
+                                      d3.selectAll(".partnership").style("stroke-width", "1px")
+                                          .style("stroke", "black")
+                                      d3.select(this).style("stroke-width", "4px")
+                                          .style("stroke", "#5998FF");
+                                      batsman1 = d.batsman_1;
+                                      batsman2 = d.batsman_2;
+
+                                      d3.selectAll(".dot")
+                                          .classed("visibleball",function(d){
+                                              return isValidBall(d);
+                                          })
+                                          .classed("invisibleball", function(d) {
+                                            return !isValidBall(d);
+                                          })
+                                          .style("opacity", function(d) {
+                                              return isSelectedBall(d) ? 1 : 0.1;
+                                          });
+                                      brushHighlight();
+                                  }
+                              })
                   });
               });
+
+
       }
   }
 })

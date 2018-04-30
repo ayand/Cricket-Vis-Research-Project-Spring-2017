@@ -9,7 +9,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.atHome = true;
 
           $scope.$on("match", function(event, id) {
-              console.log(id);
               $state.go('home.matches.match', { "id": id });
           })
 
@@ -74,7 +73,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $state.go('home.tournament.team', { team: $scope.teamName[team.name] })
           }
 
-          //console.log($scope.teams);
       }
     })
     .state('home.tournament.team', {
@@ -236,7 +234,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }
 
           $scope.$on("playerCombo", function(event, data) {
-              console.log(data);
               $scope.selectedBatsman = data.batsman;
               $scope.selectedBowler = data.bowler;
               GameService.getBallsByBatsman($scope.selectedBatsman).then(function(result) {
@@ -312,9 +309,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.showBalls = true;
           $scope.partnerships = [];
           $scope.showTimeline = true;
-          /*$scope.partnerships = partnerships;
-          console.log("PARTNERSHIPS:")
-          console.log($scope.partnerships)*/
 
           $scope.seeTimeline = function() {
               $scope.showTimeline = true;
@@ -326,7 +320,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           GameService.getGames().then(function(data) {
               var relevantGame = data.filter(function(d) { return d.match_id == $stateParams.id })[0];
-              console.log(relevantGame);
               $scope.date = relevantGame.date.split(" ")[0];
               $scope.ground = relevantGame.ground_name;
               $scope.team1 = relevantGame.team1_name;
@@ -335,7 +328,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           })
 
           $scope.$on("matchInfo", function(event, data) {
-              console.log("Match info for: " + data);
           })
 
           $scope.firstInning = balls.filter(function(d) {
@@ -524,8 +516,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }
 
           $scope.partnerships = partnerships;
-          console.log("PARTNERSHIPS:")
-          console.log(partnerships);
           $scope.firstPartnerships = $scope.partnerships.filter(function(d) {
               return d.team == $scope.firstBattingTeam;
           })
@@ -588,34 +578,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
 
           })
 
-          console.log("First batsmen: ");
-          console.log($scope.firstBatsmenAlphabetical)
-
-          console.log("Second batsmen: ");
-          console.log($scope.secondBatsmenAlphabetical)
-
-          console.log("First partnerships:")
-          console.log($scope.firstPartnerships)
-          console.log("Second partnerships:")
-          console.log($scope.secondPartnerships)
-
-          /*GameService.getPartnerships($stateParams.id).then(function(data) {
-              $scope.partnerships = data;
-              console.log("PARTNERSHIPS:")
-              console.log(data);
-              $scope.firstPartnerships = $scope.partnerships.filter(function(d) {
-                  return d.team == $scope.firstBattingTeam;
-              })
-
-              $scope.secondPartnerships = $scope.partnerships.filter(function(d) {
-                  return d.team != $scope.firstBattingTeam;
-              })
-              console.log("First partnerships:")
-              console.log($scope.firstPartnerships)
-              console.log("Second partnerships:")
-              console.log($scope.secondPartnerships)
-          })*/
-
       }
     })
     .state('home.matches.match.innings', {
@@ -633,6 +595,9 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           $scope.currentPlayerView = null;
           $scope.isCollapsed1 = true;
           $scope.isCollapsed2 = true;
+
+          $scope.$on("partnership", function(event, data) {
+          })
 
           $scope.changeCollapse = function(view) {
               if (view == "Player Stats") {
@@ -934,18 +899,14 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           });
 
           $scope.$on("batsmen", function(event, batsmen) {
-              $scope.correctHandBatsmen = Array.from(batsmen);
-              console.log("Batsmen: ");
-              console.log($scope.correctHandBatsmen)
+              $scope.activeBatsmen = Array.from(batsmen);
               $scope.$digest()
           })
 
           $scope.getClass = function(id) {
               if ($scope.activeBatsmen.includes(id) && $scope.correctHandBatsmen.includes(id)) {
-                  console.log("True")
                   return 'check';
               }
-              console.log("False")
               return 'active';
           }
 

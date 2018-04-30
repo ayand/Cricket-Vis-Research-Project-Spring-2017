@@ -7,7 +7,10 @@ angular.module('myApp').directive('partnershipMatrix', function() {
         restrict: 'E',
         scope: {
             partnerships: '=',
-            batsmen: '='
+            batsmen: '=',
+            balls: '=',
+            min: '=',
+            max: '='
         },
         link: function(scope, element, attrs) {
             var canvas = d3.select(element[0])
@@ -19,7 +22,6 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 .attr("width", width)
                 .attr("height", height)
                 .attr("fill", "white")
-                .style("stroke", "black")
 
             canvas.append("rect")
                 .attr("width", 380)
@@ -28,6 +30,15 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 .attr("y", 55)
                 .attr("fill", "#BBBBBB")
                 .style("stroke", "#BBBBBB")
+
+            var tooltipText = function(d) {
+                var line1 = "<strong>" + d.batsman_1 + " and " + d.batsman_2 + "</strong><br>";
+                var line2 = "<strong>" + d.score + " runs</strong>";
+                return line1 + line2;
+            }
+
+            var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
+            canvas.call(tip);
 
             var batsmanYScale = d3.scaleBand().domain(scope.batsmen).range([55, height - 55])
             var batsmanXScale = d3.scaleBand().domain(scope.batsmen).range([90, width - 90])
@@ -47,7 +58,8 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 .attr("width", batsmanXScale.bandwidth())
                 .attr("height", batsmanYScale.bandwidth())
                 .attr("fill", "#555555")
-                .style("stroke", "#BBBBBB")
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
                 .attr("x", function(d) {
                     return batsmanXScale(d);
                 })
@@ -70,10 +82,10 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 .attr("fill", function(d) {
                     return colorScale(d.score);
                 })
-                .style("stroke", "#BBBBBB")
-                .on("mouseover", function(d) {
-                    console.log(d);
-                })
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
+                .on("mouseover", tip.show)
+                .on("mouseout", tip.hide)
                 .style("cursor", "pointer")
 
             canvas.append("g")
@@ -104,6 +116,36 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                         return firstName + ". " + lastName
                     })
                     .attr("transform", "translate(" + xShift + ", -20) rotate(-45)")
+
+                canvas.select(".xAxis").selectAll("path").style("opacity", 0)
+                canvas.select(".yAxis").selectAll("path").style("opacity", 0)
+
+                scope.$watch("min", function(newMin, oldMin) {
+                    scope.$watch("max", function(newMax, oldMax) {
+                        var validBalls = scope.balls.filter(function(d) {
+                            var over = Math.ceil(d.ovr);
+                            return over >= newMin && over <= newMax;
+                        })
+
+                        var currentBatsmen = Array.from(new Set(
+                            validBalls.map(function(d) {
+                                return d.batsman_name;
+                            })
+                        ));
+
+                        var currentSeconds = Array.from(new Set(
+                            validBalls.map(function(d) {
+                                return d.non_striker;
+                            })
+                        ));
+
+                        var activePlayers = currentBatsmen.concat(currentSeconds);
+
+                        partnerships.style("display", function(d) {
+                            return activePlayers.includes(d.batsman_1) && activePlayers.includes(d.batsman_2) ? "block" : "none"
+                        })
+                    })
+                })
 
 
         }
