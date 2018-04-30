@@ -29,7 +29,7 @@ angular.module('myApp').directive('playerGraph', function() {
         link: function(scope, element, attrs) {
             var svg = d3.select(element[0])
                 .append("svg")
-                .attr("width", 1500)
+                .attr("width", 1200)
                 .attr("height", 283);
 
             var sortByKey = function(key) {
@@ -87,15 +87,8 @@ angular.module('myApp').directive('playerGraph', function() {
 
             var edgeTipText = function(d) {
               return "<div align='center' class='row'>\
-                          <div class='col-sm-6 col-md-6 col-lg-6'>\
-                              <h4>Batsman</h4>\
-                              <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.batsman.toString()]["name"]] + "'>\
-                              <h5>" + scope.playerDict[d.batsman.toString()]["name"] + "</h5>\
-                          </div>\
-                          <div class='col-sm-6 col-md-6 col-lg-6'>\
-                              <h4>Bowler</h4>\
-                              <img align='center' class='center-block' height='50' src='" + scope.imageDict[scope.playerDict[d.bowler.toString()]["name"]] + "'>\
-                              <h5>" + scope.playerDict[d.bowler.toString()]["name"] + "</h5>\
+                          <div class='col-sm-12 col-md-12 col-lg-12'>\
+                              <h5>" + scope.playerDict[d.batsman.toString()]["name"] + " vs. " + scope.playerDict[d.bowler.toString()]["name"] + "</h5>\
                           </div>\
                       </div>\
                       <div align='center' class='row' style='border-top: 1 px solid white'>\
@@ -128,7 +121,7 @@ angular.module('myApp').directive('playerGraph', function() {
 
             teams.sort();
 
-            var teamScale = d3.scaleBand().domain(teams).range([0, 1450]);
+            var teamScale = d3.scaleBand().domain(teams).range([0, 1150]);
 
             svg.append("g")
                 .attr("class", "xAxis")
@@ -268,7 +261,8 @@ angular.module('myApp').directive('playerGraph', function() {
                           })
 
                     }
-                    nodeTip.show(d);
+                    //nodeTip.show(d);
+                    scope.$emit("playerStats", d);
                 })
                 .on("mouseout", function(d) {
                     if (selectedPlayer == null) {
@@ -281,12 +275,15 @@ angular.module('myApp').directive('playerGraph', function() {
                       d3.selectAll(".playerNode").style("display", "block")
                           .style("stroke", "none");
                     }
-                    nodeTip.hide();
+                    //nodeTip.hide();
+                    scope.$emit("playerStats", null);
                 })
                 .on("click", function(d) {
                     if (selectedPlayer != d.id) {
                       selectedPlayer = d.id;
-
+                      selectedTeam = null;
+                      d3.select(".xAxis").selectAll("text")
+                          .style("fill", "black")
                       relevantOpponents = [];
                       d3.selectAll(".edge")
                           .style("display", function(edge) {
@@ -311,6 +308,7 @@ angular.module('myApp').directive('playerGraph', function() {
                           .style("display", function(name) {
                               return (name.id == selectedPlayer || relevantOpponents.includes(name.id)) ? "block" : "none";
                           })
+                      scope.$emit("clickedPlayer", d);
                     } else {
                         selectedPlayer = null;
                         selectedTeam = null;
@@ -321,6 +319,7 @@ angular.module('myApp').directive('playerGraph', function() {
                         d3.selectAll(".playerName").style("display", "block");
                         d3.selectAll(".playerNode").style("display", "block")
                             .style("stroke", "none");
+                       scope.$emit("clickedPlayer", null);
                     }
                 })
                 .style("cursor", "pointer")
@@ -330,7 +329,7 @@ angular.module('myApp').directive('playerGraph', function() {
                 .data(scope.graph.nodes)
                 .enter().append("text")
                 .attr("class", "playerName")
-                .attr("x", function(d) { return teamScale(d.team) + (teamScale.bandwidth() / 2) + 11; })
+                .attr("x", function(d) { return teamScale(d.team) + (teamScale.bandwidth() / 2) + 9; })
                 .attr("y", function(d) { return coordinateDict[d.team]["playerDict"][d.id.toString()] + 3 })
                 .text(function(d) {
                     var names = d.name.split(" ");
@@ -339,9 +338,11 @@ angular.module('myApp').directive('playerGraph', function() {
                     return firstInitial + ". " + lastName;
                 })
                 .style("font-weight", "bold")
-                .style("font-size", "9.5px")
+                .style("font-size", "8px")
 
             d3.select(".xAxis").selectAll("text")
+                .style("font-size", "10px")
+                .text(d => (d == "United Arab Emirates") ? "UAE" : d)
                 .style("cursor", "pointer")
                 .on("click", function(d) {
                     if (selectedPlayer != null && d != scope.playerDict[selectedPlayer.toString()]["team"]) {

@@ -1,37 +1,134 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
-  <div style="width:500px">
-    <div id="vizes" class="row">
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-            <h5>Analyzed Side</h5>
+  <div class="row">
+      <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div ng-hide="seePlayer">
+          <br>
+          <br>
+          <br>
+          <br>
+          <h3>Click to see player opponents and stats</h3>
         </div>
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-            <h5>Sorting Order</h5>
+        <div ng-show="seePlayer">
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <img align='center' class='center-block' height='100' src='{{ images[playerDict[currentPlayer.id.toString()]["name"]] }}'>
+            <h4>{{ currentPlayer.name }}</h4>
+            <h5>{{ currentPlayer.team }}</h5>
+            <table>
+                <tr>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Runs Scored</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Runs Conceded</h6>
+                    </td>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{ runsScored }}</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{ runsConceded }}</h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Balls Faced</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Overs Bowled</h6>
+                    </td>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{ballsFaced}}</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{oversBowled}}</h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Strike Rate</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:left">
+                        <h6>Wickets Taken</h6>
+                    </td>
+                    <td ng-show="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{ strikeRate }}</h6>
+                    </td>
+                    <td ng-hide="selectedSide == 'Batting'" style="text-align:right">
+                        <h6>{{ wicketsTaken }}</h6>
+                    </td>
+                </tr>
+            </table>
+            <!--<div class="row">
+                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">Runs Scored</p>
+                    <p ng-hide="selectedSide == 'Batting'">Runs Conceded</p>
+                </div>
+                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">{{ runsScored }}</p>
+                    <p ng-hide="selectedSide == 'Batting'">{{ runsConceded }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">Balls Faced</p>
+                    <p ng-hide="selectedSide == 'Batting'">Overs Bowled</p>
+                </div>
+                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">{{ ballsFaced }}</p>
+                    <p ng-hide="selectedSide == 'Batting'">{{ oversBowled }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">Strike Rate</p>
+                    <p ng-hide="selectedSide == 'Batting'">Wickets Taken</p>
+                </div>
+                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <p ng-show="selectedSide == 'Batting'">{{ strikeRate }}</p>
+                    <p ng-hide="selectedSide == 'Batting'">{{ wicketsTaken }}</p>
+                </div>
+            </div>-->
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-          <div class="btn-group">
-              <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+      </div>
+      <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+        <div style="width:500px">
+          <div id="vizes" class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h5>Analyzed Side</h5>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h5>Sorting Order</h5>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <div class="btn-group">
+                    <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+                </div>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <select ng-model="sortKey" class="form-control">
+                      <option ng-repeat="key in sortKeys" value="{{ key }}">{{ key }}</option>
+                  </select>
+              </div>
           </div>
         </div>
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-            <select ng-model="sortKey" class="form-control">
-                <option ng-repeat="key in sortKeys" value="{{ key }}">{{ key }}</option>
-            </select>
-        </div>
-    </div>
-  </div>
 
-  <br>
-  <br>
-  <player-graph
-      graph="playerGraph"
-      image-dict="images"
-      player-dict="playerDict"
-      side="selectedSide"
-      sort-key="sortKey"></player-graph>
-  <br>
+        <br>
+        <br>
+        <player-graph
+            graph="playerGraph"
+            image-dict="images"
+            player-dict="playerDict"
+            side="selectedSide"
+            sort-key="sortKey"></player-graph>
+        <br>
+      </div>
+  </div>
   <div ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">

@@ -196,6 +196,62 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
       controller: function($scope, $state, players, playerDict, images,
           GameService, games, playerGraph, $location, $anchorScroll) {
 
+          $scope.seePlayer = false;
+          $scope.currentPlayer = null;
+          $scope.previousPlayer = null;
+
+          $scope.runsScored = null;
+          $scope.ballsFaced = null;
+          $scope.strikeRate = null;
+          $scope.oversBowled = null;
+          $scope.runsConceded = null;
+          $scope.wicketsTaken = null;
+
+          $scope.$on("playerStats", function(event, data) {
+              if (data != null) {
+                  console.log("SELECTING PLAYER")
+                  $scope.seePlayer = true;
+                  $scope.currentPlayer = data;
+                  $scope.runsScored = data.runs_scored;
+                  $scope.ballsFaced = data.balls_faced;
+                  $scope.strikeRate = data.strike_rate != -1 ? data.strike_rate.toFixed(3) : "N/A";
+                  $scope.oversBowled = data.overs_bowled;
+                  $scope.runsConceded = data.runs_conceded;
+                  $scope.wicketsTaken = data.wickets_taken;
+
+              } else {
+                  //$scope.seePlayer = false;
+                  if ($scope.previousPlayer != null) {
+                      $scope.currentPlayer = $scope.previousPlayer;
+                      $scope.runsScored = $scope.previousPlayer.runs_scored;
+                      $scope.ballsFaced = $scope.previousPlayer.balls_faced;
+                      $scope.strikeRate = $scope.previousPlayer.strike_rate != -1 ? $scope.previousPlayer.strike_rate.toFixed(3) : "N/A";
+                      $scope.oversBowled = $scope.previousPlayer.overs_bowled;
+                      $scope.runsConceded = $scope.previousPlayer.runs_conceded;
+                      $scope.wicketsTaken = $scope.previousPlayer.wickets_taken;
+                  } else {
+                      $scope.seePlayer = false;
+                  }
+              }
+              $scope.$digest()
+          })
+
+          $scope.$on("clickedPlayer", function(event, data) {
+              if (data != null) {
+                //$scope.seePlayer = true;
+                $scope.currentPlayer = data;
+                $scope.previousPlayer = data;
+                $scope.runsScored = data.runs_scored;
+                $scope.ballsFaced = data.balls_faced;
+                $scope.strikeRate = data.strike_rate != -1 ? data.strike_rate.toFixed(3) : "N/A";
+                $scope.oversBowled = data.overs_bowled;
+                $scope.runsConceded = data.runs_conceded;
+                $scope.wicketsTaken = data.wickets_taken;
+              } else {
+                $scope.previousPlayer = null;
+              }
+          })
+
           $scope.playerGraph = playerGraph;
           $scope.images = images;
           $scope.playerDict = playerDict;
