@@ -1,197 +1,242 @@
-<div style="color: black">
-<div align="center">
-  <h2>{{ date + " - (" + ground + ")" }}<br>
-      {{ team1 + " vs " + team2 }}
-  </h2>
-  <h4>{{ result }}</h4>
-  <br>
-  <!--<h3>Inning Analysis</h3>
-  <div class='btn-group'>
-    <label class="btn btn-default btn-sm" ng-click="seeInning(1)">Inning 1 </label>
-    <label class="btn btn-default btn-sm" ng-click="seeInning(2)">Inning 2</label>
-  </div>-->
-  <h3>Skyline of Overs</h3>
-  <label class="btn btn-default" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
-  <label class="btn btn-default" ng-click="seeOvers()">Over Summary</label>
-  <br>
-  <br>
-  <div class="btn-group" uib-dropdown uib-keyboard-nav>
-      <button id="simple-btn-keyboard-nav" type="button" class="btn btn-success" uib-dropdown-toggle>
-          Inning Analysis <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
-          <li style="cursor:pointer" role="menuitem"><a ng-click="seeInning(1)">Inning 1</a></li>
-          <li style="cursor:pointer" role="menuitem"><a ng-click="seeInning(2)">Inning 2</a></li>
-      </ul>
-  </div>
-</div>
-<div ng-show="!showSlider1 && !showSlider2" class="row">
-    <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-      <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
+<div class="row">
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+      <div align="center">
+        <h3>{{ date + " - (" + ground + ")" }}</h3>
+
+        <h4>{{ result }}</h4>
+        <div ng-show="seeInningData">
+              <!--<h3 align="center">{{ "Inning " + inning}}</h3>
+              <h3 align="center">Stats for Overs {{ slider.minimumOver }} - {{ (slider.maximumOver < maxOvers) ? slider.maximumOver : maxOvers }}</h3>-->
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
+              <h4 align="center">{{ battingTeam + " Batsmen" }}</h4>
+              <div align="left">
+                <!--<h5>Sort By</h5>
+                <select align="center" ng-model="selectedBatsmanKey">
+                  <option value="Batting Order">Batting Order</option>
+                  <option value="Runs Scored">Runs Scored</option>
+                  <option value="Balls Faced">Balls Faced</option>
+                  <option value="Strike Rate">Strike Rate</option>
+                  <option value="Form">Form</option>
+                </select>-->
+                <div class="row">
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                      <h5>Sort By</h5>
+                    </div>
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                      <select align="center" ng-model="selectedBatsmanKey">
+                        <option value="Batting Order">Batting Order</option>
+                        <option value="Runs Scored">Runs Scored</option>
+                        <option value="Balls Faced">Balls Faced</option>
+                        <option value="Strike Rate">Strike Rate</option>
+                        <option value="Form">Form</option>
+                      </select>
+                    </div>
+                </div>
+                <div>
+                  <table class="table-condensed">
+                      <tbody>
+                        <!--<tr ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'"
+                            ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling"
+                            ng-repeat="batsman in batsmen">
+                            <td style="padding: 2px; margin: 2px">
+                              <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="45" alt="batsmanImage"/><br>
+                            </td>
+                            <td style="padding: 2px; margin: 2px">
+                              <p uib-tooltip="Runs Scored (Balls Faced)">R: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }} ({{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }})</p>
+                              <p uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</p>
+                              <p uib-tooltip="Form">F:  {{ (batsman.form != -1) ? batsman.form.toFixed(2) : "-" }}</p>
+                            </td>
+                        </tr>-->
+                        <tr>
+                            <td ng-class="activeBatsmen.includes(batsmen[$index].id) ? '' : 'active'"
+                                ng-style="currentBatsmen.includes(batsmen[$index].id) ? batsmanStyling : normalStyling"
+                                ng-repeat="batsman in batsmen"
+                                style="display: inline-block; width: 72px;  height: 157px; font-size: 9px;">
+                                <img align="center" class="center-block" uib-tooltip="{{ batsman.name }}" ng-src="{{ imageDict[batsman.name] }}" ng-click="changeBatsmen(batsmen[$index])" height="45" alt="batsmanImage"/><br>
+                                <p uib-tooltip="Runs Scored">R: {{ (batsman.runs_scored != -1) ? batsman.runs_scored.toString() : "-" }}</p>
+                                <p uib-tooltip="Balls Faced">BF: {{ (batsman.balls_faced != -1) ? batsman.balls_faced.toString() : "-" }}</p>
+                                <p uib-tooltip="Strike Rate">SR: {{ (batsman.strike_rate != -1) ? batsman.strike_rate.toFixed(1) : "-" }}</p>
+                                <p uib-tooltip="Form">F:  {{ (batsman.form != -1) ? batsman.form.toFixed(2) : "-" }}</p>
+                            </td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <h4 align="center">{{ bowlingTeam + " Bowlers" }}</h4>
+              <div align="left">
+                <div class="row">
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                      <h5>Sort By</h5>
+                    </div>
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                      <select align="center" ng-model="selectedBowlerKey">
+                        <option value="Bowling Order">Bowling Order</option>
+                        <option value="Runs Conceded">Runs Conceded</option>
+                        <option value="Wickets Taken">Wickets Taken</option>
+                        <option value="Overs Bowled">Overs Bowled</option>
+                        <option value="Extras Conceded">Extras Conceded</option>
+                      </select>
+                    </div>
+                </div>
+                <div>
+                  <table class="table-condensed">
+                      <tbody>
+                          <tr>
+                              <td ng-class="activeBowlers.includes(bowlers[$index].id) ? '' : 'active'"
+                                  ng-style="currentBowlers.includes(bowlers[$index].id) ? bowlerStyling : normalStyling"
+                                  ng-repeat="bowler in bowlers"
+                                  style="display: inline-block; width: 72px;  height: 140px; font-size: 9px;">
+                                  <img align="center" class="center-block" uib-tooltip="{{ bowler.name }}" ng-src="{{ imageDict[bowler.name] }}" ng-click="changeBowlers(bowlers[$index])" height="45" alt="bowlerImage"/><br>
+                                  <p uib-tooltip="Runs Conceded (Extras Conceded)">RC: {{ (bowler.runs_conceded != -1) ? (bowler.runs_conceded + bowler.extras_conceded).toString() : "-" }} ({{ (bowler.extras_conceded != -1) ? bowler.extras_conceded.toString() : "-" }})</p>
+                                  <p uib-tooltip="Overs Bowled">OB: {{ (bowler.overs_bowled != -1) ? bowler.overs_bowled.toString() : "-" }}</p>
+                                  <p uib-tooltip="Wickets Taken">W:  {{ (bowler.wickets_taken != -1) ? bowler.wickets_taken.toString() : "-" }}</p>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+
+              </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+      <div style="color: black">
+      <div align="center">
+        <h2>{{ team1}} vs {{team2 }}</h2>
+        <h3>Skyline of Overs</h3>
+        <div>
+          <label class="btn btn-default" ng-click="seeBalls()">Ball-by-Ball Analysis</label>
+          <label class="btn btn-default" ng-click="seeOvers()">Over Summary</label>
+          <br>
+          <br>
+          <div class="btn-group" uib-dropdown uib-keyboard-nav>
+              <button id="simple-btn-keyboard-nav" type="button" class="btn btn-success" uib-dropdown-toggle>
+                  Inning Analysis <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="simple-btn-keyboard-nav">
+                  <li style="cursor:pointer" role="menuitem"><a ng-click="seeInning(1)">Inning 1</a></li>
+                  <li style="cursor:pointer" role="menuitem"><a ng-click="seeInning(2)">Inning 2</a></li>
+              </ul>
+          </div>
+        </div>
+      </div>
       <div class="row">
-        <h4>{{ "1st Innings: " + firstBattingTeam}}<br>{{ firstTotalRuns + "-" + firstWickets}}</h4>
+        <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+          <div ng-hide="showSlider2">
+            <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
+            <div class="row">
+              <h4>{{ "1st Innings: " + firstBattingTeam}}<br>{{ firstTotalRuns + "-" + firstWickets}}</h4>
+            </div>
+            <div ng-show="showBalls">
+              <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
+              <br>
+              <br>
+            </div>
+            <div ng-show="!showBalls">
+              <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
+              <br>
+              <br>
+            </div>
+          </div>
+          <div ng-show="showSlider2">
+              <label class="btn btn-small" ng-class="showTimeline ? 'btn-success' : btn-default" ng-click="seeTimeline()">Timeline</label>
+              <label class="btn btn-small" ng-class="!showTimeline ? 'btn-success' : btn-default" ng-click="seePartnerships()">Partnerships</label>
+              <br>
+              <br>
+              <h4 ng-show="showTimeline">Timeline for Innings 1 and 2</h4>
+              <h4 ng-hide="showTimeline">Partnerships for Inning 2</h4>
+              <br>
+              <br>
+              <br>
+              <div ng-show="showTimeline">
+                  <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
+              </div>
+              <div ng-hide="showTimeline">
+                  <partnership-matrix partnerships="secondPartnerships" batsmen="secondBatsmenAlphabetical" balls="secondInning" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></partnership-matrix>
+              </div>
+          </div>
+          <div align="center" ng-show="showLeftComparison">
+            <table style="width:720px; border: 1px solid white" align="center">
+              <tr style="font-weight:bold; text-align: center">
+                <th style="text-align: center">Before Over {{ rangeSlider1.minimumOver }}</th>
+                <th style="text-align: center">After Over {{ finalOver1 }}</th>
+              </tr>
+              <tr style="text-align: center">
+                <td>{{ leftRuns1 + "-" + leftWickets1 }}</td>
+                <td>{{ rightRuns1 + "-" + rightWickets1 }}</td>
+              </tr>
+            </table>
+          </div>
+          <div style="width:720px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}" ng-show="showSlider1">
+              <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
+          </div>
+        </div>
+        <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+          <div ng-hide="showSlider1">
+            <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
+            <div class="row">
+              <h4>{{ "2nd Innings: " + secondBattingTeam}}<br>{{ secondTotalRuns + "-" + secondWickets}}</h4>
+            </div>
+            <div ng-show="showBalls">
+              <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
+              <br>
+              <br>
+            </div>
+            <div ng-show="!showBalls">
+              <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
+              <br>
+              <br>
+            </div>
+          </div>
+          <div ng-show="showSlider1">
+              <label class="btn btn-small" ng-class="showTimeline ? 'btn-success' : btn-default" ng-click="seeTimeline()">Timeline</label>
+              <label class="btn btn-small" ng-class="!showTimeline ? 'btn-success' : btn-default" ng-click="seePartnerships()">Partnerships</label>
+              <br>
+              <br>
+              <h4 ng-show="showTimeline">Timeline for Inning 1</h4>
+              <h4 ng-hide="showTimeline">Partnerships for Inning 1</h4>
+              <br>
+              <br>
+              <br>
+              <div ng-show="showTimeline">
+                  <over-timeline balls="firstBalls"  min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-timeline>
+              </div>
+              <div ng-hide="showTimeline">
+                  <partnership-matrix partnerships="firstPartnerships" batsmen="firstBatsmenAlphabetical" balls="firstInning" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></partnership-matrix>
+              </div>
+          </div>
+          <div align="center" ng-show="showRightComparison">
+            <table style="width:720px" align="center" >
+              <tr style="font-weight:bold; text-align: center">
+                <th style="text-align: center">Before Over {{ rangeSlider2.minimumOver }}</th>
+                <th style="text-align: center">After Over {{ finalOver2 }}</th>
+              </tr>
+              <tr style="text-align: center">
+                <td>{{ leftRuns2 + "-" + leftWickets2 }}</td>
+                <td>{{ rightRuns2 + "-" + rightWickets2 }}</td>
+              </tr>
+            </table>
+          </div>
+          <div style="width:720px" ng-show="showSlider2">
+              <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
+          </div>
+        </div>
       </div>
-      <div ng-show="showBalls">
-        <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
-        <br>
-        <br>
+      <div ng-show="showLegend" class="row">
+        <div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <!-- <h3>Color Key</h3> -->
+          <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver"></color-legend>
+        </div>
       </div>
-      <div ng-show="!showBalls">
-        <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
-        <br>
-        <br>
-      </div>
-      <div align="center" ng-show="showLeftComparison">
-        <table style="width:720px" align="center" class="table">
-          <tr style="font-weight:bold; text-align: center">
-            <th style="text-align: center">Before Over {{ rangeSlider1.minimumOver }}</th>
-            <th style="text-align: center">After Over {{ finalOver1 }}</th>
-          </tr>
-          <tr style="text-align: center">
-            <td>{{ leftRuns1 + "-" + leftWickets1 }}</td>
-            <td>{{ rightRuns1 + "-" + rightWickets1 }}</td>
-          </tr>
-        </table>
-      </div>
-      <div style="width:720px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}" ng-show="showSlider1">
-          <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
-      </div>
-    </div>
-    <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-      <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
-      <div class="row">
-        <h4>{{ "2nd Innings: " + secondBattingTeam}}<br>{{ secondTotalRuns + "-" + secondWickets}}</h4>
-      </div>
-      <div ng-show="showBalls">
-        <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
-        <br>
-        <br>
-      </div>
-      <div ng-show="!showBalls">
-        <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
-        <br>
-        <br>
-      </div>
-      <div align="center" ng-show="showRightComparison">
-        <table style="width:720px" align="center" class="table">
-          <tr style="font-weight:bold; text-align: center">
-            <th style="text-align: center">Before Over {{ rangeSlider2.minimumOver }}</th>
-            <th style="text-align: center">After Over {{ finalOver2 }}</th>
-          </tr>
-          <tr style="text-align: center">
-            <td>{{ leftRuns2 + "-" + leftWickets2 }}</td>
-            <td>{{ rightRuns2 + "-" + rightWickets2 }}</td>
-          </tr>
-        </table>
-      </div>
-      <div style="width:720px" ng-show="showSlider2">
-          <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
-      </div>
-    </div>
-</div>
-<div class="row" ng-show="showSlider1">
-    <div align="center" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-      <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
-      <div class="row">
-        <h4>{{ "1st Innings: " + firstBattingTeam}}<br>{{ firstTotalRuns + "-" + firstWickets}}</h4>
-      </div>
-      <div align="center" ng-show="showBalls">
-        <over-chart val="firstInning" dictionary="playerDict" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver" hoverswitch="hover"></over-chart>
-        <br>
-        <br>
-      </div>
-      <div align="center" ng-show="!showBalls">
-        <over-summary-chart val="firstDivision" team="firstBattingTeam" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-summary-chart>
-        <br>
-        <br>
-      </div>
-      <div align="center" ng-show="showLeftComparison">
-        <table style="width:720px" align="center" class="table">
-          <tr style="font-weight:bold; text-align: center">
-            <th style="text-align: center">Before Over {{ rangeSlider1.minimumOver }}</th>
-            <th style="text-align: center">After Over {{ finalOver1 }}</th>
-          </tr>
-          <tr style="text-align: center">
-            <td>{{ leftRuns1 + "-" + leftWickets1 }}</td>
-            <td>{{ rightRuns1 + "-" + rightWickets1 }}</td>
-          </tr>
-        </table>
-      </div>
-      <div align="left"  style="width:720px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}">
-          <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
-      </div>
-    </div>
-    <div align="center" class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-    </div>
-    <div align="center" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-      <div>
-          <br>
-          <br>
-          <br>
-          <br>
-          <h4>Timeline for Inning 1</h4>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <over-timeline balls="firstInning" min="rangeSlider1.minimumOver" max="rangeSlider1.maximumOver"></over-timeline>
-      </div>
-    </div>
-</div>
-<div class="row" ng-show="showSlider2">
-    <div align="center" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-      <br>
-      <br>
-      <br>
-      <br>
-      <h4>Timeline for Innings 1 and 2</h4>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <over-timeline balls="allBalls"  min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-timeline>
-    </div>
-    <div align="center" class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-    </div>
-    <div align="center" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
-      <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[secondBattingTeam] }}" height="50" alt="team2Flag"/><br>
-      <div class="row">
-        <h4>{{ "2nd Innings: " + secondBattingTeam}}<br>{{ secondTotalRuns + "-" + secondWickets}}</h4>
-      </div>
-      <div ng-show="showBalls">
-        <over-chart val="secondInning" dictionary="playerDict" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver" hoverswitch="hover"></over-chart>
-        <br>
-        <br>
-      </div>
-      <div ng-show="!showBalls">
-        <over-summary-chart val="secondDivision" team="secondBattingTeam" min="rangeSlider2.minimumOver" max="rangeSlider2.maximumOver"></over-summary-chart>
-        <br>
-        <br>
-      </div>
-      <div align="center" ng-show="showRightComparison">
-        <table style="width:720px" align="center" class="table">
-          <tr style="font-weight:bold; text-align: center">
-            <th style="text-align: center">Before Over {{ rangeSlider2.minimumOver }}</th>
-            <th style="text-align: center">After Over {{ finalOver2 }}</th>
-          </tr>
-          <tr style="text-align: center">
-            <td>{{ leftRuns2 + "-" + leftWickets2 }}</td>
-            <td>{{ rightRuns2 + "-" + rightWickets2 }}</td>
-          </tr>
-        </table>
-      </div>
-      <div align="right" style="width:720px" ng-show="showSlider2">
-          <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
+      <div class="container-fluid" autoscroll="true" ui-view></div>
       </div>
     </div>
-</div>
-<div ng-show="showLegend" class="row">
-  <div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <!-- <h3>Color Key</h3> -->
-    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver"></color-legend>
-  </div>
-</div>
-<div class="container-fluid" autoscroll="true" ui-view></div>
 </div>

@@ -5,5 +5,7 @@ angular.module('myApp', [
   'ui.router',
   'ui.bootstrap',
   'myApp.version',
-  'rzModule'
+  'rzModule',
+  'angularMultiSlider',
+  'ngAnimate'
 ]);

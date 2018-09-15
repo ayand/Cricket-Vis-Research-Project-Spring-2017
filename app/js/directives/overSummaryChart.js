@@ -1,5 +1,5 @@
 angular.module('myApp').directive('overSummaryChart', function() {
-  var height = 350;
+  var height = 280;
 
   var convertDimension = function(d) {
       return ((d * height) / 450)

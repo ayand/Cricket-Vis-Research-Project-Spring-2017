@@ -1,7 +1,12 @@
 angular.module('myApp').directive('partnershipMatrix', function() {
-    var height = 350;
-    var width = 560;
-    var margin = 80;
+    var height = 315;
+
+    var convertDimension = function(d) {
+        return ((d * height) / 350);
+    }
+
+    var width = convertDimension(560);
+    var margin = convertDimension(80);
 
     return {
         restrict: 'E',
@@ -24,10 +29,10 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 .attr("fill", "white")
 
             canvas.append("rect")
-                .attr("width", 380)
-                .attr("height", 240)
-                .attr("x", 90)
-                .attr("y", 55)
+                .attr("width", convertDimension(380))
+                .attr("height", convertDimension(240))
+                .attr("x", convertDimension(90))
+                .attr("y", convertDimension(55))
                 .attr("fill", "#BBBBBB")
                 .style("stroke", "#BBBBBB")
 
@@ -40,8 +45,8 @@ angular.module('myApp').directive('partnershipMatrix', function() {
             var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
             canvas.call(tip);
 
-            var batsmanYScale = d3.scaleBand().domain(scope.batsmen).range([55, height - 55])
-            var batsmanXScale = d3.scaleBand().domain(scope.batsmen).range([90, width - 90])
+            var batsmanYScale = d3.scaleBand().domain(scope.batsmen).range([convertDimension(55), height - convertDimension(55)])
+            var batsmanXScale = d3.scaleBand().domain(scope.batsmen).range([convertDimension(90), width - convertDimension(90)])
 
             var xShift = batsmanXScale.bandwidth() / 2
 
@@ -49,7 +54,7 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                 return d.score;
             }))
 
-            var colorScale = d3.scaleQuantile().domain(scoreRange).range(["#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#B10026"])
+            var colorScale = d3.scaleQuantile().domain(scoreRange).range(["#ADCCFF", "#97BAF1", "#82AAE3", "#6B99D5", "#5287C7", "#3777B9", "#0868AC"])
 
             var invalidPartnerships = canvas.selectAll(".invalidPartnership")
                 .data(scope.batsmen)
@@ -90,7 +95,7 @@ angular.module('myApp').directive('partnershipMatrix', function() {
 
             canvas.append("g")
                 .attr("class", "yAxis")
-                .attr("transform", "translate(90, 0)")
+                .attr("transform", "translate(" + convertDimension(90) + ", 0)")
                 .call(d3.axisLeft(batsmanYScale))
 
             canvas.select(".yAxis")
@@ -101,10 +106,11 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                     var lastName = names[names.length - 1]
                     return firstName + ". " + lastName
                 })
+                .style("font-size", "10px")
 
                 canvas.append("g")
                     .attr("class", "xAxis")
-                    .attr("transform", "translate(0, 55)")
+                    .attr("transform", "translate(0, " + convertDimension(55) + ")")
                     .call(d3.axisTop(batsmanXScale))
 
                 canvas.select(".xAxis")
@@ -115,7 +121,8 @@ angular.module('myApp').directive('partnershipMatrix', function() {
                         var lastName = names[names.length - 1]
                         return firstName + ". " + lastName
                     })
-                    .attr("transform", "translate(" + xShift + ", -20) rotate(-45)")
+                    .style("font-size", "10px")
+                    .attr("transform", "translate(" + (xShift - 5) + ", -20) rotate(-40)")
 
                 canvas.select(".xAxis").selectAll("path").style("opacity", 0)
                 canvas.select(".yAxis").selectAll("path").style("opacity", 0)

@@ -132,6 +132,17 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
       return deferred.promise;
     }
 
+    var getBracketInfo = function() {
+        var deferred = $q.defer();
+        $http.get('/data/cleaned_info/cricket_stages.json').success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            console.log("Error: " + JSON.stringify(data));
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
     return {
         getGameInfo: getGameInfo,
         getPlayers: getPlayers,
@@ -144,6 +155,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
         getMatchesByTeam: getMatchesByTeam,
         getPlayersByTeam: getPlayersByTeam,
         getPlayerGraph: getPlayerGraph,
-        getPartnerships: getPartnerships
+        getPartnerships: getPartnerships,
+        getBracketInfo: getBracketInfo
     }
 }]);

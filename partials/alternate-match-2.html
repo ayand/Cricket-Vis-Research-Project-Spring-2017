@@ -22,13 +22,6 @@
 </div>
 <div class="row">
   <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-
-  </div>
-  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-  </div>
-</div>
-<div class="row">
-  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <div ng-hide="showSlider2">
       <img align="center" class="center-block" style='border:1px solid #000000' ng-src="{{ flags[firstBattingTeam] }}" height="50" alt="team1Flag"/><br>
       <div class="row">
@@ -66,7 +59,7 @@
         </div>
     </div>
     <div align="center" ng-show="showLeftComparison">
-      <table style="width:720px" align="center" class="table">
+      <table style="width:448px" align="center" class="table">
         <tr style="font-weight:bold; text-align: center">
           <th style="text-align: center">Before Over {{ rangeSlider1.minimumOver }}</th>
           <th style="text-align: center">After Over {{ finalOver1 }}</th>
@@ -77,7 +70,7 @@
         </tr>
       </table>
     </div>
-    <div style="width:720px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}" ng-show="showSlider1">
+    <div style="width:448px; .rzslider .rz-selection{background: #555555}; .rzslider .rz-pointer{background: #555555}; .rzslider .rz-tick.rz-selected {background: #555555;}" ng-show="showSlider1">
         <rzslider rz-slider-model="rangeSlider1.minimumOver" rz-slider-high="rangeSlider1.maximumOver" rz-slider-options="rangeSlider1.options"></rzslider>
     </div>
   </div>
@@ -119,7 +112,7 @@
         </div>
     </div>
     <div align="center" ng-show="showRightComparison">
-      <table style="width:720px" align="center" class="table">
+      <table style="width:448px" align="center" class="table">
         <tr style="font-weight:bold; text-align: center">
           <th style="text-align: center">Before Over {{ rangeSlider2.minimumOver }}</th>
           <th style="text-align: center">After Over {{ finalOver2 }}</th>
@@ -130,7 +123,7 @@
         </tr>
       </table>
     </div>
-    <div style="width:720px" ng-show="showSlider2">
+    <div style="width:448px" ng-show="showSlider2">
         <rzslider rz-slider-model="rangeSlider2.minimumOver" rz-slider-high="rangeSlider2.maximumOver" rz-slider-options="rangeSlider2.options"></rzslider>
     </div>
   </div>

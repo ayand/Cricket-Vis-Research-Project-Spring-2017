@@ -1,8 +1,14 @@
 <div align="center">
     <h3>Tournament Analysis</h3>
     <br>
+
     <h4>Select a team to analyze</h4>
+    <div class="btn-group">
+        <button class="btn btn-small" ng-repeat="stage in stages" ng-class="stage == selectedStage ? 'btn-success' : 'btn-default'" ng-click="selectStage(stage)">{{ stage }}</button>
+    </div>
     <br>
+    <br>
+    <!--<tournament-bracket stage-information="bracketInfo" stage="selectedStage"></tournament-bracket>-->
     <div class="team-list">
         <table class="team-table" style="background-color:#aaaaaa">
             <tr>
@@ -17,12 +23,6 @@
                     <br>
                 </td>
             </tr>
-            <!--<tr>
-                <td align="center" ng-repeat="team in teams" style="cursor:pointer">
-                    <br>
-                    <h6>{{ team['name'] }}</h6>
-                </td>
-            </tr>-->
         </table>
     </div>
     <div class="container-fluid" autoscroll="true" ui-view></div>

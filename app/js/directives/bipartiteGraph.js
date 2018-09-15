@@ -19,8 +19,6 @@ angular.module('myApp').directive('bipartiteGraph', function() {
         restrict: 'EA',
         scope: {
             balls: '=',
-            batsmen: '=',
-            bowlers: '=',
             min: '=',
             max: '=',
             playerDict: '=',
@@ -50,34 +48,34 @@ angular.module('myApp').directive('bipartiteGraph', function() {
             var vis = d3.select(element[0])
                 .append("svg")
                 .attr("width", width)
-                .attr("height", 340)
+                .attr("height", 240)
 
             vis.append("rect")
                 .attr("width", width)
-                .attr("height", 340)
+                .attr("height", 240)
                 .attr("fill", "white")
 
                 var newBatsmen = Array.from(new Set(scope.balls.map(function(d) {
                     return d.batsman;
                 })));
 
-                newBatsmen.sort(alphabeticalSort)
+                //newBatsmen.sort(alphabeticalSort)
 
                 var newBowlers = Array.from(new Set(scope.balls.map(function(d) {
                     return d.bowler;
                 })));
                 console.log(newBowlers);
-                newBowlers.sort(alphabeticalSort)
+                //newBowlers.sort(alphabeticalSort)
 
                 var locationDict = {}
 
                 newBatsmen.forEach(function(d, i) {
-                    var coordinate = 30 + (i * 28)
+                    var coordinate = 10 + (i * 20)
                     locationDict[d.toString()] = coordinate
                 })
 
                 newBowlers.forEach(function(d, i) {
-                    var coordinate = 30 + (i * 28)
+                    var coordinate = 10 + (i * 24)
                     locationDict[d.toString()] = coordinate
                 })
 
@@ -121,6 +119,7 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     .data(newBatsmen)
                     .enter().append("g")
                     .attr("class", "batsman")
+                    .classed("activePlayer", true)
                     .attr("transform", function(d, i) {
                         return "translate(" + [0, locationDict[d.toString()]] + ")"
                     })
@@ -147,6 +146,7 @@ angular.module('myApp').directive('bipartiteGraph', function() {
                     .data(newBowlers)
                     .enter().append("g")
                     .attr("class", "bowler")
+                    .classed("activePlayer", true)
                     .on("mouseover", function(d) {
                         console.log(d);
                     })

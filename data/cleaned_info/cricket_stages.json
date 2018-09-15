@@ -1,0 +1,226 @@
+[
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "12", 
+  "team": "New Zealand", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "9", 
+  "team": "Australia", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "8", 
+  "team": "Sri Lanka", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "7", 
+  "team": "Bangladesh", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "4", 
+  "team": "England", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "2", 
+  "team": "Afghanistan", 
+  "stage": "group"
+ }, 
+ {
+  "group": "A", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "0", 
+  "team": "Scotland", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "12", 
+  "team": "India", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "8", 
+  "team": "Pakistan", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "8", 
+  "team": "South Africa", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "6", 
+  "team": "West Indies", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "6", 
+  "team": "Ireland", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "2", 
+  "team": "Zimbabwe", 
+  "stage": "group"
+ }, 
+ {
+  "group": "B", 
+  "match_score": "", 
+  "wickets": "", 
+  "group_score": "0", 
+  "team": "United Arab Emirates", 
+  "stage": "group"
+ }, 
+ {
+  "group": "", 
+  "match_score": "393", 
+  "wickets": "6", 
+  "group_score": "", 
+  "team": "New Zealand", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "250", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "West Indies", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "133", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "Sri Lanka", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "134", 
+  "wickets": "1", 
+  "group_score": "", 
+  "team": "South Africa", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "213", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "Pakistan", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "216", 
+  "wickets": "4", 
+  "group_score": "", 
+  "team": "Australia", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "302", 
+  "wickets": "6", 
+  "group_score": "", 
+  "team": "India", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "193", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "Bangladesh", 
+  "stage": "QF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "281", 
+  "wickets": "5", 
+  "group_score": "", 
+  "team": "South Africa", 
+  "stage": "SF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "299", 
+  "wickets": "6", 
+  "group_score": "", 
+  "team": "New Zealand", 
+  "stage": "SF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "328", 
+  "wickets": "7", 
+  "group_score": "", 
+  "team": "Australia", 
+  "stage": "SF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "233", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "India", 
+  "stage": "SF"
+ }, 
+ {
+  "group": "", 
+  "match_score": "183", 
+  "wickets": "10", 
+  "group_score": "", 
+  "team": "New Zealand", 
+  "stage": "F"
+ }, 
+ {
+  "group": "", 
+  "match_score": "186", 
+  "wickets": "3", 
+  "group_score": "", 
+  "team": "Australia", 
+  "stage": "F"
+ }
+]

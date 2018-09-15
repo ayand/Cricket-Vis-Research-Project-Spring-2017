@@ -98,6 +98,11 @@ svg {
   overflow-y: auto;
 }
 
+.player-listing {
+  max-height: 300px; /*Provide height in pixels or in other units as per your layout*/
+  overflow-y: auto;
+}
+
 .team-list {
     max-width: 1500px;
     overflow-x: auto;
@@ -157,8 +162,16 @@ table {
   border-collapse: collapse;
   width: 100%;
   border-spacing: 5px;
-  border: 1px;
+  border-color: white;
   /*max-width: 650px;*/
+}
+
+table.table-condensed > tbody > tr > td{
+  border-left-color: white;
+}
+
+table td {
+
 }
 
 
@@ -207,7 +220,7 @@ td {
 .rzslider {
   position: relative;
   display: inline-block;
-  width: 560px;
+  width: 448px;
   height: 4px;
   margin: 35px 0 15px 0;
   vertical-align: middle;

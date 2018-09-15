@@ -1,5 +1,5 @@
 angular.module('myApp').directive('generateBallVis', function() {
-  var svgDimension = 330;
+  var svgDimension = 270;
 
   var convertDimension = function(d) {
       return ((d * svgDimension) / 580);
@@ -38,6 +38,46 @@ angular.module('myApp').directive('generateBallVis', function() {
     ["#FFFFE5", "#FFF7BC", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"]
   ];
 
+  var startingXs = [-1.525, 0];
+  var startingYs = [];
+  var y = 0;
+  for (var i = 0; i < 7; i++) {
+      startingYs.push(2.515 * i);
+  }
+
+  var pitchAreas = []
+
+  var index = 0;
+  for (var i = 0; i < startingXs.length; i++) {
+      for (var j = 0; j < startingYs.length; j++) {
+
+          console.log(startingXs[i]);
+          console.log(startingYs[j]);
+          pitchAreas.push({
+              "leftX": startingXs[i],
+              "topY": startingYs[j],
+              "rightX": startingXs[i] + 1.525,
+              "bottomY": startingYs[j] + 5.03,
+              "score": 0,
+              "area": index
+          });
+          index += 1;
+      }
+  }
+  var pitchHeatScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
+      "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"])
+
+  var changeHeatMap = function() {
+      var pitchMin = d3.min(pitchAreas.filter(d => d != 0), d => d["score"])
+      var pitchMax = d3.max(pitchAreas.filter(d => d != 0), d => d["score"])
+      pitchHeatScale.domain([pitchMin, pitchMax])
+
+      d3.selectAll(".pitchHeatTile")
+          .attr("fill", d => d["score"] == 0 ? "#FFFFCC" : pitchHeatScale(d["score"]))
+  }
+
+
+
   return {
       restrict: 'EA',
       scope: {
@@ -46,7 +86,8 @@ angular.module('myApp').directive('generateBallVis', function() {
           bowlers: '=',
           min: '=',
           max: '=',
-          dictionary: '='
+          dictionary: '=',
+          mapView: '='
       },
       link: function(scope, element, attrs) {
         var selectedZone = 0;
@@ -439,6 +480,57 @@ angular.module('myApp').directive('generateBallVis', function() {
               && zoneCondition && handCondition && partnershipCondition;
         }
 
+        var isValidBall2 = function(d) {
+          /*var batsmanCondition = true;
+          if (scope.batsmen.length != 0) {
+              batsmanCondition = scope.batsmen.includes(d.batsman);
+          }*/
+          var bowlerCondition = true;
+          if (scope.bowlers.length != 0) {
+              bowlerCondition = scope.bowlers.includes(d.bowler);
+          }
+          var over = Math.floor(d.ovr) + 1;
+          var overCondition = ((over >= scope.min) && (over <= scope.max));
+          var zoneCondition = (selectedZone == 0 || correctZone(selectedZone) == d.z);
+
+          var handCondition = true;
+          if (selectedHand != null) {
+              if (selectedHand == "right") {
+                  handCondition = d.bat_right_handed == "y";
+              } else {
+                  handCondition = d.bat_right_handed != "y";
+              }
+          }
+
+          var partnershipCondition = true;
+          if (batsman1 != null) {
+                var condition1 = (batsman1 == d.batsman_name && batsman2 == d.non_striker);
+                var condition2 = (batsman1 == d.non_striker && batsman2 == d.batsman_name);
+                partnershipCondition = condition1 || condition2;
+          }
+
+          return bowlerCondition && overCondition
+              && zoneCondition && handCondition && partnershipCondition;
+        }
+
+        var validPitchBalls = [];
+        var validStumpBalls = [];
+        var validGroundBalls = [];
+
+        var recalculateHeatMaps = function() {
+            pitchAreas.forEach(function(d) {
+                d["score"] = 0;
+            })
+            validPitchBalls.filter(d => isValidBall(d) && d["landing_y"] >= 0).forEach(function(d) {
+              var column = d["landing_x"] < 0 ? 0 : 8;
+              var row = Math.floor(d["landing_y"] / 2.515);
+              pitchAreas[column + row]["score"] += 1
+            })
+            changeHeatMap();
+        }
+
+
+
         var isSelectedBall = function(d) {
           var pitchXCondition = true;
           var pitchYCondition = true;
@@ -716,71 +808,77 @@ angular.module('myApp').directive('generateBallVis', function() {
             .style("text-anchor", "middle")
             .text("R");
 
-        leftBat.on("click", function() {
-            if (selectedHand != "left") {
-                selectedHand = "left"
-                leftBat.style("opacity", 1);
-                rightBat.style("opacity", 0.1);
-            } else {
-                selectedHand = null;
-                leftBat.style("opacity", 1);
-                rightBat.style("opacity", 1);
-            }
+            leftBat.on("click", function() {
+                if (selectedHand != "left") {
+                    selectedHand = "left"
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 0.1);
+                    //scope.$emit("handFilter", true);
+                } else {
+                    selectedHand = null;
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 1);
+                    //scope.$emit("handFilter", false);
+                }
 
-            var validBatsmen = new Set(scope.balls.filter(function(d) {
-                return isValidBall(d);
-            }).map(function(d) {
-                return d.batsman;
-            }))
+                var validBatsmen = new Set(scope.balls.filter(function(d) {
+                    return isValidBall2(d);
+                }).map(function(d) {
+                    return d.batsman;
+                }))
 
-            scope.$emit('batsmen', validBatsmen);
+                scope.$emit('batsmen', validBatsmen);
 
-            d3.selectAll(".dot")
-                .classed("visibleball",function(d){
-                    return isValidBall(d);
-                })
-                .classed("invisibleball", function(d) {
-                  return !isValidBall(d);
-                })
-                .style("opacity", function(d) {
-                    return isSelectedBall(d) ? 1 : 0.1;
-                });
+                d3.selectAll(".dot")
+                    .classed("visibleball",function(d){
+                        return isValidBall(d);
+                    })
+                    .classed("invisibleball", function(d) {
+                      return !isValidBall(d);
+                    })
+                    .style("opacity", function(d) {
+                        return isSelectedBall(d) ? 1 : 0.1;
+                    });
 
-            brushHighlight();
-        })
+                brushHighlight();
+                recalculateHeatMaps();
+            })
 
-        rightBat.on("click", function() {
-            if (selectedHand != "right") {
-                selectedHand = "right"
-                rightBat.style("opacity", 1);
-                leftBat.style("opacity", 0.1);
-            } else {
-                selectedHand = null;
-                leftBat.style("opacity", 1);
-                rightBat.style("opacity", 1);
-            }
+            rightBat.on("click", function() {
+                if (selectedHand != "right") {
+                    selectedHand = "right"
+                    rightBat.style("opacity", 1);
+                    leftBat.style("opacity", 0.1);
+                    //scope.$emit("handFilter", true);
+                } else {
+                    selectedHand = null;
+                    leftBat.style("opacity", 1);
+                    rightBat.style("opacity", 1);
+                    //scope.$emit("handFilter", false);
+                }
 
-            var validBatsmen = new Set(scope.balls.filter(function(d) {
-                return isValidBall(d);
-            }).map(function(d) {
-                return d.batsman;
-            }))
+                var validBatsmen = new Set(scope.balls.filter(function(d) {
+                    return isValidBall2(d);
+                }).map(function(d) {
+                    return d.batsman;
+                }))
 
-            scope.$emit('batsmen', validBatsmen);
+                scope.$emit('batsmen', validBatsmen);
 
-            d3.selectAll(".dot")
-                .classed("visibleball",function(d){
-                    return isValidBall(d);
-                })
-                .classed("invisibleball", function(d) {
-                  return !isValidBall(d);
-                })
-                .style("opacity", function(d) {
-                    return isSelectedBall(d) ? 1 : 0.1;
-                });
+                d3.selectAll(".dot")
+                    .classed("visibleball",function(d){
+                        return isValidBall(d);
+                    })
+                    .classed("invisibleball", function(d) {
+                      return !isValidBall(d);
+                    })
+                    .style("opacity", function(d) {
+                        return isSelectedBall(d) ? 1 : 0.1;
+                    });
 
-            brushHighlight();
-        })
+                brushHighlight();
+                recalculateHeatMaps();
+            })
 
         var pitchBrush = d3.brush()
             .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
@@ -788,15 +886,13 @@ angular.module('myApp').directive('generateBallVis', function() {
             .on("brush", pitchBrushMove)
             .on("end", pitchBrushEnd);
 
-
-
-        var validPitchBalls = scope.balls.filter(function(d) {
+        validPitchBalls = scope.balls.filter(function(d) {
             return d["landing_x"] != null && d["landing_y"] != null;
         });
 
-        var pitchBrushArea = pitch.append("g")
+        /*var pitchBrushArea = pitch.append("g")
             .attr("class", "brush")
-            .call(pitchBrush);
+            .call(pitchBrush);*/
 
         var pitchBalls = pitch.selectAll(".dot")
             .data(validPitchBalls);
@@ -842,14 +938,34 @@ angular.module('myApp').directive('generateBallVis', function() {
                 if (isValidBall(d) && isSelectedBall(d)) {
                     ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
                 }
-            })
+            });
 
-            var validStumpBalls = scope.balls.filter(function(d) {
+            var pitchAreaRect = pitch.selectAll(".pitchHeatTile")
+                .data(pitchAreas, d => d["index"])
+                .enter()
+                .append("rect")
+                .attr("class", "pitchHeatTile")
+                .attr("x", d => pitchX(d["leftX"]))
+                .attr("y", d => pitchY(d["topY"]))
+                .attr("width", d => (pitchX(d["rightX"]) - pitchX(d["leftX"])))
+                .attr("height", d => (pitchY(d["bottomY"]) - pitchY(d["topY"])))
+                .attr("fill", "blue")
+                .style("stroke", "gray")
+                .style("opacity", 0.8)
+                .on("mouseover", function(d)  {
+                    console.log(d)
+                });
+
+
+
+            var pitchBrushArea = pitch.append("g")
+                .attr("class", "brush")
+                .call(pitchBrush);
+
+            validStumpBalls = scope.balls.filter(function(d) {
                 return d["ended_x"] != null && d["ended_y"] != null
                     && d["ended_x"] >= -2 && d["ended_x"] <= 2 && d["ended_y"] <= 4;
             });
-
-
 
             var stumpBalls = stumpWindow.selectAll(".dot")
                 .data(validStumpBalls);
@@ -894,7 +1010,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     }
                 })
 
-                var validGroundBalls = scope.balls.filter(function(d) {
+                validGroundBalls = scope.balls.filter(function(d) {
                     return d["x"] != null && d["y"] != null;
                 });
 
@@ -939,6 +1055,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                         }
                     })
 
+            recalculateHeatMaps();
+
             brushHighlight();
 
             var lasso = d3.lasso().closePathSelect(true)
@@ -954,6 +1072,7 @@ angular.module('myApp').directive('generateBallVis', function() {
             d3.selectAll(".zone-path").on("click", function(d, index) {
                 if (selectedZone == d.data.zone) {
                     selectedZone = 0;
+                    d3.select("#zoneFilter").style("visibility", "hidden")
                     d3.selectAll(".zone-path")
                         .attr("fill", function(path, i) {
                             return zoneColors[i];
@@ -970,6 +1089,14 @@ angular.module('myApp').directive('generateBallVis', function() {
                             return isSelectedBall(d) ? 1 : 0.1
                         })
 
+                        var validBatsmen = new Set(scope.balls.filter(function(d) {
+                            return isValidBall(d);
+                        }).map(function(d) {
+                            return d.batsman;
+                        }))
+
+                        //scope.$emit('batsmen', validBatsmen);
+
                         brushHighlight();
 
                 } else {
@@ -980,6 +1107,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                       });
                     }
                     selectedZone = d.data.zone;
+                    d3.select("#zoneFilter").style("visibility", "visible")
                     d3.selectAll(".zone-path")
                         .attr("fill", function(path, i) {
                             if (selectedZone == path.data.zone) {
@@ -998,13 +1126,20 @@ angular.module('myApp').directive('generateBallVis', function() {
                         return !isValidBall(d);
                     })
                     .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1 })
+
+                    var validBatsmen = new Set(scope.balls.filter(function(d) {
+                        return isValidBall(d);
+                    }).map(function(d) {
+                        return d.batsman;
+                    }))
                     brushHighlight();
                 }
+                recalculateHeatMaps();
             });
 
             scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
                 scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
-
+                  recalculateHeatMaps();
                   //selectedHand = null;
 
                   var consideredBalls = scope.balls.filter(function(dot) {
@@ -1054,27 +1189,35 @@ angular.module('myApp').directive('generateBallVis', function() {
                   }
                   var hands = [];
                   if (newBatsmen.length != 0) {
+
+                    //hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
                     hands = Array.from(new Set(batsmen.map(function(d) {
                         return scope.dictionary[d.toString()]["hand"];
                     })));
+                    console.log(hands);
                   }
+                  //hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
+                  console.log(hands);
                   if (selectedHand == null) {
                     leftBat.style("display", "none");
                     rightBat.style("display", "none");
                     leftBat.style("opacity", 1);
                     rightBat.style("opacity", 1);
                     if (hands.length == 1) {
+                        console.log("ONLY ONE HAND")
                         if (hands[0] == "Left") {
                             leftBat.style("display", "block");
                         } else {
                             rightBat.style("display", "block");
                         }
                     } else {
+                      console.log("TWO HAND")
                       leftBat.style("display", "block");
                       rightBat.style("display", "block");
                     }
                   }
                   selectedZone = 0;
+                  d3.select("#zoneFilter").style("visibility", "hidden")
                   d3.selectAll(".dot")
                       .classed("visibleball",function(d){
                           return isValidBall(d);
@@ -1107,6 +1250,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             scope.$watch('min', function(newMin, oldMin) {
                 scope.$watch('max', function(newMax, oldMax) {
+                  recalculateHeatMaps();
                   selectedHand = null;
                   batsman1 = null;
                   batsman2 = null;
@@ -1154,6 +1298,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                   var hands = Array.from(new Set(batsmen.map(function(d) {
                       return scope.dictionary[d.toString()]["hand"];
                   })));
+                  //var hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
+                  //console.log(hands);
                   leftBat.style("display", "none");
                   rightBat.style("display", "none");
                   leftBat.style("opacity", 1);
@@ -1169,6 +1315,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     rightBat.style("display", "block");
                   }
                   selectedZone = 0;
+                  d3.select("#zoneFilter").style("visibility", "hidden")
                   d3.selectAll(".dot")
                       .classed("visibleball",function(d){
                           return isValidBall(d);
@@ -1264,7 +1411,60 @@ angular.module('myApp').directive('generateBallVis', function() {
                   });
               });
 
+            scope.$watch('mapView', function(newView, oldView) {
+                pitch.selectAll(".pitchHeatTile").style("display", newView == "Balls" ? "none" : "block")
+            })
 
+            scope.$on("handFilter", function(event, data) {
+                hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
+                selectedHand = null;
+                leftBat.style("display", "none");
+                rightBat.style("display", "none");
+                leftBat.style("opacity", 1);
+                rightBat.style("opacity", 1);
+                if (hands.length == 1) {
+                    console.log("ONLY ONE HAND")
+                    if (hands[0] == "Left") {
+                        leftBat.style("display", "block");
+                    } else {
+                        rightBat.style("display", "block");
+                    }
+                } else {
+                  console.log("TWO HAND")
+                  leftBat.style("display", "block");
+                  rightBat.style("display", "block");
+                }
+            })
+
+            scope.$on("zoneFilter", function(event, data) {
+              selectedZone = 0;
+              //d3.select("#zoneFilter").style("visibility", "hidden")
+              d3.selectAll(".zone-path")
+                  .attr("fill", function(path, i) {
+                      return zoneColors[i];
+                  })
+                  .style('stroke', '#CCCCCC');
+              d3.selectAll(".dot")
+                  .classed("visibleball",function(d){
+                      return isValidBall(d);
+                  })
+                  .classed("invisibleball", function(d) {
+                      return !isValidBall(d);
+                  })
+                  .style("opacity", function(d) {
+                      return isSelectedBall(d) ? 1 : 0.1
+                  })
+
+                  var validBatsmen = new Set(scope.balls.filter(function(d) {
+                      return isValidBall(d);
+                  }).map(function(d) {
+                      return d.batsman;
+                  }))
+
+                  scope.$emit('batsmen', validBatsmen);
+
+                  brushHighlight();
+            })
       }
   }
 })

@@ -1,5 +1,5 @@
 angular.module('myApp').directive('overTimeline', function() {
-  var height = 350;
+  var height = 280;
 
   var convertDimension = function(d) {
       return ((d * height) / 475)
@@ -152,7 +152,7 @@ angular.module('myApp').directive('overTimeline', function() {
 
         vis.append("text")
             .attr("x", width - convertDimension(225))
-            .attr("y", height - convertDimension(20))
+            .attr("y", height - convertDimension(20) + 10)
             .text("Over")
             .style("text-anchor", "end");
 

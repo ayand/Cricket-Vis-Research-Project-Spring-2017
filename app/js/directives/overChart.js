@@ -3,7 +3,7 @@
 angular.module('myApp')
 .directive('overChart', function() {
 
-  var height = 350;
+  var height = 280;
 
   var convertDimension = function(d) {
       return ((d * height) / 450);
@@ -26,6 +26,12 @@ angular.module('myApp')
         .append("svg")
           .attr("width", width)
           .attr("height", height + 10);
+
+      vis.append("rect")
+          .attr("width", width)
+          .attr("height", height + 10)
+          .attr("fill", "white")
+          .style("stroke", "black")
 
       var overNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
           21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,
