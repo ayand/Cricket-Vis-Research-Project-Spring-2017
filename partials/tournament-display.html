@@ -1,27 +1,31 @@
 <div align="center">
   <br>
-    <h4>{{ teamName }}</h4>
+    <h4 align="center">{{ teamName }}</h4>
     <br>
-    <h5>Tournament Analysis</h5>
+    <h5  align="center">Tournament Analysis</h5>
     <br>
 
     <div class="row">
-        <div class="col-sm-3 col-md-3 col-lg-3">
+        <div align="left" class="col-sm-3 col-md-3 col-lg-3">
             <h4 align="center">Team Players</h4>
             <br>
-            <div class="player-list">
-              <table>
-                  <tr style="cursor:pointer"
-                      ng-repeat="player in players"
-                      ng-style="selected.includes(player.id) ? playerStyling : normalStyling"
-                      ng-click="clickPlayer(player.id)"
-                      ng-mouseover="selectPlayer(player)"
-                      ng-mouseleave="selectPlayer(null)">
-                      <td>
-                        <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="60" alt="bowlerImage"/><br>
-                      </td>
-                      <td>{{ player.name }}</td>
-                  </tr>
+            <div style="text-align: center">
+              <table class="table-condensed">
+                  <tbody>
+                    <tr>
+                        <td style="display: inline-block; width: 100px;  height: 157px; cursor: pointer; border-left: 1px solid #bbbbbb; border-right: 1px solid #bbbbbb"
+                            ng-repeat="player in players"
+                            ng-style="selected.includes(player.id) ? playerStyling : normalStyling"
+                            ng-click="clickPlayer(player.id)"
+                            ng-mouseover="selectPlayer(player)"
+                            ng-mouseleave="selectPlayer(null)">
+                          <br>
+                          <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="90" alt="bowlerImage"/><br>
+                          {{ player.name }}
+                        </td>
+                        <!--<td>{{ player.name }}</td>-->
+                    </tr>
+                  </tbody>
               </table>
             </div>
         </div>

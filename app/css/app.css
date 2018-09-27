@@ -114,8 +114,8 @@ td {
 }
 
 div.player-list {
-    overflow-y: auto;
-    max-height: 800px;
+    overflow-x: auto;
+    max-width: 800px;
 }
 
 .inactiveball {

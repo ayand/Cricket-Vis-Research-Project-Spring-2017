@@ -50,9 +50,7 @@ angular.module('myApp').directive('partnershipMatrix', function() {
 
             var xShift = batsmanXScale.bandwidth() / 2
 
-            var scoreRange = d3.extent(scope.partnerships.map(function(d) {
-                return d.score;
-            }))
+            var scoreRange = d3.extent(scope.partnerships.map(d => d.score))
 
             var colorScale = d3.scaleQuantile().domain(scoreRange).range(["#ADCCFF", "#97BAF1", "#82AAE3", "#6B99D5", "#5287C7", "#3777B9", "#0868AC"])
 
