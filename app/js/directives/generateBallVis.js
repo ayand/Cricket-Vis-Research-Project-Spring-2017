@@ -94,10 +94,12 @@ angular.module('myApp').directive('generateBallVis', function() {
       stumpMapScale.domain([stumpMin, stumpMax]);
 
       d3.selectAll(".pitchHeatTile")
-          .attr("fill", d => d["score"] == 0 ? "#FFFFCC" : pitchMapScale(d["score"]))
+          .attr("fill", d => d["score"] == 0 ? "none" : pitchMapScale(d["score"]))
+          .style("stroke", d => d["score"] == 0 ? "none" : "gray")
 
       d3.selectAll(".stumpHeatTile")
-          .attr("fill", d => d["score"] == 0 ? "#FFFFCC" : stumpMapScale(d["score"]))
+          .attr("fill", d => d["score"] == 0 ? "none" : stumpMapScale(d["score"]))
+          .style("stroke", d => d["score"] == 0 ? "none" : "gray")
   }
 
 
@@ -790,7 +792,64 @@ angular.module('myApp').directive('generateBallVis', function() {
           brushHighlight();
         }
 
+        var changeBallVisibility = function() {
+          d3.selectAll(".dot")
+              .classed("visibleball",function(d){
+                  return isValidBall(d);
+              })
+              .classed("invisibleball", function(d) {
+                return !isValidBall(d);
+              })
+              .style("opacity", function(d) {
+                  return isSelectedBall(d) ? 1 : 0.1;
+              });
+        }
 
+        var plotPoints = function(canvas, data, xScale, yScale, xName, yName) {
+          return canvas.selectAll(".dot")
+              .data(data)
+              .enter().append("circle")
+              .attr("class", "dot")
+              .attr("cx", function(d) {
+                  return xScale(d[xName]);
+              })
+              .attr("cy", function(d) {
+                  if (yName == "landing_y" && d[yName] < 0) {
+                      return pitchY(-0.25);
+                  }
+                  return yScale(d[yName]);
+              })
+              .attr("r", idealRadius) //Previous value: 3.5
+              .attr("fill", function(d) {
+                if (isWicketBall(d)) {
+                    return "#F45333";
+                } else {
+                    if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
+                        return "#CCCCCC";
+                    } else {
+                        if (d.extras_type != "") {
+                            return "#7BCCC4";
+                        } else {
+                            if (d.runs_batter < 4) {
+                              return "#43A2CA";
+                            } else {
+                                return "#0868AC";
+                            }
+                        }
+                    }
+                }
+              })
+              .on("mouseover", function(d) {
+                  if (isValidBall(d) && isSelectedBall(d)) {
+                      ballMouseover(d);
+                  }
+              })
+              .on("mouseout", function(d) {
+                  if (isValidBall(d) && isSelectedBall(d)) {
+                      ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
+                  }
+              })
+        }
 
         var pitchBrush = d3.brush()
             .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
@@ -802,55 +861,11 @@ angular.module('myApp').directive('generateBallVis', function() {
             return d["landing_x"] != null && d["landing_y"] != null;
         });
 
-        /*var pitchBrushArea = pitch.append("g")
+        var pitchBrushArea = pitch.append("g")
             .attr("class", "brush")
-            .call(pitchBrush);*/
+            .call(pitchBrush);
 
-        var pitchBalls = pitch.selectAll(".dot")
-            .data(validPitchBalls);
-
-        pitchBalls.enter().append("circle")
-            .attr("class", "dot")
-            .attr("cx", function(d) {
-                return pitchX(d["landing_x"]);
-            })
-            .attr("cy", function(d) {
-              if (d["landing_y"] < 0) {
-                  return pitchY(-0.25);
-              } else {
-                  return pitchY(d["landing_y"]);
-              }
-            })
-            .attr("r", idealRadius) //Previous value: 3.5
-            .attr("fill", function(d) {
-              if (isWicketBall(d)) {
-                  return "#F45333";
-              } else {
-                  if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                      return "#CCCCCC";
-                  } else {
-                      if (d.extras_type != "") {
-                          return "#7BCCC4";
-                      } else {
-                          if (d.runs_batter < 4) {
-                            return "#43A2CA";
-                          } else {
-                              return "#0868AC";
-                          }
-                      }
-                  }
-              }
-            })
-            .on("mouseover", function(d) {
-                if (isValidBall(d) && isSelectedBall(d)) {
-                    ballMouseover(d);
-                }
-            })
-            .on("mouseout", function(d) {
-                if (isValidBall(d) && isSelectedBall(d)) {
-                    ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
-                }
-            });
+        plotPoints(pitchBrushArea, validPitchBalls, pitchX, pitchY, "landing_x", "landing_y")
 
             var pitchAreaRect = pitch.selectAll(".pitchHeatTile")
                 .data(pitchAreas, d => d["index"])
@@ -868,57 +883,16 @@ angular.module('myApp').directive('generateBallVis', function() {
                     console.log(d)
                 });
 
-            var pitchBrushArea = pitch.append("g")
-                .attr("class", "brush")
-                .call(pitchBrush);
-
             validStumpBalls = scope.balls.filter(function(d) {
                 return d["ended_x"] != null && d["ended_y"] != null
                     && d["ended_x"] >= -2 && d["ended_x"] <= 2 && d["ended_y"] <= 4;
             });
 
-            var stumpBalls = stumpWindow.selectAll(".dot")
-                .data(validStumpBalls);
+            var stumpBrushArea = stumpWindow.append("g")
+                .attr("class", "brush")
+                .call(stumpBrush);
 
-            stumpBalls.enter().append("circle")
-                .attr("class", "dot")
-                .attr("cx", function(d) {
-                    return stumpX(d["ended_x"]);
-                })
-                .attr("cy", function(d) {
-                  return stumpY(d["ended_y"]);
-
-                })
-                .attr("r", idealRadius) //Previous value: 3.5
-                .attr("fill", function(d) {
-                  if (isWicketBall(d)) {
-                      return "#F45333";
-                  } else {
-                      if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                          return "#CCCCCC";
-                      } else {
-                          if (d.extras_type != "") {
-                              return "#7BCCC4";
-                          } else {
-                              if (d.runs_batter < 4) {
-                                return "#43A2CA";
-                              } else {
-                                  return "#0868AC";
-                              }
-                          }
-                      }
-                  }
-                })
-                .on("mouseover", function(d) {
-                    if (isValidBall(d) && isSelectedBall(d)) {
-                        ballMouseover(d);
-                    }
-                })
-                .on("mouseout", function(d) {
-                    if (isValidBall(d) && isSelectedBall(d)) {
-                        ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
-                    }
-                })
+            plotPoints(stumpBrushArea, validStumpBalls, stumpX, stumpY, "ended_x", "ended_y")
 
                 var stumpAreaRect = stumpWindow.selectAll(".stumpHeatTile")
                     .data(stumpAreas, d => d["index"])
@@ -935,10 +909,6 @@ angular.module('myApp').directive('generateBallVis', function() {
                     .on("mouseover", function(d)  {
                         console.log(d)
                     });
-
-                var stumpBrushArea = stumpWindow.append("g")
-                    .attr("class", "brush")
-                    .call(stumpBrush);
 
                     var leftBat = stumpWindow.append("g")
                         .attr("class", "left-bat")
@@ -1021,16 +991,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                             scope.$emit('batsmen', validBatsmen);
 
-                            d3.selectAll(".dot")
-                                .classed("visibleball",function(d){
-                                    return isValidBall(d);
-                                })
-                                .classed("invisibleball", function(d) {
-                                  return !isValidBall(d);
-                                })
-                                .style("opacity", function(d) {
-                                    return isSelectedBall(d) ? 1 : 0.1;
-                                });
+                            changeBallVisibility();
 
                             brushHighlight();
                             recalculateHeatMaps();
@@ -1057,16 +1018,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                             scope.$emit('batsmen', validBatsmen);
 
-                            d3.selectAll(".dot")
-                                .classed("visibleball",function(d){
-                                    return isValidBall(d);
-                                })
-                                .classed("invisibleball", function(d) {
-                                  return !isValidBall(d);
-                                })
-                                .style("opacity", function(d) {
-                                    return isSelectedBall(d) ? 1 : 0.1;
-                                });
+                            changeBallVisibility();
 
                             brushHighlight();
                             recalculateHeatMaps();
@@ -1076,46 +1028,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     return d["x"] != null && d["y"] != null;
                 });
 
-                var groundBalls = ground.selectAll(".dot")
-                    .data(validGroundBalls)
-                    .enter().append("circle")
-                    .attr("class", "dot")
-                    .attr("cx", function(d) {
-                        return groundX(d["x"]);
-                    })
-                    .attr("cy", function(d) {
-                        return groundY(d["y"]);
-                    })
-                    .attr("r", idealRadius) //Previous value: 3.5
-                    .attr("fill", function(d) {
-                      if (isWicketBall(d)) {
-                          return "#F45333";
-                      } else {
-                          if (d.runs_batter == 0 && d.extras_type != "Wd" && d.extras_type != "Nb") {
-                              return "#CCCCCC";
-                          } else {
-                              if (d.extras_type != "") {
-                                  return "#7BCCC4";
-                              } else {
-                                  if (d.runs_batter < 4) {
-                                    return "#43A2CA";
-                                  } else {
-                                      return "#0868AC";
-                                  }
-                              }
-                          }
-                      }
-                    })
-                    .on("mouseover", function(d) {
-                        if (isValidBall(d) && isSelectedBall(d)) {
-                            ballMouseover(d);
-                        }
-                    })
-                    .on("mouseout", function(d) {
-                        if (isValidBall(d) && isSelectedBall(d)) {
-                            ballMouseout(scope.min, scope.max, scope.batsmen, scope.bowlers);
-                        }
-                    })
+                var groundBalls = plotPoints(ground, validGroundBalls, groundX, groundY, "x", "y")
 
             recalculateHeatMaps();
 
@@ -1140,16 +1053,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                             return zoneColors[i];
                         })
                         .style('stroke', '#CCCCCC');
-                    d3.selectAll(".dot")
-                        .classed("visibleball",function(d){
-                            return isValidBall(d);
-                        })
-                        .classed("invisibleball", function(d) {
-                            return !isValidBall(d);
-                        })
-                        .style("opacity", function(d) {
-                            return isSelectedBall(d) ? 1 : 0.1
-                        })
+                    changeBallVisibility();
 
                         var validBatsmen = new Set(scope.balls.filter(function(d) {
                             return isValidBall(d);
@@ -1180,14 +1084,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         })
                         .style("stroke", "black");
 
-                    d3.selectAll(".dot")
-                    .classed("visibleball",function(d){
-                        return isValidBall(d);
-                    })
-                    .classed("invisibleball", function(d) {
-                        return !isValidBall(d);
-                    })
-                    .style("opacity", function(d) { return isSelectedBall(d) ? 1 : 0.1 })
+                    changeBallVisibility();
 
                     var validBatsmen = new Set(scope.balls.filter(function(d) {
                         return isValidBall(d);
@@ -1199,327 +1096,268 @@ angular.module('myApp').directive('generateBallVis', function() {
                 recalculateHeatMaps();
             });
 
-            scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
-                scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
-                  recalculateHeatMaps();
-                  //selectedHand = null;
-
-                  var consideredBalls = scope.balls.filter(function(dot) {
-                      var batsmanCondition = true;
-                      if (newBatsmen.length != 0) {
-                          batsmanCondition = newBatsmen.includes(dot.batsman);
-                      }
-                      var bowlerCondition = true;
-                      if (newBowlers.length != 0) {
-                          bowlerCondition = newBowlers.includes(dot.bowler);
-                      }
-                      var over = Math.floor(dot.ovr) + 1;
-                      var overCondition = ((over >= scope.min) && (over <= scope.max));
-                      return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
-                  });
-
-                  var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
-                  consideredBalls.forEach(function(d) {
-                      var zone = correctZone(d.z) - 1;
-                      zoneScores[zone] += d.runs_w_extras;
-                  });
-
-                  var scoreSet = Array.from(new Set(zoneScores));
-                  scoreSet.sort(function(a, b) {
-                      return a - b;
-                  })
-
-                  var list = scoreSet.length - 1;
-
-                  d3.selectAll(".zone-path")
-                      .attr("fill", function(d, i) {
-                          var score = zoneScores[i];
-                          return colorScales[list][scoreSet.indexOf(score)];
-                      })
-                      .style("stroke", "#CCCCCC")
-
-                  var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
-                      var over = Math.floor(d.ovr) + 1;
-                      return over >= scope.min && over <= scope.max;
-                  }).map(function(d) {
-                      return d.batsman;
-                  })))
-                  if (newBatsmen.length != 0) {
-                      batsmen = batsmen.filter(function(d) {
-                          return newBatsmen.includes(d);
-                      });
-                  }
-                  var hands = [];
-                  if (newBatsmen.length != 0) {
-
-                    //hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
-                    hands = Array.from(new Set(batsmen.map(function(d) {
-                        return scope.dictionary[d.toString()]["hand"];
-                    })));
-                    console.log(hands);
-                  }
-                  //hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
-                  console.log(hands);
-                  if (selectedHand == null) {
-                    leftBat.style("display", "none");
-                    rightBat.style("display", "none");
-                    leftBat.style("opacity", 1);
-                    rightBat.style("opacity", 1);
-                    if (hands.length == 1) {
-                        console.log("ONLY ONE HAND")
-                        if (hands[0] == "Left") {
-                            leftBat.style("display", "block");
-                        } else {
-                            rightBat.style("display", "block");
-                        }
-                    } else {
-                      console.log("TWO HAND")
+            var changeBats = function(hands) {
+              leftBat.style("display", "none");
+              rightBat.style("display", "none");
+              leftBat.style("opacity", 1);
+              rightBat.style("opacity", 1);
+              if (hands.length == 1) {
+                  if (hands[0] == "Left") {
                       leftBat.style("display", "block");
+                  } else {
                       rightBat.style("display", "block");
-                    }
                   }
-                  selectedZone = 0;
-                  d3.select("#zoneFilter").style("visibility", "hidden")
-                  d3.selectAll(".dot")
-                      .classed("visibleball",function(d){
-                          return isValidBall(d);
-                      })
-                      .classed("invisibleball", function(d) {
-                        return !isValidBall(d);
-                      })
-                      .style("opacity", function(d) {
-                          return isSelectedBall(d) ? 1 : 0.1;
-                      });
+              } else {
+                leftBat.style("display", "block");
+                rightBat.style("display", "block");
+              }
+            }
 
-                      if (selectedZone != 0) {
-                          zoneColors = [];
-                          d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                              zoneColors.push(e.attributes.fill.value);
-                          });
-                          d3.selectAll(".zone-path")
-                              .attr("fill", function(path, i) {
-                                  if (selectedZone == path.data.zone) {
-                                      return zoneColors[i];
-                                  } else {
-                                      return 'gray';
-                                  }
-                          })
-                      }
+            var collectZoneColors = function() {
+              if (selectedZone != 0) {
+                  zoneColors = [];
+                  d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
+                      zoneColors.push(e.attributes.fill.value);
+                  });
+                  d3.selectAll(".zone-path")
+                      .attr("fill", function(path, i) {
+                          if (selectedZone == path.data.zone) {
+                              return zoneColors[i];
+                          } else {
+                              return 'gray';
+                          }
+                  })
+              }
+            }
 
-                      brushHighlight();
-                });
+            var playerChange = function(newBatsmen, newBowlers) {
+              recalculateHeatMaps();
+              //selectedHand = null;
+
+              var consideredBalls = scope.balls.filter(function(dot) {
+                  var batsmanCondition = true;
+                  if (newBatsmen.length != 0) {
+                      batsmanCondition = newBatsmen.includes(dot.batsman);
+                  }
+                  var bowlerCondition = true;
+                  if (newBowlers.length != 0) {
+                      bowlerCondition = newBowlers.includes(dot.bowler);
+                  }
+                  var over = Math.floor(dot.ovr) + 1;
+                  var overCondition = ((over >= scope.min) && (over <= scope.max));
+                  return batsmanCondition && bowlerCondition && overCondition && (dot.z != 0);
+              });
+
+              var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+              consideredBalls.forEach(function(d) {
+                  var zone = correctZone(d.z) - 1;
+                  zoneScores[zone] += d.runs_w_extras;
+              });
+
+              var scoreSet = Array.from(new Set(zoneScores));
+              scoreSet.sort(function(a, b) {
+                  return a - b;
+              })
+
+              var list = scoreSet.length - 1;
+
+              d3.selectAll(".zone-path")
+                  .attr("fill", function(d, i) {
+                      var score = zoneScores[i];
+                      return colorScales[list][scoreSet.indexOf(score)];
+                  })
+                  .style("stroke", "#CCCCCC")
+
+              var batsmen = Array.from(new Set(scope.balls.filter(function(d) {
+                  var over = Math.floor(d.ovr) + 1;
+                  return over >= scope.min && over <= scope.max;
+              }).map(function(d) {
+                  return d.batsman;
+              })))
+              if (newBatsmen.length != 0) {
+                  batsmen = batsmen.filter(function(d) {
+                      return newBatsmen.includes(d);
+                  });
+              }
+              var hands = [];
+              if (newBatsmen.length != 0) {
+                hands = Array.from(new Set(batsmen.map(function(d) {
+                    return scope.dictionary[d.toString()]["hand"];
+                })));
+              }
+              if (selectedHand == null) {
+                changeBats(hands);
+              }
+              selectedZone = 0;
+              d3.select("#zoneFilter").style("visibility", "hidden")
+
+              changeBallVisibility();
+
+                  collectZoneColors();
+
+                  brushHighlight();
+            }
+
+            scope.$watchCollection('batsmen', function(newBatsmen, oldBatsmen) {
+                playerChange(newBatsmen, scope.bowlers);
             });
 
-            scope.$watch('min', function(newMin, oldMin) {
-                scope.$watch('max', function(newMax, oldMax) {
-                  recalculateHeatMaps();
-                  selectedHand = null;
-                  batsman1 = null;
-                  batsman2 = null;
-                  d3.selectAll(".partnership").style("stroke-width", "1px")
-                      .style("stroke", "black");
-                  var distinctBatsmen = new Set();
+            scope.$watchCollection('bowlers', function(newBowlers, oldBowlers) {
+                playerChange(scope.batsmen, newBowlers);
+            });
 
-                  var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+            var overChange = function(min, max) {
+              d3.selectAll(".partnership").style("stroke-width", "1px")
+                  .style("stroke", "black")
+              d3.selectAll(".partnershipBar").style("opacity", 1)
+              recalculateHeatMaps();
+              selectedHand = null;
+              batsman1 = null;
+              batsman2 = null;
+              d3.selectAll(".partnership").style("stroke-width", "1px")
+                  .style("stroke", "black");
+              var distinctBatsmen = new Set();
 
-                  scope.balls.forEach(function(dot) {
-                    var batsmanCondition = true;
-                    if (scope.batsmen.length != 0) {
-                        batsmanCondition = scope.batsmen.includes(dot.batsman);
-                    }
-                    var bowlerCondition = true;
-                    if (scope.bowlers.length != 0) {
-                        bowlerCondition = scope.bowlers.includes(dot.bowler);
-                    }
-                    var over = Math.floor(dot.ovr) + 1;
-                    var overCondition = ((over >= newMin) && (over <= newMax));
-                    if (batsmanCondition && bowlerCondition && overCondition
-                        && (dot.z != 0)) {
-                        var zone = correctZone(dot.z) - 1;
-                        zoneScores[zone] += dot.runs_w_extras;
-                        distinctBatsmen.add(dot.batsman);
-                    }
+              var zoneScores = [0, 0, 0, 0, 0, 0, 0, 0];
+
+              scope.balls.forEach(function(dot) {
+                var batsmanCondition = true;
+                if (scope.batsmen.length != 0) {
+                    batsmanCondition = scope.batsmen.includes(dot.batsman);
+                }
+                var bowlerCondition = true;
+                if (scope.bowlers.length != 0) {
+                    bowlerCondition = scope.bowlers.includes(dot.bowler);
+                }
+                var over = Math.floor(dot.ovr) + 1;
+                var overCondition = ((over >= min) && (over <= max));
+                if (batsmanCondition && bowlerCondition && overCondition
+                    && (dot.z != 0)) {
+                    var zone = correctZone(dot.z) - 1;
+                    zoneScores[zone] += dot.runs_w_extras;
+                    distinctBatsmen.add(dot.batsman);
+                }
+              })
+
+              var scoreSet = Array.from(new Set(zoneScores));
+              scoreSet.sort(function(a, b) {
+                  return a - b;
+              })
+
+              var list = scoreSet.length - 1;
+
+              d3.selectAll(".zone-path")
+                  .attr("fill", function(d, i) {
+                      var score = zoneScores[i];
+                      return colorScales[list][scoreSet.indexOf(score)];
                   })
+                  .style("stroke", "#CCCCCC")
+                  .style("cursor", "pointer")
 
-                  var scoreSet = Array.from(new Set(zoneScores));
-                  scoreSet.sort(function(a, b) {
-                      return a - b;
-                  })
+              var batsmen = Array.from(distinctBatsmen)
+              var hands = Array.from(new Set(batsmen.map(function(d) {
+                  return scope.dictionary[d.toString()]["hand"];
+              })));
+              changeBats(hands);
+              selectedZone = 0;
+              d3.select("#zoneFilter").style("visibility", "hidden")
 
-                  var list = scoreSet.length - 1;
+              changeBallVisibility();
 
-                  d3.selectAll(".zone-path")
-                      .attr("fill", function(d, i) {
-                          var score = zoneScores[i];
-                          return colorScales[list][scoreSet.indexOf(score)];
-                      })
-                      .style("stroke", "#CCCCCC")
-                      .style("cursor", "pointer")
+                  collectZoneColors();
+                  brushHighlight();
 
-                  var batsmen = Array.from(distinctBatsmen)
-                  var hands = Array.from(new Set(batsmen.map(function(d) {
-                      return scope.dictionary[d.toString()]["hand"];
-                  })));
-                  //var hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
-                  //console.log(hands);
-                  leftBat.style("display", "none");
-                  rightBat.style("display", "none");
-                  leftBat.style("opacity", 1);
-                  rightBat.style("opacity", 1);
-                  if (hands.length == 1) {
-                      if (hands[0] == "Left") {
-                          leftBat.style("display", "block");
-                      } else {
-                          rightBat.style("display", "block");
-                      }
-                  } else {
-                    leftBat.style("display", "block");
-                    rightBat.style("display", "block");
-                  }
-                  selectedZone = 0;
-                  d3.select("#zoneFilter").style("visibility", "hidden")
-                  d3.selectAll(".dot")
-                      .classed("visibleball",function(d){
-                          return isValidBall(d);
-                      })
-                      .classed("invisibleball", function(d) {
-                        return !isValidBall(d);
-                      })
-                      .style("opacity", function(d) {
-                          return isSelectedBall(d) ? 1 : 0.1;
-                      });
-
-                      if (selectedZone != 0) {
-                          zoneColors = [];
-                          d3.selectAll(".zone-path")._groups[0].forEach(function(e) {
-                              zoneColors.push(e.attributes.fill.value);
-                          });
-                          d3.selectAll(".zone-path")
-                              .attr("fill", function(path, i) {
-                                  if (selectedZone == path.data.zone) {
-                                      return zoneColors[i];
-                                  } else {
-                                      return 'gray';
-                                  }
-                          })
-                      }
-                      brushHighlight();
-
-                      d3.selectAll(".activePlayer")
-                          .on("mouseover", function(d) {
-                              tempPlayer = d;
-                              d3.selectAll(".edge")
-                                  .style("opacity", function(edge) {
-                                      return edge.batsman == d || edge.bowler == d ? 1 : 0.1
-                                  })
-                              brushHighlight();
-                          })
-                          .on("mouseout", function(d) {
-                              tempPlayer = null;
-                              d3.selectAll(".edge")
-                                  .style("opacity", 1)
-                              brushHighlight();
-                          })
-
-                      d3.selectAll(".inactivePlayer")
-                          .on("mouseover", function(d) {
-                              return;
-                          })
-                          .on("mouseout", function(d) {
-                              return;
-                          })
-
-                          d3.selectAll(".partnership")
-                              .on("click", function(d) {
-                                  if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
-                                      d3.selectAll(".partnership").style("stroke-width", "1px")
-                                          .style("stroke", "black")
-                                      d3.selectAll(".partnershipBar").style("opacity", 1)
-                                      batsman1 = null;
-                                      batsman2 = null;
-
-                                      d3.selectAll(".dot")
-                                          .classed("visibleball",function(d){
-                                              return isValidBall(d);
-                                          })
-                                          .classed("invisibleball", function(d) {
-                                            return !isValidBall(d);
-                                          })
-                                          .style("opacity", function(d) {
-                                              return isSelectedBall(d) ? 1 : 0.1;
-                                          });
-                                      brushHighlight();
-                                  } else {
-
-                                      d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
-                                          .style("stroke", e => (d == e) ? "gold" : "black")
-                                      d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
-                                      batsman1 = d.batsman_1;
-                                      batsman2 = d.batsman_2;
-
-                                      d3.selectAll(".dot")
-                                          .classed("visibleball",function(d){
-                                              return isValidBall(d);
-                                          })
-                                          .classed("invisibleball", function(d) {
-                                            return !isValidBall(d);
-                                          })
-                                          .style("opacity", function(d) {
-                                              return isSelectedBall(d) ? 1 : 0.1;
-                                          });
-                                      brushHighlight();
-                                  }
-                                  recalculateHeatMaps();
+                  d3.selectAll(".activePlayer")
+                      .on("mouseover", function(d) {
+                          tempPlayer = d;
+                          d3.selectAll(".edge")
+                              .style("opacity", function(edge) {
+                                  return edge.batsman == d || edge.bowler == d ? 1 : 0.1
                               })
+                          brushHighlight();
+                      })
+                      .on("mouseout", function(d) {
+                          tempPlayer = null;
+                          d3.selectAll(".edge")
+                              .style("opacity", 1)
+                          brushHighlight();
+                      })
 
-                              d3.selectAll(".partnershipBar")
-                                  .on("click", function(d) {
-                                      if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
-                                          d3.selectAll(".partnership").style("stroke-width", "1px")
-                                              .style("stroke", "black")
-                                          d3.selectAll(".partnershipBar").style("opacity", 1)
-                                          batsman1 = null;
-                                          batsman2 = null;
+                  d3.selectAll(".inactivePlayer")
+                      .on("mouseover", function(d) {
+                          return;
+                      })
+                      .on("mouseout", function(d) {
+                          return;
+                      })
+            }
 
-                                          d3.selectAll(".dot")
-                                              .classed("visibleball",function(d){
-                                                  return isValidBall(d);
-                                              })
-                                              .classed("invisibleball", function(d) {
-                                                return !isValidBall(d);
-                                              })
-                                              .style("opacity", function(d) {
-                                                  return isSelectedBall(d) ? 1 : 0.1;
-                                              });
-                                          brushHighlight();
-                                      } else {
+            scope.$watch('min', function(newMin, oldMin) {
+                overChange(newMin, scope.max);
+            })
 
-                                          d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
-                                              .style("stroke", e => (d == e) ? "gold" : "black")
-                                          d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
-                                          batsman1 = d.batsman_1;
-                                          batsman2 = d.batsman_2;
+            scope.$watch('max', function(newMax, oldMax) {
+                overChange(scope.min, newMax);
+            })
 
-                                          d3.selectAll(".dot")
-                                              .classed("visibleball",function(d){
-                                                  return isValidBall(d);
-                                              })
-                                              .classed("invisibleball", function(d) {
-                                                return !isValidBall(d);
-                                              })
-                                              .style("opacity", function(d) {
-                                                  return isSelectedBall(d) ? 1 : 0.1;
-                                              });
-                                          brushHighlight();
-                                      }
-                                      recalculateHeatMaps();
-                                  })
-                  });
-              });
+            d3.selectAll(".partnership")
+                .on("click", function(d) {
+                    if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
+                        d3.selectAll(".partnership").style("stroke-width", "1px")
+                            .style("stroke", "black")
+                        d3.selectAll(".partnershipBar").style("opacity", 1)
+                        batsman1 = null;
+                        batsman2 = null;
+
+                        changeBallVisibility();
+
+                        brushHighlight();
+                    } else {
+
+                        d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
+                            .style("stroke", e => (d == e) ? "gold" : "black")
+                        d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
+                        batsman1 = d.batsman_1;
+                        batsman2 = d.batsman_2;
+
+                        changeBallVisibility();
+
+                        brushHighlight();
+                    }
+                    recalculateHeatMaps();
+                })
+
+                d3.selectAll(".partnershipBar")
+                    .on("click", function(d) {
+                        if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
+                            d3.selectAll(".partnership").style("stroke-width", "1px")
+                                .style("stroke", "black")
+                            d3.selectAll(".partnershipBar").style("opacity", 1)
+                            batsman1 = null;
+                            batsman2 = null;
+
+                            changeBallVisibility();
+
+                            brushHighlight();
+                        } else {
+
+                            d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
+                                .style("stroke", e => (d == e) ? "gold" : "black")
+                            d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
+                            batsman1 = d.batsman_1;
+                            batsman2 = d.batsman_2;
+
+                            changeBallVisibility();
+                            brushHighlight();
+                        }
+                        recalculateHeatMaps();
+                    })
 
             scope.$watch('mapView', function(newView, oldView) {
                 pitch.selectAll(".pitchHeatTile").style("display", newView == "Balls" ? "none" : "block")
+                pitchBrushArea.style("display", newView == "Balls" ? "block" : "none")
                 stumpWindow.selectAll(".stumpHeatTile").style("display", newView == "Balls" ? "none" : "block")
+                stumpBrushArea.style("display", newView == "Balls" ? "block" : "none")
             })
 
             scope.$on("handFilter", function(event, data) {
@@ -1551,16 +1389,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                       return zoneColors[i];
                   })
                   .style('stroke', '#CCCCCC');
-              d3.selectAll(".dot")
-                  .classed("visibleball",function(d){
-                      return isValidBall(d);
-                  })
-                  .classed("invisibleball", function(d) {
-                      return !isValidBall(d);
-                  })
-                  .style("opacity", function(d) {
-                      return isSelectedBall(d) ? 1 : 0.1
-                  })
+              changeBallVisibility();
 
                   var validBatsmen = new Set(scope.balls.filter(function(d) {
                       return isValidBall(d);

@@ -222,7 +222,7 @@ angular.module('myApp').directive('stumpMatchup', function() {
               if (newVal == null) {
                   vis.selectAll(".dot").style("display", "block");
               } else {
-                  vis.selectAll(".dot").style("display", function(d) { console.log("Changing"); return d.game == newVal.match_id ? "block" : "none" })
+                  vis.selectAll(".dot").style("display", function(d) {  return d.game == newVal.match_id ? "block" : "none" })
               }
           })
 
@@ -267,7 +267,12 @@ angular.module('myApp').directive('stumpMatchup', function() {
                       }
                   })
 
-              balls.exit().remove();
+              balls.exit()
+                  .transition()
+                  .duration(1000)
+                  .attr("cx", svgDimension)
+                  .attr("cy", svgDimension)
+                  .remove();
 
               var batsmen = Array.from(new Set(newBalls.map(function(d) {
                   return d.batsman;

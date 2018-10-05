@@ -213,6 +213,7 @@ angular.module('myApp').directive('playerGraph', function() {
                     edgeTip.hide();
                 })
                 .on("click", function(d) {
+                    console.log("CLICK")
                     if (currentCombo != d) {
                         currentCombo = d;
                         d3.selectAll(".edge").style("stroke", function(e) {
@@ -279,8 +280,10 @@ angular.module('myApp').directive('playerGraph', function() {
                     scope.$emit("playerStats", null);
                 })
                 .on("click", function(d) {
+                    console.log("CLICK");
                     if (selectedPlayer != d.id) {
                       selectedPlayer = d.id;
+                      
                       selectedTeam = null;
                       d3.select(".xAxis").selectAll("text")
                           .style("fill", "black")
@@ -345,6 +348,7 @@ angular.module('myApp').directive('playerGraph', function() {
                 .text(d => (d == "United Arab Emirates") ? "UAE" : d)
                 .style("cursor", "pointer")
                 .on("click", function(d) {
+                    console.log("CLICK")
                     if (selectedPlayer != null && d != scope.playerDict[selectedPlayer.toString()]["team"]) {
                       if (selectedTeam != d) {
                           selectedTeam = d;

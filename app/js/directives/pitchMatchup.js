@@ -249,7 +249,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
               if (newVal == null) {
                   vis.selectAll(".dot").style("display", "block");
               } else {
-                  vis.selectAll(".dot").style("display", function(d) { console.log("Changing"); return d.game == newVal.match_id ? "block" : "none" })
+                  vis.selectAll(".dot").style("display", function(d) {  return d.game == newVal.match_id ? "block" : "none" })
               }
           })
 
@@ -299,7 +299,12 @@ angular.module('myApp').directive('pitchMatchup', function() {
                   .on("mouseover", function(d) { ballMouseover(d); })
                   .on("mouseout", function() { ballMouseout(); });*/
 
-              balls.exit().remove();
+              balls.exit()
+                .transition()
+                .duration(1000)
+                .attr("cx", svgDimension)
+                .attr("cy", svgDimension)
+                .remove();
 
               /*d3.selectAll(".dot")
                   .on("mouseover", function(d) { ballMouseover(d); })

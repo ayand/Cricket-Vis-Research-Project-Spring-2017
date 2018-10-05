@@ -62,36 +62,6 @@
                     </td>
                 </tr>
             </table>
-            <!--<div class="row">
-                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">Runs Scored</p>
-                    <p ng-hide="selectedSide == 'Batting'">Runs Conceded</p>
-                </div>
-                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">{{ runsScored }}</p>
-                    <p ng-hide="selectedSide == 'Batting'">{{ runsConceded }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">Balls Faced</p>
-                    <p ng-hide="selectedSide == 'Batting'">Overs Bowled</p>
-                </div>
-                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">{{ ballsFaced }}</p>
-                    <p ng-hide="selectedSide == 'Batting'">{{ oversBowled }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div style="text-align:left" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">Strike Rate</p>
-                    <p ng-hide="selectedSide == 'Batting'">Wickets Taken</p>
-                </div>
-                <div style="text-align:right" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <p ng-show="selectedSide == 'Batting'">{{ strikeRate }}</p>
-                    <p ng-hide="selectedSide == 'Batting'">{{ wicketsTaken }}</p>
-                </div>
-            </div>-->
         </div>
       </div>
       <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
@@ -132,13 +102,15 @@
   <div ng-show="showVizes">
       <div class="row">
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="right" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="60" alt="batsmanImage"/><br>
+            <img ng-show="showCombo" align="right" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="60" alt="batsmanImage"/><br>
           </div>
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h4>{{ playerDict[selectedBowler.toString()].name + " bowled " + displayedBalls.length + " " + (displayedBalls.length != 1 ? "balls" : "ball") + " to " + playerDict[selectedBatsman.toString()].name }}</h4>
+            <h4 ng-show="showCombo">{{ playerDict[selectedBowler.toString()].name + " bowled " + displayedBalls.length + " " + (displayedBalls.length != 1 ? "balls" : "ball") + " to " + playerDict[selectedBatsman.toString()].name }}</h4>
+            <h4 ng-show="showBatBalls">{{ displayedPlayer.name }} hit {{ displayedBalls.length }} balls.</h4>
+            <h4 ng-show="showBowlBalls">{{ displayedPlayer.name }} bowled {{ displayedBalls.length }} balls.</h4>
           </div>
           <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img align="left" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
+            <img ng-show="showCombo" align="left" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
           </div>
       </div>
       <br>

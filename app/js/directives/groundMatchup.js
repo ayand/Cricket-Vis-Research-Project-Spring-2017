@@ -255,7 +255,7 @@ angular.module('myApp').directive('groundMatchup', function() {
                   if (newVal == null) {
                       vis.selectAll(".dot").style("display", "block");
                   } else {
-                      vis.selectAll(".dot").style("display", function(d) { console.log("Changing"); return d.game == newVal.match_id ? "block" : "none" })
+                      vis.selectAll(".dot").style("display", function(d) {  return d.game == newVal.match_id ? "block" : "none" })
                   }
               })
 
@@ -299,7 +299,12 @@ angular.module('myApp').directive('groundMatchup', function() {
                       }
                   })
 
-              balls.exit().remove();
+              balls.exit()
+                  .transition()
+                  .duration(1000)
+                  .attr("cx", svgDimension / 2)
+                  .attr("cy", svgDimension / 2)
+                  .remove();
 
               var zoneScores = [0,0,0,0,0,0,0,0];
 

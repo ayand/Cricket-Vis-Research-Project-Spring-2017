@@ -9,31 +9,34 @@
         <div align="left" class="col-sm-3 col-md-3 col-lg-3">
             <h4 align="center">Team Players</h4>
             <br>
-            <div style="text-align: center">
-              <table class="table-condensed">
-                  <tbody>
-                    <tr>
-                        <td style="display: inline-block; width: 100px;  height: 157px; cursor: pointer; border-left: 1px solid #bbbbbb; border-right: 1px solid #bbbbbb"
-                            ng-repeat="player in players"
-                            ng-style="selected.includes(player.id) ? playerStyling : normalStyling"
-                            ng-click="clickPlayer(player.id)"
-                            ng-mouseover="selectPlayer(player)"
-                            ng-mouseleave="selectPlayer(null)">
-                          <br>
-                          <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="90" alt="bowlerImage"/><br>
-                          {{ player.name }}
-                        </td>
-                        <!--<td>{{ player.name }}</td>-->
-                    </tr>
-                  </tbody>
-              </table>
+            <div class="row">
+              <div>
+                <table class="table-condensed">
+                    <tbody>
+                      <tr>
+                          <td style="text-align: center; display: inline-block; width: 100px;  height: 157px; cursor: pointer; border-left: 1px solid #bbbbbb; border-right: 1px solid #bbbbbb"
+                              ng-repeat="player in players"
+                              ng-style="selected.includes(player.id) ? playerStyling : normalStyling"
+                              ng-click="clickPlayer(player.id)"
+                              ng-mouseover="selectPlayer(player)"
+                              ng-mouseleave="selectPlayer(null)">
+                            <br>
+                            <img align="center" class="center-block" ng-src="{{ imageDict[player.name] }}"  height="90" alt="bowlerImage"/><br>
+                            {{ player.name }}
+                          </td>
+                          <!--<td>{{ player.name }}</td>-->
+                      </tr>
+                    </tbody>
+                </table>
+              </div>
             </div>
         </div>
         <div class="col-sm-9 col-md-9 col-lg-9">
             <!--<tournament-display data="teamData" team="teamName" selected-players="selected"></tournament-display>-->
             <div class="btn-group">
-                <button class="btn btn-default" ng-click="changeView('allBalls')">All Tournament Balls</button>
-                <button class="btn btn-default" ng-click="changeView('scoreProgression')">Score Progressions</button>
+                <button class="btn" ng-class="view == 'allBalls' ? 'btn-success' : 'btn-default'" ng-click="changeView('allBalls')">All Tournament Balls</button>
+                <button class="btn" ng-class="view == 'scoreProgression' ? 'btn-success' : 'btn-default'" ng-click="changeView('scoreProgression')">Score Progressions</button>
+                <button class="btn" ng-class="view == 'overSummaries' ? 'btn-success' : 'btn-default'" ng-click="changeView('overSummaries')">Over Summaries</button>
             </div>
             <br>
             <br>

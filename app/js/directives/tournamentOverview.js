@@ -5,6 +5,10 @@ angular.module('myApp').directive('tournamentOverview', function() {
   var isWicketBall = function(d) {
       return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
   }
+  var height = 280
+  var convertDimension = function(d) {
+      return ((d * height) / 450)
+  }
 
   var decideColor = function(d) {
     if (isWicketBall(d)) {
@@ -26,6 +30,22 @@ angular.module('myApp').directive('tournamentOverview', function() {
     }
   }
 
+  var teamColors = {};
+  teamColors["India"] = "#0080FF";
+  teamColors["Bangladesh"] = "#5AAB54";
+  teamColors["United Arab Emirates"] = "#003366";
+  teamColors["Scotland"] = "#66B2FF";
+  teamColors["Ireland"] = "#80FF00";
+  teamColors["Afghanistan"] = "#0066CC";
+  teamColors["England"] = "#004C99";
+  teamColors["South Africa"] = "#006633";
+  teamColors["Australia"] = "gold";
+  teamColors["New Zealand"] = "#000000";
+  teamColors["West Indies"] = "#660000";
+  teamColors["Pakistan"] = "#00CC00";
+  teamColors["Zimbabwe"] = "#CC0000";
+  teamColors["Sri Lanka"] = "#000099";
+
   var isDotBall = function(d) {
       return !isWicketBall(d) && d.runs_batter == 0 && d.extras_type != "Wd"
           && d.extras_type != "Nb";
@@ -43,6 +63,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
           currentPlayer: "="
       },
       link: function(scope, element, attrs) {
+          console.log(scope.team);
           var games = scope.data.batting_balls.map(function(d) { return parseInt(d.key) });
 
           var getIndex = function(i) {
@@ -384,7 +405,7 @@ angular.module('myApp').directive('tournamentOverview', function() {
 
                           var firstInningRunScale = d3.scaleLinear().domain([0, maxScore]).range([385, 40]);
                           var secondInningRunScale = d3.scaleLinear().domain([0, maxScore]).range([515, 860]);
-                          var overScale = d3.scaleLinear().domain([1, 50]).range([10, matchScale.bandwidth() - 10])
+                          var overScale = d3.scaleLinear().domain([1, 50]).range([5, matchScale.bandwidth() - 5])
 
                           var decideY = function(i, score) {
                               if (i == 1) {
@@ -514,34 +535,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
                               .attr("class", "overLine")
                               .attr("d", overLine)
 
-                              /*var batWicket = batScoreProgression.selectAll(".wicket")
-                                  .data(function(d) {
-                                      return d3.nest()
-                                          .key(function(ball) { return Math.ceil(ball.ovr) })
-                                          .rollup(function(leaves) { return {
-                                                "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
-                                                "wickets": leaves.filter(function(d) { return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd" })
-                                          }})
-                                          .entries(d.values)
-                                  })
-                                  .enter().append("g")
-                                  .attr("class", "wicket")
-                                  .attr("transform", function(d) {
-                                      return "translate(" + [overScale(parseInt(d.key)), firstInningRunScale(d.value.maxScore)] +")"
-                                  })
-
-                              batWicket.selectAll(".wicketBall")
-                                  .data(function(d) { return d.value.wickets })
-                                  .enter().append("circle")
-                                  .attr("class", "wicketBall")
-                                  .attr("r", 1)
-                                  .attr("transform", function(d, i) {
-                                      var y = i * -3;
-                                      return "translate("+[0,y]+")";
-                                  })
-                                  .attr("fill", "#F45333")
-                                  .style("stroke", "#F45333")*/
-
                               batScoreProgression.append("g")
                                   .attr("transform", "translate(0, 405)")
                                   .call(d3.axisTop(overScale).tickValues([1, 50]))
@@ -645,35 +638,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .attr("class", "overLine")
                                   .attr("d", overLine)
 
-                                  /*var bowlWicket = bowlScoreProgression.selectAll(".wicket")
-                                      .data(function(d) {
-                                          var data = d3.nest()
-                                              .key(function(ball) { return Math.ceil(ball.ovr) })
-                                              .rollup(function(leaves) { return {
-                                                    "maxScore": d3.max(leaves, function(leaf) { return leaf.cumul_runs; }),
-                                                    "wickets": leaves.filter(function(d) { return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd" })
-                                              }})
-                                              .entries(d.values)
-                                          return data;
-                                      })
-                                      .enter().append("g")
-                                      .attr("class", "wicket")
-                                      .attr("transform", function(d) {
-                                          return "translate(" + [overScale(parseInt(d.key)), secondInningRunScale(d.value.maxScore)] +")"
-                                      })
-
-                                  bowlWicket.selectAll(".wicketBall")
-                                      .data(function(d) { return d.value.wickets })
-                                      .enter().append("circle")
-                                      .attr("class", "wicketBall")
-                                      .attr("r", 1)
-                                      .attr("transform", function(d, i) {
-                                          var y = i * 3;
-                                          return "translate("+[0,y]+")";
-                                      })
-                                      .attr("fill", "#F45333")
-                                      .style("stroke", "#F45333")*/
-
                                   bowlScoreProgression.append("g")
                                       .attr("transform", "translate(0, 495)")
                                       .call(d3.axisBottom(overScale).tickValues([1, 50]))
@@ -692,6 +656,136 @@ angular.module('myApp').directive('tournamentOverview', function() {
 
                               allBallStuff.style("display", "block");
                               scoreProgression.style("display", "none");
+
+                              var overSummaries = vis.append("g")
+                                  .attr("class", "overSummaries");
+
+                              var stack = d3.stack()
+                                  .keys(["runs", "wickets"])
+                                  .order(d3.stackOrderNone)
+                                  .offset(d3.stackOffsetNone);
+
+                              var batSummary = overSummaries.selectAll(".batSummary")
+                                  .data(scope.data.batting_balls)
+                                  .enter().append("g")
+                                  .attr("class", "batSummary")
+                                  .attr("transform", function(d, i) {
+                                      console.log(d);
+                                      return "translate("+[matchScale(getIndex(i)), 0]+")"
+                                  });
+
+                              var batArea = batSummary.append("g")
+                                  .attr("transform", function(d) {
+                                      var y = (d.values[0].inning == 1) ? 0 : 130
+                                      if (y == 0) {
+                                          return "translate(0, 0)"
+                                      }
+                                      return "translate("+[0, y + 770]+") scale(1, -1)"
+                                  })
+
+                              var batBars = batArea.selectAll(".summaryBar")
+                                  .data(function(d) {
+                                      var nestedData = d3.nest()
+                                          .key(ball => Math.ceil(ball.ovr))
+                                          .rollup(function(leaves) {
+                                              return {
+                                                  "runs": d3.sum(leaves, leaf => leaf.runs_batter),
+                                                  "wickets": leaves.filter(leaf => leaf.wicket).length
+                                              }
+                                          })
+                                          .entries(d.values)
+                                      return stack(nestedData.map(nest => nest.value));
+                                  })
+                                  .enter().append("g")
+                                  .attr("class", "summaryBar")
+                                  .attr("fill", function(d) {
+                                      if (d.key == "runs") {
+                                          return teamColors[scope.team];
+                                      } else {
+                                          return "#F45333";
+                                      }
+                                  })
+
+                              batBars.selectAll("rect")
+                                  .data(d => d)
+                                  .enter().append("rect")
+                                  .attr("x", (d, i) => overScale(i + 1))
+                                  .attr("y", function(d) {
+                                      //console.log(d);
+                                      return (385 - (convertDimension(18) * d[1]))
+                                  })
+                                  .attr("height", function(d) {
+                                      //console.log(d)
+                                      return convertDimension(18) * (d[1] - d[0]);
+                                  })
+                                  .attr("width", (matchScale.bandwidth() - 10) / 50)
+
+
+                              var bowlSummary = overSummaries.selectAll(".bowlSummary")
+                                  .data(scope.data.bowling_balls)
+                                  .enter().append("g")
+                                  .attr("class", "bowlSummary")
+                                  .attr("transform", function(d, i) {
+                                      return "translate("+[matchScale(getIndex(i)),0]+")"
+                                  });
+
+                                  var bowlArea = bowlSummary.append("g")
+                                      .attr("transform", function(d) {
+                                          var y = (d.values[0].inning == 1) ? 0 : 130
+                                          if (y == 0) {
+                                              return "translate(0, 0)"
+                                          }
+                                          return "translate("+[0, y + 770]+") scale(1, -1)"
+                                      })
+
+                                  var bowlBars = bowlArea.selectAll(".summaryBar")
+                                      .data(function(d) {
+                                          var nestedData = d3.nest()
+                                              .key(ball => Math.ceil(ball.ovr))
+                                              .rollup(function(leaves) {
+                                                  return {
+                                                      "runs": d3.sum(leaves, leaf => leaf.runs_batter),
+                                                      "wickets": leaves.filter(leaf => leaf.wicket).length
+                                                  }
+                                              })
+                                              .entries(d.values)
+                                          return stack(nestedData.map(nest => nest.value));
+                                      })
+                                      .enter().append("g")
+                                      .attr("class", "summaryBar")
+                                      .attr("fill", function(d) {
+                                          if (d.key == "runs") {
+                                              return teamColors[scope.team];
+                                          } else {
+                                              return "#F45333";
+                                          }
+                                      })
+
+                                  bowlBars.selectAll("rect")
+                                      .data(d => d)
+                                      .enter().append("rect")
+                                      .attr("x", (d, i) => overScale(i + 1))
+                                      .attr("y", function(d) {
+                                          //console.log(d);
+                                          return (385 - (convertDimension(18) * d[1]))
+                                      })
+                                      .attr("height", function(d) {
+                                          //console.log(d)
+                                          return convertDimension(18) * (d[1] - d[0]);
+                                      })
+                                      .attr("width", (matchScale.bandwidth() - 10) / 50)
+
+                              batSummary.append("g")
+                                  .attr("transform", "translate(0, 405)")
+                                  .call(d3.axisTop(overScale).tickValues([1, 50]))
+                                  .selectAll("text")
+                                  .style("font-weight", "bold")
+
+                              bowlSummary.append("g")
+                                  .attr("transform", "translate(0, 495)")
+                                  .call(d3.axisBottom(overScale).tickValues([1, 50]))
+                                  .selectAll("text")
+                                  .style("font-weight", "bold")
 
                               scope.$watchCollection('selectedPlayers', function(newPlayers, oldPlayers) {
                                   if (newPlayers.length == 0) {
@@ -713,9 +807,15 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   if (newVal == "allBalls") {
                                       allBallStuff.style("display", "block");
                                       scoreProgression.style("display", "none");
+                                      overSummaries.style("display", "none");
+                                  } else if (newVal == "overSummaries") {
+                                      allBallStuff.style("display", "none");
+                                      scoreProgression.style("display", "none");
+                                      overSummaries.style("display", "block");
                                   } else {
                                       allBallStuff.style("display", "none");
                                       scoreProgression.style("display", "block");
+                                      overSummaries.style("display", "none");
                                   }
                               })
 
