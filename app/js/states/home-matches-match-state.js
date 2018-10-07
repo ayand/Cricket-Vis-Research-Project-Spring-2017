@@ -507,13 +507,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             $scope.$digest()
         })
 
-        $scope.getClass = function(id) {
-            if ($scope.activeBatsmen.includes(id) && $scope.correctHandBatsmen.includes(id)) {
-                return 'check';
-            }
-            return 'active';
-        }
-
     }
   })
 })

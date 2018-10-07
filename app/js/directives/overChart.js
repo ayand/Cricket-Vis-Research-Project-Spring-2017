@@ -168,16 +168,19 @@ angular.module('myApp')
           .attr("transform", "translate(0, " + (height - margin) + ")")
           .call(overAxis)
 
-          //console.log(scope.hoverswitch)
+      var changeVisibility = function(newMin, newMax) {
+        d3.selectAll("." + className)
+            .classed("visiblebar", function(d) { var over = Math.ceil(d.ovr); return (over >= newMin && over <= newMax) })
+            .classed("invisiblebar", function(d) { var over = Math.ceil(d.ovr); return !(over >= newMin && over <= newMax) })
+      }
 
-            scope.$watch('min', function(newMin, oldMin) {
-                scope.$watch('max', function(newMax, oldMax) {
+      scope.$watch('min', function(newMin, oldMin) {
+          changeVisibility(newMin, scope.max);
+      })
 
-                  d3.selectAll("." + className)
-                      .classed("visiblebar", function(d) { var over = Math.ceil(d.ovr); return (over >= newMin && over <= newMax) })
-                      .classed("invisiblebar", function(d) { var over = Math.ceil(d.ovr); return !(over >= newMin && over <= newMax) })
-                })
-            })
+      scope.$watch('max', function(newMax, oldMax) {
+          changeVisibility(scope.min, newMax);
+      })
 
             scope.$watch('hoverswitch', function(newVal, oldVal) {
                 if (newVal) {

@@ -135,27 +135,29 @@ angular.module('myApp').directive('overSummaryChart', function() {
           .attr("transform", "translate(0, " + (height - margin) + ")")
           .call(overAxis)
 
+      var changeVisibility = function(newMin, newMax) {
+        vis.selectAll('.summary-bar')
+            .selectAll('rect')
+            .style("opacity", function(d, i) {
+                //console.log('i: ' + i);
+                //console.log('changing');
+                var over = i + 1;
+                if (over >= newMin && over <= newMax) {
+                    //console.log('not fading');
+                    return 1;
+                } else {
+                    //console.log('fading');
+                    return 0.2;
+                }
+            })
+      }
+
       scope.$watch('min', function(newMin, oldMin) {
-          scope.$watch('max', function(newMax, oldMax) {
-              /*console.log("min: " + newMin);
-              console.log("max: " + newMax);*/
-              min = newMin;
-              max = newMax;
-              vis.selectAll('.summary-bar')
-                  .selectAll('rect')
-                  .style("opacity", function(d, i) {
-                      //console.log('i: ' + i);
-                      //console.log('changing');
-                      var over = i + 1;
-                      if (over >= newMin && over <= newMax) {
-                          //console.log('not fading');
-                          return 1;
-                      } else {
-                          //console.log('fading');
-                          return 0.2;
-                      }
-                  })
-          })
+          changeVisibility(newMin, scope.max);
+      })
+
+      scope.$watch('max', function(newMax, oldMax) {
+          changeVisibility(scope.min, newMax);
       })
     }
   }

@@ -41,7 +41,7 @@ angular.module('myApp').directive('generateBallVis', function() {
   var startingXs = [-1.525, 0];
   var startingYs = [];
   var y = 0;
-  for (var i = 0; i < 7; i++) {
+  for (var i = 0; i < 8; i++) {
       startingYs.push(2.515 * i);
   }
 
@@ -54,7 +54,7 @@ angular.module('myApp').directive('generateBallVis', function() {
               "leftX": startingXs[i],
               "topY": startingYs[j],
               "rightX": startingXs[i] + 1.525,
-              "bottomY": startingYs[j] + 5.03,
+              "bottomY": startingYs[j] + 2.515,
               "score": 0,
               "area": index
           });
@@ -363,8 +363,6 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("ry", convertDimension(3))
                 .attr("fill", "#683F16");
 
-
-
             var ground = groundVis.append("g")
 
             ground.append("rect")
@@ -548,9 +546,18 @@ angular.module('myApp').directive('generateBallVis', function() {
                 d["score"] = 0;
             })
             validPitchBalls.filter(d => isValidBall(d) && d["landing_y"] >= 0).forEach(function(d) {
+              if (Math.abs(d["landing_x"]) > 1.525) {
+                  console.log("LANDING X: " + d["landing_x"])
+              }
               var column = d["landing_x"] < 0 ? 0 : 8;
               var row = Math.floor(d["landing_y"] / 2.515);
               pitchAreas[column + row]["score"] += 1
+            })
+
+            pitchAreas.forEach(function(d) {
+                console.log("INDEX: " + d.area)
+                console.log("SCORE: " + d.score)
+                console.log(d);
             })
 
             stumpAreas.forEach(function(d) {
@@ -574,8 +581,6 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             changeHeatMap();
         }
-
-
 
         var isSelectedBall = function(d) {
           var pitchXCondition = true;
@@ -647,6 +652,12 @@ angular.module('myApp').directive('generateBallVis', function() {
         };
 
         var ballMouseover = function(curBall) {
+          console.log(curBall.landing_x)
+          console.log(curBall.landing_y)
+          var column = curBall["landing_x"] < 0 ? 0 : 8;
+          var row = Math.floor(curBall["landing_y"] / 2.515);
+          console.log(column);
+          console.log(row);
           d3.selectAll('.visibleball').style('opacity',function(d){
               if(d==curBall){
                   return 1;
@@ -765,8 +776,6 @@ angular.module('myApp').directive('generateBallVis', function() {
             .on("brush", stumpBrushMove)
             .on("end", stumpBrushEnd);
 
-
-
         var lasso_start = function() {
         }
 
@@ -878,9 +887,10 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("height", d => (pitchY(d["bottomY"]) - pitchY(d["topY"])))
                 .attr("fill", "blue")
                 .style("stroke", "gray")
-                .style("opacity", 0.8)
-                .on("mouseover", function(d)  {
+                .style("opacity", 0.65)
+                .on("mouseover", function(d, i)  {
                     console.log(d)
+                    console.log(i);
                 });
 
             validStumpBalls = scope.balls.filter(function(d) {
@@ -894,7 +904,9 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             plotPoints(stumpBrushArea, validStumpBalls, stumpX, stumpY, "ended_x", "ended_y")
 
-                var stumpAreaRect = stumpWindow.selectAll(".stumpHeatTile")
+                var stumpHeatmapArea = stumpWindow.append("g")
+
+                var stumpAreaRect = stumpHeatmapArea.selectAll(".stumpHeatTile")
                     .data(stumpAreas, d => d["index"])
                     .enter()
                     .append("rect")
@@ -905,7 +917,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     .attr("height", d => (stumpY(d["bottomY"]) - stumpY(d["topY"])))
                     .attr("fill", "blue")
                     .style("stroke", "gray")
-                    .style("opacity", 0.8)
+                    .style("opacity", 0.65)
                     .on("mouseover", function(d)  {
                         console.log(d)
                     });
@@ -1023,6 +1035,51 @@ angular.module('myApp').directive('generateBallVis', function() {
                             brushHighlight();
                             recalculateHeatMaps();
                         })
+
+                    stumpHeatmapArea.append("rect")
+                        .attr("height", convertDimension(137.46))
+                        .attr("width", convertDimension(7.366))
+                        .attr("x", ((svgDimension / 2) - convertDimension(3.683)))
+                        .attr("y", (svgDimension - convertDimension(137.46)))
+                        .attr("rx", convertDimension(4))
+                        .attr("ry", convertDimension(4))
+                        .attr("fill", "#FAE3A1");
+
+                    stumpHeatmapArea.append("rect")
+                        .attr("height", convertDimension(137.46))
+                        .attr("width", convertDimension(7.366))
+                        .attr("x", ((svgDimension / 2) - convertDimension(22.1366666667)))
+                        .attr("y", (svgDimension - convertDimension(137.46)))
+                        .attr("rx", convertDimension(4))
+                        .attr("ry", convertDimension(4))
+                        .attr("fill", "#FAE3A1");
+
+                    stumpHeatmapArea.append("rect")
+                        .attr("height", convertDimension(137.46))
+                        .attr("width", convertDimension(7.366))
+                        .attr("x", ((svgDimension / 2) + convertDimension(14.7706666667)))
+                        .attr("y", (svgDimension - convertDimension(137.46)))
+                        .attr("rx", convertDimension(4))
+                        .attr("ry", convertDimension(4))
+                        .attr("fill", "#FAE3A1");
+
+                    stumpHeatmapArea.append("rect")
+                        .attr("width", convertDimension(20))
+                        .attr("height", convertDimension(4))
+                        .attr("x", (svgDimension / 2))
+                        .attr("y", (svgDimension - convertDimension(138.793333333)))
+                        .attr("rx", convertDimension(3))
+                        .attr("ry", convertDimension(3))
+                        .attr("fill", "#683F16");
+
+                    stumpHeatmapArea.append("rect")
+                        .attr("width", convertDimension(20))
+                        .attr("height", convertDimension(4))
+                        .attr("x", ((svgDimension / 2) - convertDimension(20)))
+                        .attr("y", (svgDimension - convertDimension(138.793333333)))
+                        .attr("rx", convertDimension(3))
+                        .attr("ry", convertDimension(3))
+                        .attr("fill", "#683F16");
 
                 validGroundBalls = scope.balls.filter(function(d) {
                     return d["x"] != null && d["y"] != null;
@@ -1356,7 +1413,7 @@ angular.module('myApp').directive('generateBallVis', function() {
             scope.$watch('mapView', function(newView, oldView) {
                 pitch.selectAll(".pitchHeatTile").style("display", newView == "Balls" ? "none" : "block")
                 pitchBrushArea.style("display", newView == "Balls" ? "block" : "none")
-                stumpWindow.selectAll(".stumpHeatTile").style("display", newView == "Balls" ? "none" : "block")
+                stumpHeatmapArea.style("display", newView == "Balls" ? "none" : "block")
                 stumpBrushArea.style("display", newView == "Balls" ? "block" : "none")
             })
 

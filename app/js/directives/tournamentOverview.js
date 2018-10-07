@@ -63,7 +63,6 @@ angular.module('myApp').directive('tournamentOverview', function() {
           currentPlayer: "="
       },
       link: function(scope, element, attrs) {
-          console.log(scope.team);
           var games = scope.data.batting_balls.map(function(d) { return parseInt(d.key) });
 
           var getIndex = function(i) {
@@ -665,12 +664,41 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   .order(d3.stackOrderNone)
                                   .offset(d3.stackOffsetNone);
 
+                              var battingMax = d3.max(scope.data.batting_balls, function(data) {
+                                  var nestedData = d3.nest()
+                                      .key(ball => Math.ceil(ball.ovr))
+                                      .rollup(function(leaves) {
+                                          return {
+                                              "runs": d3.sum(leaves, leaf => leaf.runs_batter),
+                                              "wickets": leaves.filter(leaf => leaf.wicket).length
+                                          }
+                                      })
+                                      .entries(data.values);
+                                  return d3.max(nestedData, d => d.value.runs + d.value.wickets);
+                              })
+
+                              var bowlingMax = d3.max(scope.data.bowling_balls, function(data) {
+                                  var nestedData = d3.nest()
+                                      .key(ball => Math.ceil(ball.ovr))
+                                      .rollup(function(leaves) {
+                                          return {
+                                              "runs": d3.sum(leaves, leaf => leaf.runs_batter),
+                                              "wickets": leaves.filter(leaf => leaf.wicket).length
+                                          }
+                                      })
+                                      .entries(data.values);
+                                  return d3.max(nestedData, d => d.value.runs + d.value.wickets);
+                              })
+
+                              var maxBarLength = (battingMax > bowlingMax) ? battingMax : bowlingMax;
+
+                              var stackScale = d3.scaleLinear().domain([0, maxBarLength]).range([0, matchScale.bandwidth()])
+
                               var batSummary = overSummaries.selectAll(".batSummary")
                                   .data(scope.data.batting_balls)
                                   .enter().append("g")
                                   .attr("class", "batSummary")
                                   .attr("transform", function(d, i) {
-                                      console.log(d);
                                       return "translate("+[matchScale(getIndex(i)), 0]+")"
                                   });
 
@@ -706,20 +734,14 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                       }
                                   })
 
+
                               batBars.selectAll("rect")
                                   .data(d => d)
                                   .enter().append("rect")
-                                  .attr("x", (d, i) => overScale(i + 1))
-                                  .attr("y", function(d) {
-                                      //console.log(d);
-                                      return (385 - (convertDimension(18) * d[1]))
-                                  })
-                                  .attr("height", function(d) {
-                                      //console.log(d)
-                                      return convertDimension(18) * (d[1] - d[0]);
-                                  })
-                                  .attr("width", (matchScale.bandwidth() - 10) / 50)
-
+                                  .attr("x", d => stackScale(d[0]))
+                                  .attr("y", (d, i) => firstInningScale(i + 1))
+                                  .attr("height", firstInningScale.bandwidth())
+                                  .attr("width", d => stackScale(d[1] - d[0]))
 
                               var bowlSummary = overSummaries.selectAll(".bowlSummary")
                                   .data(scope.data.bowling_balls)
@@ -764,28 +786,22 @@ angular.module('myApp').directive('tournamentOverview', function() {
                                   bowlBars.selectAll("rect")
                                       .data(d => d)
                                       .enter().append("rect")
-                                      .attr("x", (d, i) => overScale(i + 1))
-                                      .attr("y", function(d) {
-                                          //console.log(d);
-                                          return (385 - (convertDimension(18) * d[1]))
-                                      })
-                                      .attr("height", function(d) {
-                                          //console.log(d)
-                                          return convertDimension(18) * (d[1] - d[0]);
-                                      })
-                                      .attr("width", (matchScale.bandwidth() - 10) / 50)
+                                      .attr("x", d => stackScale(d[0]))
+                                      .attr("y", (d, i) => firstInningScale(i + 1))
+                                      .attr("height", firstInningScale.bandwidth())
+                                      .attr("width", d => stackScale(d[1] - d[0]))
 
-                              batSummary.append("g")
-                                  .attr("transform", "translate(0, 405)")
-                                  .call(d3.axisTop(overScale).tickValues([1, 50]))
-                                  .selectAll("text")
-                                  .style("font-weight", "bold")
+                              overSummaries.append("g")
+                                  .attr("class", "batAxis")
+                                  .classed("allBalls", true)
+                                  .attr("transform", "translate(50,0)")
+                                  .call(d3.axisLeft(firstInningScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
 
-                              bowlSummary.append("g")
-                                  .attr("transform", "translate(0, 495)")
-                                  .call(d3.axisBottom(overScale).tickValues([1, 50]))
-                                  .selectAll("text")
-                                  .style("font-weight", "bold")
+                              overSummaries.append("g")
+                                  .attr("class", "bowlAxis")
+                                  .classed("allBalls", true)
+                                  .attr("transform", "translate(50,0)")
+                                  .call(d3.axisLeft(secondInningScale).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]));
 
                               scope.$watchCollection('selectedPlayers', function(newPlayers, oldPlayers) {
                                   if (newPlayers.length == 0) {
