@@ -218,6 +218,55 @@ angular.module('myApp').directive('stumpMatchup', function() {
           ballX.domain([-1.5, 1.5]);
           ballY.domain([0, 3]);
 
+          var brushStart = function() {}
+
+          var reverseX = d3.scaleLinear().domain([0, svgDimension]).range([-1.5, 1.5]);
+          var reverseY = d3.scaleLinear().domain([svgDimension, 0]).range([0, 3])
+
+          var leftX = null;
+          var rightX = null;
+          var topY = null;
+          var bottomY = null;
+
+          var brushMove = function() {
+            var e = d3.event.selection;
+            if (e) {
+                leftX = reverseX(e[0][0]);
+                rightX = reverseX(e[1][0]);
+                topY = reverseY(e[1][1]);
+                bottomY = reverseY(e[0][1]);
+            }
+          }
+
+          var brushEnd = function() {
+              if (d3.event.selection) {
+                scope.$emit("geoFilter", {
+                    "leftX": leftX,
+                    "rightX": rightX,
+                    "topY": topY,
+                    "bottomY": bottomY,
+                    "xName": "ended_x",
+                    "yName": "ended_y"
+                })
+                console.log("Emitting");
+              } else {
+                scope.$emit("geoFilter", {
+                    "leftX": null,
+                    "rightX": rightX,
+                    "topY": topY,
+                    "bottomY": bottomY,
+                    "xName": "ended_x",
+                    "yName": "ended_y"
+                })
+              }
+          }
+
+          var brush = d3.brush()
+              .extent([[0, 0], [svgDimension, svgDimension]])
+              .on("start", brushStart)
+              .on("brush", brushMove)
+              .on("end", brushEnd)
+
           scope.$watch('game', function(newVal, oldVal) {
               if (newVal == null) {
                   vis.selectAll(".dot").style("display", "block");
@@ -225,6 +274,10 @@ angular.module('myApp').directive('stumpMatchup', function() {
                   vis.selectAll(".dot").style("display", function(d) {  return d.game == newVal.match_id ? "block" : "none" })
               }
           })
+
+          var brushArea = window.append("g")
+              .attr("class", "brush")
+              .call(brush);
 
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];
@@ -242,8 +295,6 @@ angular.module('myApp').directive('stumpMatchup', function() {
                   .on("mouseout", function() { ballMouseout(); });
 
               balls.merge(ballsEnter)
-                  .transition()
-                  .duration(1000)
                   .attr("cx", function(d) { return ballX(d["ended_x"]) })
                   .attr("cy", function(d) { return ballY(d["ended_y"]) })
                   .attr("r", idealRadius)
@@ -268,8 +319,6 @@ angular.module('myApp').directive('stumpMatchup', function() {
                   })
 
               balls.exit()
-                  .transition()
-                  .duration(1000)
                   .attr("cx", svgDimension)
                   .attr("cy", svgDimension)
                   .remove();

@@ -113,27 +113,28 @@
             <img ng-show="showCombo" align="left" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
           </div>
       </div>
-      <br>
-      <div align="center" class="row">
-          <h4>Games</h4>
-          <div class="btn-group">
-            <label class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
-          </div>
+
+  </div>
+  <br>
+  <div align="center" class="row">
+      <h4>Games</h4>
+      <div class="btn-group">
+        <label uib-tooltip="{{ game.team1_name + ' vs. ' + game.team2_name }}" class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
       </div>
-      <br>
-      <div class="row">
-        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h4>Pitch Map</h4>
-            <pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>
-        </div>
-        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h4>Stump Map</h4>
-            <stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>
-        </div>
-        <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h4>Ground Map</h4>
-            <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
-        </div>
-      </div>
+  </div>
+  <br>
+  <div class="row">
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h4>Pitch Map</h4>
+        <pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h4>Stump Map</h4>
+        <stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <h4>Ground Map</h4>
+        <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
+    </div>
   </div>
 </div>

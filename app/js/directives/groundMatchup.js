@@ -77,6 +77,55 @@ angular.module('myApp').directive('groundMatchup', function() {
           var ballX = d3.scaleLinear().range([bottomEnd + convertDimension(10), topEnd - convertDimension(10)]).domain([0, 360]);
           var ballY = d3.scaleLinear().range([topEnd - convertDimension(10), bottomEnd + convertDimension(10)]).domain([0, 360]);
 
+          var reverseX = d3.scaleLinear().range([0, 360]).domain([bottomEnd + convertDimension(10), topEnd - convertDimension(10)])
+          var reverseY = d3.scaleLinear().range([360, 0]).domain([bottomEnd + convertDimension(10), topEnd - convertDimension(10)])
+
+          var brushStart = function() {}
+
+          var leftX = null;
+          var rightX = null;
+          var topY = null;
+          var bottomY = null;
+
+          var brushMove = function() {
+            var e = d3.event.selection;
+            if (e) {
+                leftX = reverseX(e[0][0]);
+                rightX = reverseX(e[1][0]);
+                topY = reverseY(e[1][1]);
+                bottomY = reverseY(e[0][1]);
+            }
+          }
+
+          var brushEnd = function() {
+              if (d3.event.selection) {
+                scope.$emit("geoFilter", {
+                    "leftX": leftX,
+                    "rightX": rightX,
+                    "topY": topY,
+                    "bottomY": bottomY,
+                    "xName": "x",
+                    "yName": "y"
+                })
+                console.log("Emitting");
+              } else {
+                scope.$emit("geoFilter", {
+                    "leftX": null,
+                    "rightX": rightX,
+                    "topY": topY,
+                    "bottomY": bottomY,
+                    "xName": "x",
+                    "yName": "y"
+                })
+              }
+          }
+
+          var brush = d3.brush()
+              .extent([[0, 0], [svgDimension, svgDimension]])
+              .on("start", brushStart)
+              .on("brush", brushMove)
+              .on("end", brushEnd)
+
           var isWicketBall = function(d) {
               return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
           }
@@ -259,6 +308,10 @@ angular.module('myApp').directive('groundMatchup', function() {
                   }
               })
 
+          var brushArea = ground.append("g")
+              .attr("class", "brush")
+              .call(brush);
+
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];
               var validBalls = newBalls.filter(function(d) {
@@ -274,8 +327,6 @@ angular.module('myApp').directive('groundMatchup', function() {
                   .on("mouseout", function() { ballMouseout(); })
 
               balls.merge(ballsEnter)
-                  .transition()
-                  .duration(1000)
                   .attr("cx", function(d) { return ballX(d["x"]) })
                   .attr("cy", function(d) { return ballY(d["y"]) })
                   .attr("r", idealRadius)
@@ -300,8 +351,6 @@ angular.module('myApp').directive('groundMatchup', function() {
                   })
 
               balls.exit()
-                  .transition()
-                  .duration(1000)
                   .attr("cx", svgDimension / 2)
                   .attr("cy", svgDimension / 2)
                   .remove();

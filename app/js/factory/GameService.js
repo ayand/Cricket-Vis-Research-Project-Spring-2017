@@ -143,6 +143,26 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
         return deferred.promise;
     }
 
+    var getBallsByRegion = function(params) {
+        var deferred = $q.defer();
+        var url = 'https://serene-spire-90540.herokuapp.com/balls/?'
+            + 'leftX=' + params.leftX + "&"
+            + 'rightX=' + params.rightX + "&"
+            + 'topY=' + params.topY + "&"
+            + 'bottomY=' + params.bottomY + "&"
+            + 'xName=' + params.xName + "&"
+            + 'yName=' + params.yName;
+
+        console.log(url)
+        $http.get(url).success(function(data, status, headers, config) {
+            deferred.resolve(data);
+        }).error(function(data, status, headers, config) {
+            console.log("Error: " + JSON.stringify(data));
+            deferred.reject();
+        });
+        return deferred.promise;
+    }
+
     return {
         getGameInfo: getGameInfo,
         getPlayers: getPlayers,
@@ -156,6 +176,7 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
         getPlayersByTeam: getPlayersByTeam,
         getPlayerGraph: getPlayerGraph,
         getPartnerships: getPartnerships,
-        getBracketInfo: getBracketInfo
+        getBracketInfo: getBracketInfo,
+        getBallsByRegion: getBallsByRegion
     }
 }]);

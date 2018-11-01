@@ -75,6 +75,55 @@ angular.module('myApp').directive('pitchMatchup', function() {
               var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
               vis.call(tip);
 
+              var brushStart = function() {}
+
+              var reverseX = d3.scaleLinear().domain([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]).range([-1.525, 1.525]);
+              var reverseY = d3.scaleLinear().domain([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))]).range([-1, 20.12])
+
+              var leftX = null;
+              var rightX = null;
+              var topY = null;
+              var bottomY = null;
+
+              var brushMove = function() {
+                var e = d3.event.selection;
+                if (e) {
+                    leftX = reverseX(e[0][0]);
+                    rightX = reverseX(e[1][0]);
+                    topY = reverseY(e[0][1]);
+                    bottomY = reverseY(e[1][1]);
+                }
+              }
+
+              var brushEnd = function() {
+                  if (d3.event.selection) {
+                    scope.$emit("geoFilter", {
+                        "leftX": leftX,
+                        "rightX": rightX,
+                        "topY": topY,
+                        "bottomY": bottomY,
+                        "xName": "landing_x",
+                        "yName": "landing_y"
+                    })
+                    console.log("Emitting");
+                  } else {
+                    scope.$emit("geoFilter", {
+                        "leftX": null,
+                        "rightX": rightX,
+                        "topY": topY,
+                        "bottomY": bottomY,
+                        "xName": "landing_x",
+                        "yName": "landing_y"
+                    })
+                  }
+              }
+
+              var brush = d3.brush()
+                  .extent([[trueX, trueY], [(trueX + trueWidth), (trueY + trueHeight)]])
+                  .on("start", brushStart)
+                  .on("brush", brushMove)
+                  .on("end", brushEnd)
+
               var zoom = function() {
 
                   //console.log(d3.event.transform);
@@ -242,6 +291,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
 
           var ballX = d3.scaleLinear().range([((svgDimension / 2) - (width / 2)), ((svgDimension / 2) + (width / 2))]);
           var ballY = d3.scaleLinear().range([((svgDimension / 2) - (height / 2)) - (convertDimension(24)), ((svgDimension / 2) + (height / 2))])
+
           ballX.domain([-1.525, 1.525]);
           ballY.domain([-1, 20.12]);
 
@@ -253,11 +303,15 @@ angular.module('myApp').directive('pitchMatchup', function() {
               }
           })
 
+          var brushArea = ground.append("g")
+              .attr("class", "brush")
+              .call(brush);
+
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];
               var validBalls = newBalls.filter(function(d) { return d["landing_x"] != null && d["landing_y"] != null; });
 
-              var balls = ground.selectAll(".dot")
+              var balls = brushArea.selectAll(".dot")
                   .data(validBalls, function(d) { return d.delivery_number; });
 
               var ballsEnter = balls.enter().append("circle")
@@ -267,8 +321,6 @@ angular.module('myApp').directive('pitchMatchup', function() {
 
 
               balls.merge(ballsEnter)
-                  .transition()
-                  .duration(1000)
                   .attr("cx", function(d) { return ballX(d["landing_x"]) })
                   .attr("cy", function(d) {
                       var coordinate = d["landing_y"] < 0 ? -0.25 : d["landing_y"];
@@ -300,8 +352,6 @@ angular.module('myApp').directive('pitchMatchup', function() {
                   .on("mouseout", function() { ballMouseout(); });*/
 
               balls.exit()
-                .transition()
-                .duration(1000)
                 .attr("cx", svgDimension)
                 .attr("cy", svgDimension)
                 .remove();
