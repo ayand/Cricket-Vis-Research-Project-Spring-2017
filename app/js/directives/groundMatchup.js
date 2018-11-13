@@ -1,5 +1,5 @@
 angular.module('myApp').directive('groundMatchup', function() {
-    var svgDimension = 380;
+    var svgDimension = 300;
     var convertDimension = function(d) {
         return ((d * svgDimension) / 580);
     }
@@ -16,14 +16,14 @@ angular.module('myApp').directive('groundMatchup', function() {
     }
 
     var colorScales = [
-      ["#FFF7BC"],
-      ["#FFF7BC", "#D95F0E"],
-      ["#FFF7BC", "#FEC44F", "#D95F0E"],
-      ["#FFFFD4", "#FED98E", "#FE9929", "#CC4C02"],
-      ["#FFFFD4", "#FED98E", "#FE9929", "#D95F0E", "#993404"],
-      ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#D95F0E", "#993404"],
-      ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"],
-      ["#FFFFE5", "#FFF7BC", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"]
+      ["#ADCCFF"],
+      ["#ADCCFF", "#95BEF3"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4", "#2076B8"],
+      ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4", "#2076B8", "#0868AC"]
     ];
 
     return {
@@ -98,7 +98,8 @@ angular.module('myApp').directive('groundMatchup', function() {
           }
 
           var brushEnd = function() {
-              if (d3.event.selection) {
+              console.log("BRUSH END BEING CALLED")
+              if (d3.event.selection && leftX != null) {
                 scope.$emit("geoFilter", {
                     "leftX": leftX,
                     "rightX": rightX,
@@ -107,16 +108,11 @@ angular.module('myApp').directive('groundMatchup', function() {
                     "xName": "x",
                     "yName": "y"
                 })
-                console.log("Emitting");
+                console.log("EMITTING");
+                scope.$emit("clickedPlayer", null)
+                scope.$emit("currentBrush", 3)
               } else {
-                scope.$emit("geoFilter", {
-                    "leftX": null,
-                    "rightX": rightX,
-                    "topY": topY,
-                    "bottomY": bottomY,
-                    "xName": "x",
-                    "yName": "y"
-                })
+
               }
           }
 
@@ -131,32 +127,33 @@ angular.module('myApp').directive('groundMatchup', function() {
           }
 
           var tooltipText = function(d) {
-                var overNumber = Math.floor(d.ovr) + 1;
-                var ballNumber = (d.ovr * 10) % 10;
-                var batsman = d.batsman_name;
-                var bowler = d.bowler_name;
-                var runs = d.runs_w_extras;
-                var scoreType = d.extras_type;
-                var score = "";
-                if (scoreType == "Wd") {
-                    score = "Wides";
-                } else if (scoreType == "Lb") {
-                    score = "Leg byes";
-                } else if (scoreType == "Nb") {
-                    score = "No Ball";
-                } else {
-                    score = "Runs"
-                }
-                //var wicket = d.wicket;
-                //var line1 = "<strong>Over " + overNumber + ", Ball " + ballNumber + "</strong><br/>";
-                var game = scope.games.filter(function(g) { return g.match_id == d.game; })[0];
-                var line1 = "Date: " + game.date.split(" ")[0] + "<br/>";
-                var line2 = batsman + ": " + runs + " " + score + "<br/>"
-                var line3 = "Bowled by " + bowler + "<br/>";
-                var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
-                var tooltipText = (line1 + line2 + line3 + line4);
-                return tooltipText;
+            var overNumber = Math.ceil(d.ovr);
+            var ballNumber = (d.ovr * 10) % 10;
+            var batsman = d.batsman_name;
+            var bowler = d.bowler_name;
+            var runs = d.runs_w_extras;
+            var scoreType = d.extras_type;
+            var score = "";
+            if (scoreType == "Wd") {
+                score = "Wides";
+            } else if (scoreType == "Lb") {
+                score = "Leg byes";
+            } else if (scoreType == "Nb") {
+                score = "No Ball";
+            } else {
+                score = "Runs"
             }
+            //var wicket = d.wicket;
+            var game = scope.games.filter(function(g) { return g.match_id == d.game; })[0];
+            var line1 = "Date: " + game.date.split(" ")[0] + "<br/>";
+            var line2 = d.batting_team + " vs. " + d.bowling_team + "<br/>";
+            var line3 = "Over " + overNumber + ", Ball " + ballNumber + "<br/>";
+            var line4 = batsman + ": " + runs + " " + score + "<br/>";
+            var line5 = "Bowled by " + bowler + "<br/>";;
+            var line6 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
+            var tooltipText = (line1 + line2 + line3 + line4 + line5 + line6);
+            return tooltipText;
+          }
 
             var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return tooltipText(d); });
             vis.call(tip);
@@ -312,6 +309,27 @@ angular.module('myApp').directive('groundMatchup', function() {
               .attr("class", "brush")
               .call(brush);
 
+          scope.$on("clearBrushes", function(event, data) {
+              console.log(data);
+              brushArea.call(brush.move, null);
+
+              leftX = null;
+              rightX = null;
+              topY = null;
+              bottomY = null;
+              brushArea.call(brush);
+          })
+
+          scope.$on("clearBrush3", function(event, data) {
+            brushArea.call(brush.move, null);
+
+            leftX = null;
+            rightX = null;
+            topY = null;
+            bottomY = null;
+            brushArea.call(brush);
+          })
+
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];
               var validBalls = newBalls.filter(function(d) {
@@ -364,7 +382,7 @@ angular.module('myApp').directive('groundMatchup', function() {
                   zoneScores[zone] += d.runs_w_extras;
               })
 
-              var scoreSet = Array.from(new Set(zoneScores));
+              var scoreSet = Array.from(new Set(zoneScores.filter(d => d != 0)));
               scoreSet.sort(function(a, b) { return a - b; });
 
               var list = scoreSet.length - 1;
@@ -372,7 +390,10 @@ angular.module('myApp').directive('groundMatchup', function() {
               d3.selectAll(".zone-path")
                   .attr("fill", function(d, i) {
                       var score = zoneScores[i];
-                      return colorScales[list][scoreSet.indexOf(score)];
+                      if (score != 0) {
+                        return colorScales[list][scoreSet.indexOf(score)];
+                      }
+                      return "white"
                   })
                   .style("stroke", "#CCCCCC");
           })

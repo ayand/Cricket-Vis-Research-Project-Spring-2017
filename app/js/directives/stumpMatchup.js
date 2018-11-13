@@ -1,5 +1,5 @@
 angular.module('myApp').directive('stumpMatchup', function() {
-    var svgDimension = 380;
+    var svgDimension = 300;
 
     var convertDimension = function(d) {
         return ((d * svgDimension) / 580);
@@ -30,31 +30,33 @@ angular.module('myApp').directive('stumpMatchup', function() {
                 }
 
                 var tooltipText = function(d) {
-                      var overNumber = Math.floor(d.ovr) + 1;
-                      var ballNumber = (d.ovr * 10) % 10;
-                      var batsman = d.batsman_name;
-                      var bowler = d.bowler_name;
-                      var runs = d.runs_w_extras;
-                      var scoreType = d.extras_type;
-                      var score = "";
-                      if (scoreType == "Wd") {
-                          score = "Wides";
-                      } else if (scoreType == "Lb") {
-                          score = "Leg byes";
-                      } else if (scoreType == "Nb") {
-                          score = "No Ball";
-                      } else {
-                          score = "Runs"
-                      }
-                      //var wicket = d.wicket;
-                      var game = scope.games.filter(function(g) { return g.match_id == d.game; })[0];
-                      var line1 = "Date: " + game.date.split(" ")[0] + "<br/>";
-                      var line2 = batsman + ": " + runs + " " + score + "<br/>"
-                      var line3 = "Bowled by " + bowler + "<br/>";
-                      var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
-                      var tooltipText = (line1 + line2 + line3 + line4);
-                      return tooltipText;
+                  var overNumber = Math.ceil(d.ovr);
+                  var ballNumber = (d.ovr * 10) % 10;
+                  var batsman = d.batsman_name;
+                  var bowler = d.bowler_name;
+                  var runs = d.runs_w_extras;
+                  var scoreType = d.extras_type;
+                  var score = "";
+                  if (scoreType == "Wd") {
+                      score = "Wides";
+                  } else if (scoreType == "Lb") {
+                      score = "Leg byes";
+                  } else if (scoreType == "Nb") {
+                      score = "No Ball";
+                  } else {
+                      score = "Runs"
                   }
+                  //var wicket = d.wicket;
+                  var game = scope.games.filter(function(g) { return g.match_id == d.game; })[0];
+                  var line1 = "Date: " + game.date.split(" ")[0] + "<br/>";
+                  var line2 = d.batting_team + " vs. " + d.bowling_team + "<br/>";
+                  var line3 = "Over " + overNumber + ", Ball " + ballNumber + "<br/>";
+                  var line4 = batsman + ": " + runs + " " + score + "<br/>";
+                  var line5 = "Bowled by " + bowler + "<br/>";;
+                  var line6 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
+                  var tooltipText = (line1 + line2 + line3 + line4 + line5 + line6);
+                  return tooltipText;
+                }
 
                   var isWicketBall = function(d) {
                       return d.wicket == true && d.extras_type != "Nb" && d.extras_type != "Wd";
@@ -239,7 +241,8 @@ angular.module('myApp').directive('stumpMatchup', function() {
           }
 
           var brushEnd = function() {
-              if (d3.event.selection) {
+              console.log("BRUSH END BEING CALLED")
+              if (d3.event.selection  && leftX != null) {
                 scope.$emit("geoFilter", {
                     "leftX": leftX,
                     "rightX": rightX,
@@ -249,15 +252,10 @@ angular.module('myApp').directive('stumpMatchup', function() {
                     "yName": "ended_y"
                 })
                 console.log("Emitting");
+                scope.$emit("clickedPlayer", null)
+                scope.$emit("currentBrush", 2)
               } else {
-                scope.$emit("geoFilter", {
-                    "leftX": null,
-                    "rightX": rightX,
-                    "topY": topY,
-                    "bottomY": bottomY,
-                    "xName": "ended_x",
-                    "yName": "ended_y"
-                })
+
               }
           }
 
@@ -278,6 +276,27 @@ angular.module('myApp').directive('stumpMatchup', function() {
           var brushArea = window.append("g")
               .attr("class", "brush")
               .call(brush);
+
+          scope.$on("clearBrushes", function(event, data) {
+              console.log(data);
+              brushArea.call(brush.move, null);
+
+              leftX = null;
+              rightX = null;
+              topY = null;
+              bottomY = null;
+              brushArea.call(brush);
+          })
+
+          scope.$on("clearBrush2", function(event, data) {
+            brushArea.call(brush.move, null);
+
+            leftX = null;
+            rightX = null;
+            topY = null;
+            bottomY = null;
+            brushArea.call(brush);
+          })
 
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];

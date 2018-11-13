@@ -36,14 +36,14 @@ angular.module('myApp').directive('generateBallVis', function() {
   }
 
   var colorScales = [
-    ["#FFF7BC"],
-    ["#FFF7BC", "#D95F0E"],
-    ["#FFF7BC", "#FEC44F", "#D95F0E"],
-    ["#FFFFD4", "#FED98E", "#FE9929", "#CC4C02"],
-    ["#FFFFD4", "#FED98E", "#FE9929", "#D95F0E", "#993404"],
-    ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#D95F0E", "#993404"],
-    ["#FFFFD4", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"],
-    ["#FFFFE5", "#FFF7BC", "#FEE391", "#FEC44F", "#FE9929", "#EC7014", "#CC4C02", "#8C2D04"]
+    ["#ADCCFF"],
+    ["#ADCCFF", "#95BEF3"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4", "#2076B8"],
+    ["#ADCCFF", "#95BEF3", "#7EAFE7", "#66A1DB", "#4F93D0", "#3785C4", "#2076B8", "#0868AC"]
   ];
 
   var startingXs = [-1.525, 0];
@@ -552,10 +552,6 @@ angular.module('myApp').directive('generateBallVis', function() {
         }
 
         var isValidBall2 = function(d) {
-          /*var batsmanCondition = true;
-          if (scope.batsmen.length != 0) {
-              batsmanCondition = scope.batsmen.includes(d.batsman);
-          }*/
           var bowlerCondition = true;
           if (scope.bowlers.length != 0) {
               bowlerCondition = scope.bowlers.includes(d.bowler);
@@ -1312,7 +1308,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                   zoneScores[zone] += d.runs_w_extras;
               });
 
-              var scoreSet = Array.from(new Set(zoneScores));
+              var scoreSet = Array.from(new Set(zoneScores.filter(d => d != 0)));
               scoreSet.sort(function(a, b) {
                   return a - b;
               })
@@ -1322,7 +1318,10 @@ angular.module('myApp').directive('generateBallVis', function() {
               d3.selectAll(".zone-path")
                   .attr("fill", function(d, i) {
                       var score = zoneScores[i];
-                      return colorScales[list][scoreSet.indexOf(score)];
+                      if (score != 0) {
+                        return colorScales[list][scoreSet.indexOf(score)];
+                      }
+                      return "white"
                   })
                   .style("stroke", "#CCCCCC")
 
@@ -1397,7 +1396,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                 }
               })
 
-              var scoreSet = Array.from(new Set(zoneScores));
+              var scoreSet = Array.from(new Set(zoneScores.filter(d => d != 0)));
               scoreSet.sort(function(a, b) {
                   return a - b;
               })
@@ -1407,7 +1406,10 @@ angular.module('myApp').directive('generateBallVis', function() {
               d3.selectAll(".zone-path")
                   .attr("fill", function(d, i) {
                       var score = zoneScores[i];
-                      return colorScales[list][scoreSet.indexOf(score)];
+                      if (score != 0) {
+                        return colorScales[list][scoreSet.indexOf(score)];
+                      }
+                      return "white"
                   })
                   .style("stroke", "#CCCCCC")
                   .style("cursor", "pointer")

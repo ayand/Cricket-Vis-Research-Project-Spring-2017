@@ -1,5 +1,5 @@
 angular.module('myApp').directive('pitchMatchup', function() {
-  var svgDimension = 380;
+  var svgDimension = 300;
 
   var convertDimension = function(d) {
       return ((d * svgDimension) / 580);
@@ -38,7 +38,7 @@ angular.module('myApp').directive('pitchMatchup', function() {
                   .attr("height", svgDimension);
 
               var tooltipText = function(d) {
-                  var overNumber = Math.floor(d.ovr) + 1;
+                  var overNumber = Math.ceil(d.ovr);
                   var ballNumber = (d.ovr * 10) % 10;
                   var batsman = d.batsman_name;
                   var bowler = d.bowler_name;
@@ -57,10 +57,12 @@ angular.module('myApp').directive('pitchMatchup', function() {
                   //var wicket = d.wicket;
                   var game = scope.games.filter(function(g) { return g.match_id == d.game; })[0];
                   var line1 = "Date: " + game.date.split(" ")[0] + "<br/>";
-                  var line2 = batsman + ": " + runs + " " + score + "<br/>"
-                  var line3 = "Bowled by " + bowler + "<br/>";
-                  var line4 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
-                  var tooltipText = (line1 + line2 + line3 + line4);
+                  var line2 = d.batting_team + " vs. " + d.bowling_team + "<br/>";
+                  var line3 = "Over " + overNumber + ", Ball " + ballNumber + "<br/>";
+                  var line4 = batsman + ": " + runs + " " + score + "<br/>";
+                  var line5 = "Bowled by " + bowler + "<br/>";;
+                  var line6 = !isWicketBall(d) ? "" : ("Wicket- " + scope.dictionary[d.who_out.toString()]["name"] + " (" + d.wicket_method + ")");
+                  var tooltipText = (line1 + line2 + line3 + line4 + line5 + line6);
                   return tooltipText;
               }
 
@@ -96,7 +98,8 @@ angular.module('myApp').directive('pitchMatchup', function() {
               }
 
               var brushEnd = function() {
-                  if (d3.event.selection) {
+                  console.log("BRUSH END BEING CALLED")
+                  if (d3.event.selection && leftX != null) {
                     scope.$emit("geoFilter", {
                         "leftX": leftX,
                         "rightX": rightX,
@@ -106,16 +109,9 @@ angular.module('myApp').directive('pitchMatchup', function() {
                         "yName": "landing_y"
                     })
                     console.log("Emitting");
-                  } else {
-                    scope.$emit("geoFilter", {
-                        "leftX": null,
-                        "rightX": rightX,
-                        "topY": topY,
-                        "bottomY": bottomY,
-                        "xName": "landing_x",
-                        "yName": "landing_y"
-                    })
-                  }
+                    scope.$emit("clickedPlayer", null)
+                    scope.$emit("currentBrush", 1)
+                  } else {}
               }
 
               var brush = d3.brush()
@@ -307,6 +303,27 @@ angular.module('myApp').directive('pitchMatchup', function() {
               .attr("class", "brush")
               .call(brush);
 
+          scope.$on("clearBrushes", function(event, data) {
+              console.log(data);
+              brushArea.call(brush.move, null);
+
+              leftX = null;
+              rightX = null;
+              topY = null;
+              bottomY = null;
+              brushArea.call(brush);
+          })
+
+          scope.$on("clearBrush1", function(event, data) {
+            brushArea.call(brush.move, null);
+
+            leftX = null;
+            rightX = null;
+            topY = null;
+            bottomY = null;
+            brushArea.call(brush);
+          })
+
           scope.$watchCollection('balls', function(newBalls, oldBalls) {
               zoneColors = [];
               var validBalls = newBalls.filter(function(d) { return d["landing_x"] != null && d["landing_y"] != null; });
@@ -347,20 +364,11 @@ angular.module('myApp').directive('pitchMatchup', function() {
                       }
                   })
 
-              /*d3.selectAll(".dot")
-                  .on("mouseover", function(d) { ballMouseover(d); })
-                  .on("mouseout", function() { ballMouseout(); });*/
-
               balls.exit()
                 .attr("cx", svgDimension)
                 .attr("cy", svgDimension)
                 .remove();
 
-              /*d3.selectAll(".dot")
-                  .on("mouseover", function(d) { ballMouseover(d); })
-                  .on("mouseout", function() { ballMouseout(); });*/
-
-              //console.log("Done")
           })
 
 

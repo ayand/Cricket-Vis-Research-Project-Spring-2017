@@ -71,7 +71,12 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         $scope.geoFilter = false;
         $scope.geoParams = {};
 
+        var pitchLoc = null;
+        var stumpLoc = null;
+        var groundLoc = null;
+
         $scope.$on("clickedPlayer", function(event, data) {
+
             if (data != null) {
               //$scope.seePlayer = true;
               $scope.currentPlayer = data;
@@ -129,6 +134,11 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
             } else {
               $scope.previousPlayer = null;
+              /*$scope.displayedBalls = [];
+              $scope.showVizes = false;
+              $scope.showCombo = false;
+              $scope.showBatBalls = false;
+              $scope.showBowlBalls = false;*/
               //$scope.showVizes = false;
             }
         })
@@ -195,9 +205,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             })
         });
 
-        var pitchLoc = null;
-        var stumpLoc = null;
-        var groundLoc = null;
+
 
         var checkGeoValidity = function(d) {
             var pitchXCond = true;
@@ -206,6 +214,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             if (pitchLoc != null) {
                 pitchXCond = d.landing_x >= pitchLoc.leftX && d.landing_x <= pitchLoc.rightX;
                 pitchYCond = d.landing_y >= pitchLoc.topY && d.landing_y <= pitchLoc.bottomY;
+            } else {
+                //console.log("NULL PITCH LOC")
             }
 
             var stumpXCond = true;
@@ -214,6 +224,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             if (stumpLoc != null) {
                 stumpXCond = d.ended_x >= stumpLoc.leftX && d.ended_x <= stumpLoc.rightX;
                 stumpYCond = d.ended_y >= stumpLoc.topY && d.ended_y <= stumpLoc.bottomY;
+            } else {
+                //console.log("NULL STUMP LOC")
             }
 
             var groundXCond = true;
@@ -222,98 +234,66 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             if (groundLoc != null) {
                 groundXCond = d.x >= groundLoc.leftX && d.x <= groundLoc.rightX;
                 groundYCond = d.y >= groundLoc.topY && d.y <= groundLoc.bottomY;
+            } else {
+                //console.log("NULL GROUND LOC")
             }
             return pitchXCond && pitchYCond && stumpXCond && stumpYCond
                 && groundXCond && groundYCond;
         }
 
+        $scope.$on("clearBrushes2", function(event, data) {
+            $scope.$broadcast("clearBrushes", "clearBrushes")
+        })
+
         $scope.$on("geoFilter", function(event, data) {
-            console.log("RECEIVING");
-            if (data.leftX == null) {
-                $scope.geoFilter = false;
-                if (data.xName == "landing_x") {
-                    pitchLoc = null;
-                } else if (data.xName == "x") {
-                    groundLoc = null;
-                } else {
-                    stumpLoc = null;
-                }
-                if (pitchLoc == null && groundLoc == null && stumpLoc == null) {
-                    $scope.displayedBalls = [];
-                    $scope.representedGames = [];
-                    console.log("No more")
-                    $scope.$digest();
-                } else {
-                  var locs = [pitchLoc, groundLoc, stumpLoc].filter(d => d != null)
+          $scope.seePlayer = false;
+          $scope.geoFilter = true;
+          $scope.showCombo = false;
+          $scope.showBatBalls = false;
+          $scope.showBowlBalls = false;
+          $scope.geoParams = data;
+          if (data.xName == "landing_x") {
+              pitchLoc = data;
+          } else if (data.xName == "x") {
+              groundLoc = data;
+          } else {
+              stumpLoc = data;
+          }
+          GameService.getBallsByRegion(data).then(function(result) {
+              //console.log(result);
+              $scope.displayedBalls = result;
 
-
-                  GameService.getBallsByRegion(locs[0]).then(function(result) {
-                      console.log(result);
-                      $scope.displayedBalls = result.filter(d => checkGeoValidity(d));
-
-                      var relevantPlayers = $scope.displayedBalls.map(function(d) {
-                          return $scope.selectedSide == "Batting" ? d.batsman : d.bowler;
-                      })
-
-                      $scope.$broadcast("players", relevantPlayers);
-
-                      var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
-                      $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
-                      $scope.representedGames.sort(function(a, b) {
-                          if (a.date < b.date) {
-
-                              return -1;
-                          } else if (a.date > b.date) {
-                              return 1;
-                          }
-                          return 0;
-                      })
-                      console.log($scope.representedGames);
-                      //d3.selectAll(".selection").remove()
-                      $location.hash('vizes');
-                      $anchorScroll();
-                  })
-                }
-            } else {
-              $scope.geoFilter = true;
-              $scope.showCombo = false;
-              $scope.showBatBalls = false;
-              $scope.showBowlBalls = false;
-              $scope.geoParams = data;
-              if (data.xName == "landing_x") {
-                  pitchLoc = data;
-              } else if (data.xName == "x") {
-                  groundLoc = data;
-              } else {
-                  stumpLoc = data;
+              var relevantPlayers = {
+                  "batsmen": [],
+                  "bowlers": []
               }
-              GameService.getBallsByRegion(data).then(function(result) {
-                  console.log(result);
-                  $scope.displayedBalls = result.filter(d => checkGeoValidity(d));
 
-                  var relevantPlayers = $scope.displayedBalls.map(function(d) {
-                      return $scope.selectedSide == "Batting" ? d.batsman : d.bowler;
-                  })
-
-                  $scope.$broadcast("players", relevantPlayers);
-
-                  var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
-                  $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
-                  $scope.representedGames.sort(function(a, b) {
-                      if (a.date < b.date) {
-
-                          return -1;
-                      } else if (a.date > b.date) {
-                          return 1;
-                      }
-                      return 0;
-                  })
-                  console.log($scope.representedGames);
-                  //d3.selectAll(".selection").remove()
-                  $location.hash('vizes');
-                  $anchorScroll();
+              $scope.displayedBalls.forEach(function(d) {
+                  relevantPlayers["batsmen"].push(d.batsman);
+                  relevantPlayers["bowlers"].push(d.bowler);
               })
-            }
+
+              relevantPlayers["batsmen"] = Array.from(new Set(relevantPlayers["batsmen"]));
+              relevantPlayers["bowlers"] = Array.from(new Set(relevantPlayers["bowlers"]));
+
+              $scope.$broadcast("players", relevantPlayers);
+
+              var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
+              $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
+              $scope.representedGames.sort(function(a, b) {
+                  if (a.date < b.date) {
+
+                      return -1;
+                  } else if (a.date > b.date) {
+                      return 1;
+                  }
+                  return 0;
+              })
+              //console.log($scope.representedGames);
+              //d3.selectAll(".selection").remove()
+              $location.hash('vizes');
+              $anchorScroll();
+          })
         })
 
         $scope.$watch("selectedSide", function(newVal, oldVal) {
@@ -362,6 +342,15 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                       $anchorScroll();
                   })
               }
+            }
+        })
+
+        $scope.$on("currentBrush", function(event, data) {
+            console.log("CURRENT BRUSH: " + data)
+            for (var i = 1; i <= 3; i++) {
+                if (i != data) {
+                    $scope.$broadcast(("clearBrush" + i), "clearBrush")
+                }
             }
         })
 

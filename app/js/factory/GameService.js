@@ -153,7 +153,6 @@ angular.module('myApp').factory('GameService', ['$http', '$q', function($http, $
             + 'xName=' + params.xName + "&"
             + 'yName=' + params.yName;
 
-        console.log(url)
         $http.get(url).success(function(data, status, headers, config) {
             deferred.resolve(data);
         }).error(function(data, status, headers, config) {

@@ -81,7 +81,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               }
           }
 
-          $scope.view = "overSummaries";
+          $scope.view = "allBalls";
 
           $scope.changeView = function(view) {
               $scope.view = view;

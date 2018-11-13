@@ -31,11 +31,17 @@
               </div>
             </div>
         </div>
-        <div class="col-sm-9 col-md-9 col-lg-9">
+        <div align="center" class="col-sm-2 col-md-2 col-lg-2">
+            <br>
+            <br>
+            <br>
+            <br>
+            <vertical-color-legend></vertical-color-legend>
+        </div>
+        <div class="col-sm-7 col-md-7 col-lg-7">
             <!--<tournament-display data="teamData" team="teamName" selected-players="selected"></tournament-display>-->
             <div class="btn-group">
                 <button class="btn" ng-class="view == 'allBalls' ? 'btn-success' : 'btn-default'" ng-click="changeView('allBalls')">All Tournament Balls</button>
-                <button class="btn" ng-class="view == 'scoreProgression' ? 'btn-success' : 'btn-default'" ng-click="changeView('scoreProgression')">Score Progressions</button>
                 <button class="btn" ng-class="view == 'overSummaries' ? 'btn-success' : 'btn-default'" ng-click="changeView('overSummaries')">Over Summaries</button>
             </div>
             <br>

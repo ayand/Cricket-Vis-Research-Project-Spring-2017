@@ -183,6 +183,8 @@ angular.module('myApp').directive('playerGraph', function() {
             var temporaryPlayer = null;
             var temporaryOpponents = [];
 
+            var temporaryPlayers = null;
+
             var edges = svg.selectAll(".edge")
                 .data(scope.graph.edges)
                 .enter().append("line")
@@ -230,15 +232,6 @@ angular.module('myApp').directive('playerGraph', function() {
                             temporaryOpponents.push(opponentSide);
                         }
                       })
-                      /*d3.selectAll(".edge")
-                          .style("display", function(edge) {
-                              var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
-                              var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
-                              if (d.id == relevantSide) {
-                                  temporaryOpponents.push(opponentSide);
-                              }
-                              return (d.id == relevantSide) ? 'block' : 'none';
-                          })*/
 
                       d3.selectAll(".playerNode")
                           .style("display", function(node) {
@@ -263,7 +256,7 @@ angular.module('myApp').directive('playerGraph', function() {
                         var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
                         return selectedPlayer == relevantSide && d.id == opponentSide;
                       })[0];
-                      console.log("SHOWING")
+                      //console.log("SHOWING")
                       edgeTip.show(relevantEdge);
                     }
                 })
@@ -274,9 +267,24 @@ angular.module('myApp').directive('playerGraph', function() {
                           .style("fill", "black")
                       temporaryOpponents = [];
                       //d3.selectAll(".edge").style("display", "none")
-                      d3.selectAll(".playerName").style("display", "block");
-                      d3.selectAll(".playerNode").style("display", "block")
-                          .style("stroke", "none");
+                      if (temporaryPlayers != null) {
+                        d3.selectAll(".playerNode").style("display", function(d) {
+                            var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                            var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                            return (condition1 || condition2) ? "block": "none";
+                        }).style("stroke", "none")
+
+                        d3.selectAll(".playerName").style("display", function(d) {
+                            var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                            var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                            return (condition1 || condition2) ? "block": "none";
+                        })
+                      } else {
+                        d3.selectAll(".playerName").style("display", "block");
+                        d3.selectAll(".playerNode").style("display", "block")
+                            .style("stroke", "none");
+                      }
+
                     }
                     //nodeTip.hide();
                     scope.$emit("playerStats", null);
@@ -285,7 +293,9 @@ angular.module('myApp').directive('playerGraph', function() {
                     }
                 })
                 .on("click", function(d) {
-                    console.log("CLICK");
+                    d3.selectAll(".selection").remove();
+                    scope.$emit("clearBrushes2", "clearBrushes")
+                    temporaryPlayers = null;
                     d3.selectAll(".edge").style("display", "none")
                     if (selectedPlayer != d.id) {
                       if (selectedPlayer != null) {
@@ -305,17 +315,6 @@ angular.module('myApp').directive('playerGraph', function() {
                             relevantOpponents.push(opponentSide);
                         }
                       })
-
-
-                      /*d3.selectAll(".edge")
-                          .style("display", function(edge) {
-                              var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
-                              var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
-                              if (d.id == relevantSide) {
-                                  relevantOpponents.push(opponentSide);
-                              }
-                              return (d.id == relevantSide) ? 'block' : 'none';
-                          })*/
 
                       d3.selectAll(".playerNode")
                           .style("display", function(node) {
@@ -345,7 +344,7 @@ angular.module('myApp').directive('playerGraph', function() {
                     }
                 })
                 .on('contextmenu', function(d) {
-                    console.log(d);
+                    //console.log(d);
                     d3.event.preventDefault()
                     if (selectedPlayer != null) {
                       var relevantEdge = scope.graph.edges.filter(function(edge) {
@@ -386,55 +385,6 @@ angular.module('myApp').directive('playerGraph', function() {
                 .style("font-weight", "bold")
                 .style("font-size", "8px")
 
-            /*d3.select(".xAxis").selectAll("text")
-                .style("font-size", "10px")
-                .text(d => (d == "United Arab Emirates") ? "UAE" : d)
-                .style("cursor", "pointer")
-                .on("click", function(d) {
-                    console.log("CLICK")
-                    if (selectedPlayer != null && d != scope.playerDict[selectedPlayer.toString()]["team"]) {
-                      if (selectedTeam != d) {
-                          selectedTeam = d;
-                          d3.select(".xAxis").selectAll("text")
-                              .style("fill", function(team) { return team == d ? "orange" : "black" })
-
-                          playerNodes.style("display", function(node) {
-                              console.log("Changing display");
-                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id) && scope.playerDict[node.id.toString()]["team"] == d)) ? "block": "none"
-                          })
-
-                          playerNames.style("display", function(node) {
-                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id) && scope.playerDict[node.id.toString()]["team"] == d)) ? "block": "none"
-                          })
-
-                          edges.style("display", function(edge) {
-                                  var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
-                                  var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
-                                  return (selectedPlayer == relevantSide && scope.playerDict[opponentSide.toString()]["team"] == selectedTeam) ? 'block' : 'none';
-                              })
-                      } else {
-                          selectedTeam = null;
-                          d3.select(this)
-                              .style("fill", "black")
-
-                          playerNodes.style("display", function(node) {
-
-                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id))) ? "block": "none"
-                          })
-
-                          playerNames.style("display", function(node) {
-                              return (selectedPlayer == node.id || (relevantOpponents.includes(node.id))) ? "block": "none"
-                          })
-
-                          edges.style("display", function(edge) {
-                                  var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
-                                  var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
-                                  return (selectedPlayer == relevantSide) ? 'block' : 'none';
-                              })
-                      }
-                    }
-                })*/
-
             var keyDict = {}
             keyDict["Runs Scored"] = "runs_scored";
             keyDict["Balls Faced"] = "balls_faced";
@@ -444,7 +394,7 @@ angular.module('myApp').directive('playerGraph', function() {
             keyDict["Wickets Taken"] = "wickets_taken";
 
             scope.$watch('sortKey', function(newVal, oldVal) {
-                console.log(newVal);
+                //console.log(newVal);
                 if (newVal != oldVal) {
                   var tempDict = {};
 
@@ -486,7 +436,50 @@ angular.module('myApp').directive('playerGraph', function() {
                 }
             })
 
+            scope.$on('players', function(event, newVal) {
+                console.log(newVal)
+                if (newVal != null) {
+                  temporaryPlayers = newVal;
+                  d3.selectAll(".edge").style("display", "none")
+                  temporaryPlayer = null;
+                  temporaryOpponents = [];
+                  scope.$emit("clickedPlayer", null)
+                  d3.selectAll(".playerNode").style("stroke", "none");
+                  console.log(temporaryPlayers)
+                  d3.selectAll(".playerNode").style("display", function(d) {
+                      var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                      var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                      return (condition1 || condition2) ? "block": "none";
+                  })
+
+                  d3.selectAll(".playerName").style("display", function(d) {
+                      var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                      var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                      return (condition1 || condition2) ? "block": "none";
+                  })
+                } else {
+                  temporaryPlayers = null;
+                  d3.selectAll(".playerNode").style("display", "block")
+
+                  d3.selectAll(".playerName").style("display", "block")
+                }
+
+            })
+
             scope.$watch('side', function(newVal, oldVal) {
+              if (temporaryPlayers != null) {
+                d3.selectAll(".playerNode").style("display", function(d) {
+                    var condition1 = newVal == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                    var condition2 = newVal == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                    return (condition1 || condition2) ? "block": "none";
+                })
+
+                d3.selectAll(".playerName").style("display", function(d) {
+                    var condition1 = newVal == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                    var condition2 = newVal == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                    return (condition1 || condition2) ? "block": "none";
+                })
+              }
               if (selectedPlayer != null) {
                 selectedTeam = null;
                 d3.select(".xAxis").selectAll("text")
@@ -510,6 +503,8 @@ angular.module('myApp').directive('playerGraph', function() {
                         }
                         return (selectedPlayer == relevantSide) ? 'block' : 'none';
                     })*/
+
+
 
               playerNodes.style("display", function(d) {
                         return (d.id == selectedPlayer || relevantOpponents.includes(d.id)) ? "block" : "none";
