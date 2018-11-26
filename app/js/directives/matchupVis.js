@@ -668,15 +668,26 @@ angular.module('myApp').directive('matchupVis', function() {
 
         var pitchBrushArea = pitchGround.append("g")
             .attr("class", "pitchBrush")
-            .call(pitchBrush);
 
         var stumpBrushArea = stumpWindow.append("g")
             .attr("class", "stumpBrush")
-            .call(stumpBrush);
 
         var groundBrushArea = ground.append("g")
             .attr("class", "groundBrush")
-            .call(groundBrush);
+
+        pitchBrushArea.call(pitchBrush);
+        /*pitchBrushArea.call(pitchBrush.move, null);
+        pitchBrushArea.call(pitchBrush);*/
+
+        stumpBrushArea.call(stumpBrush);
+        /*stumpBrushArea.call(stumpBrush.move, null);
+        stumpBrushArea.call(stumpBrush);*/
+
+        groundBrushArea.call(groundBrush);
+        /*groundBrushArea.call(groundBrush.move, null);
+        groundBrushArea.call(groundBrush);*/
+
+
 
         scope.$on("clearBrushes", function(event, data) {
             console.log("Clearing");

@@ -17,6 +17,8 @@ angular.module('myApp').directive('playerGraph', function() {
 
     }
 
+    var noClick = false;
+
     return {
         restrict: 'EA',
         scope: {
@@ -300,7 +302,7 @@ angular.module('myApp').directive('playerGraph', function() {
                     }
                 })
                 .on("click", function(d) {
-                    d3.selectAll(".selection").remove();
+                    //d3.selectAll(".selection").remove();
                     scope.$emit("clearBrushes2", "clearBrushes")
                     temporaryPlayers = null;
                     d3.selectAll(".edge").style("display", "none")
