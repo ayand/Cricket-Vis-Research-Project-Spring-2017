@@ -336,7 +336,6 @@ angular.module('myApp').directive('pitchMatchup', function() {
                   .on("mouseover", function(d) { ballMouseover(d); })
                   .on("mouseout", function() { ballMouseout(); });
 
-
               balls.merge(ballsEnter)
                   .attr("cx", function(d) { return ballX(d["landing_x"]) })
                   .attr("cy", function(d) {

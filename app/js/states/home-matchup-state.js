@@ -263,21 +263,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               //console.log(result);
               $scope.displayedBalls = result;
 
-              var relevantPlayers = {
-                  "batsmen": [],
-                  "bowlers": []
-              }
-
-              $scope.displayedBalls.forEach(function(d) {
-                  relevantPlayers["batsmen"].push(d.batsman);
-                  relevantPlayers["bowlers"].push(d.bowler);
-              })
-
-              relevantPlayers["batsmen"] = Array.from(new Set(relevantPlayers["batsmen"]));
-              relevantPlayers["bowlers"] = Array.from(new Set(relevantPlayers["bowlers"]));
-
-              $scope.$broadcast("players", relevantPlayers);
-
               var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
               $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
               $scope.representedGames.sort(function(a, b) {
@@ -294,6 +279,23 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
               $location.hash('vizes');
               $anchorScroll();
           })
+        })
+
+        $scope.$on("finalBalls", function(event, data) {
+          var relevantPlayers = {
+              "batsmen": [],
+              "bowlers": []
+          }
+
+          data.forEach(function(d) {
+              relevantPlayers["batsmen"].push(d.batsman);
+              relevantPlayers["bowlers"].push(d.bowler);
+          })
+
+          relevantPlayers["batsmen"] = Array.from(new Set(relevantPlayers["batsmen"]));
+          relevantPlayers["bowlers"] = Array.from(new Set(relevantPlayers["bowlers"]));
+
+          $scope.$broadcast("players", relevantPlayers);
         })
 
         $scope.$watch("selectedSide", function(newVal, oldVal) {

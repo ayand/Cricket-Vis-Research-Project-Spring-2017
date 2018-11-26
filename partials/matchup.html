@@ -1,6 +1,40 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
   <div class="row">
+      <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+        <div style="width:500px">
+          <div id="vizes" class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h5>Analyzed Side</h5>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h5>Sorting Order</h5>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <div class="btn-group">
+                    <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
+                </div>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <select ng-model="sortKey" class="form-control">
+                      <option ng-repeat="key in sortKeys" value="{{ key }}">{{ key }}</option>
+                  </select>
+              </div>
+          </div>
+        </div>
+
+        <br>
+        <br>
+        <player-graph
+            graph="playerGraph"
+            image-dict="images"
+            player-dict="playerDict"
+            side="selectedSide"
+            sort-key="sortKey"></player-graph>
+        <br>
+      </div>
       <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
         <div ng-hide="seePlayer">
           <br>
@@ -65,40 +99,6 @@
             <h5 ng-show="previousPlayer != null">Right click on another player for interactions</h5>
         </div>
       </div>
-      <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-        <div style="width:500px">
-          <div id="vizes" class="row">
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                  <h5>Analyzed Side</h5>
-              </div>
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                  <h5>Sorting Order</h5>
-              </div>
-          </div>
-          <div class="row">
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                <div class="btn-group">
-                    <button ng-repeat="side in sides" class="btn btn-small" ng-click="selectSide(side)" ng-class="side == selectedSide ? 'btn-success' : 'btn-default'">{{ side }}</button>
-                </div>
-              </div>
-              <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                  <select ng-model="sortKey" class="form-control">
-                      <option ng-repeat="key in sortKeys" value="{{ key }}">{{ key }}</option>
-                  </select>
-              </div>
-          </div>
-        </div>
-
-        <br>
-        <br>
-        <player-graph
-            graph="playerGraph"
-            image-dict="images"
-            player-dict="playerDict"
-            side="selectedSide"
-            sort-key="sortKey"></player-graph>
-        <br>
-      </div>
   </div>
   <div ng-show="showVizes">
       <div class="row">
@@ -125,20 +125,25 @@
   </div>
   <br>
   <div class="row">
-    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-        <vertical-color-legend></vertical-color-legend>
-    </div>
+    <matchup-vis balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame">
+    </matchup-vis>
     <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
         <h4>Pitch Map</h4>
-        <pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>
+        <div id="pitchMap"></div>
+        <!--<pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>-->
     </div>
     <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
         <h4>Stump Map</h4>
-        <stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>
+        <div id="stumpMap"></div>
+        <!--<stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>-->
     </div>
     <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
         <h4>Ground Map</h4>
-        <ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>
+        <div id="groundMap"></div>
+        <!--<ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>-->
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <vertical-color-legend></vertical-color-legend>
     </div>
   </div>
 </div>

@@ -251,13 +251,20 @@ angular.module('myApp').directive('playerGraph', function() {
                     //nodeTip.show(d);
                     scope.$emit("playerStats", d);
                     if (selectedPlayer != null && selectedPlayer != d.id) {
-                      var relevantEdge = scope.graph.edges.filter(function(edge) {
+                      var relevantEdges = scope.graph.edges.filter(function(edge) {
                         var relevantSide = (scope.side == "Batting") ? edge.batsman : edge.bowler;
                         var opponentSide = (scope.side == "Batting") ? edge.bowler : edge.batsman;
                         return selectedPlayer == relevantSide && d.id == opponentSide;
-                      })[0];
+                      });
+                      var relevantEdge = null;
+                      if (relevantEdges.length != 0) {
+                          relevantEdge = relevantEdges[0];
+                      }
                       //console.log("SHOWING")
-                      edgeTip.show(relevantEdge);
+                      console.log(relevantEdge);
+                      if (relevantEdge != null) {
+                          edgeTip.show(relevantEdge);
+                      }
                     }
                 })
                 .on("mouseout", function(d) {
