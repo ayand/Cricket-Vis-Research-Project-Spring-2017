@@ -507,6 +507,30 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             $scope.$digest()
         })
 
+        $scope.$watchCollection("currentBatsmen", function(newBatsmen, oldBatsmen) {
+            if (newBatsmen == null || newBatsmen.length == 0) {
+                $scope.$broadcast("batsmanFilter", false)
+            } else {
+                $scope.$broadcast("batsmanFilter", true)
+            }
+        })
+
+        $scope.$watchCollection("currentBowlers", function(newBowlers, oldBowlers) {
+            if (newBowlers == null || newBowlers.length == 0) {
+                $scope.$broadcast("bowlerFilter", false)
+            } else {
+                $scope.$broadcast("bowlerFilter", true)
+            }
+        })
+
+        $scope.$on("battingFilter", function(event, data) {
+            $scope.currentBatsmen = [];
+        })
+
+        $scope.$on("bowlingFilter", function(event, data) {
+            $scope.currentBowlers = [];
+        })
+
     }
   })
 })

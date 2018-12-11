@@ -1,5 +1,5 @@
 angular.module('myApp').directive('partnershipMatrix', function() {
-    var height = 315;
+    var height = 280;
 
     var convertDimension = function(d) {
         return ((d * height) / 350);

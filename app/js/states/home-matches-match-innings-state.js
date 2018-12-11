@@ -9,8 +9,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
     url: '/innings/:number',
     templateUrl: 'partials/alternate-innings-4.html',
     controller: function($scope, players, $stateParams, images, $uibModal,
-        $anchorScroll, $location) {
-
+        $anchorScroll, $location, $timeout) {
+        $scope.glued = true;
         $scope.imageDict = images;
         $scope.playerViews = ["Player Stats", "Player Graph"]
         $scope.currentPlayerView = null;
@@ -22,8 +22,56 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         $scope.bowlerFilter = false;
         $scope.handFilter = false;
         $scope.zoneFilter = false;
+        $scope.showOverFilter = false;
+        $scope.showBatsmanFilter = false;
+        $scope.showBowlerFilter = false;
+        $scope.showPartnershipFilter = false;
+        $scope.showPitchFilter = false;
+        $scope.showStumpFilter = false;
+        $scope.showGroundFilter = false;
+        $scope.showBatFilter = false;
+        $scope.showZoneFilter = false;
 
-        $scope.mapViews = ["Balls", "Heatmap"];
+        $scope.$on("batsmanFilter", function(event, data) {
+            $scope.showBatsmanFilter = data;
+        })
+
+        $scope.$on("bowlerFilter", function(event, data) {
+            $scope.showBowlerFilter = data;
+        })
+
+        $scope.$on("partnerFilter", function(event, data) {
+            $scope.showPartnershipFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.$on("stumpFilter", function(event, data) {
+            $scope.showStumpFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.$on("pitchFilter", function(event, data) {
+            $scope.showPitchFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.$on("groundFilter", function(event, data) {
+            $scope.showGroundFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.$on("batFilter", function(event, data) {
+            console.log("receiving BAT signal")
+            $scope.showBatFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.$on("zoneFilter", function(event, data) {
+            $scope.showZoneFilter = data;
+            $scope.$digest();
+        })
+
+        $scope.mapViews = ["Balls", "Heatmap - Balls", "Heatmap - Runs"];
 
         $scope.mapView = "Balls";
 
@@ -262,11 +310,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             $scope.$broadcast("handFilter", "off");
         }
 
-        $scope.removeZoneFilter = function() {
-            $scope.zoneFilter = false;
-            d3.select("#zoneFilter").style("visibility", "hidden")
-            $scope.$broadcast("zoneFilter", "off");
-        }
 
         $scope.selectedBatsmanKey = "Batting Order";
         $scope.selectedBowlerKey = "Bowling Order";
@@ -276,7 +319,14 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         };
 
         $scope.$watch('slider.minimumOver', function(newMin, oldMin, scope) {
+          $scope.showPartnershipFilter = false;
+          $scope.showBatFilter = false;
           var newMax = $scope.slider.maximumOver;
+          if (newMin == 1 && newMax == 50) {
+              $scope.showOverFilter = false;
+          } else {
+              $scope.showOverFilter = true;
+          }
 
           var activeBalls = $scope.inningBalls.filter(function(d) {
               var over = Math.floor(d.ovr) + 1;
@@ -369,8 +419,14 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         })
 
         $scope.$watch('slider.maximumOver', function(newMax, oldMax, scope) {
-
+          $scope.showPartnershipFilter = false;
+          $scope.showBatFilter = false;
           var newMin = $scope.slider.minimumOver;
+          if (newMin == 1 && newMax == 50) {
+              $scope.showOverFilter = false;
+          } else {
+              $scope.showOverFilter = true;
+          }
           var activeBalls = $scope.inningBalls.filter(function(d) {
               var over = Math.floor(d.ovr) + 1;
               return over >= newMin && over <= newMax;
@@ -494,6 +550,59 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
             $scope.$digest();
         })
 
+        $scope.removeOverFilter = function() {
+            console.log("Removed over filter")
+            $scope.slider.minimumOver = 1;
+            $scope.slider.maximumOver = 50;
+            $scope.showOverFilter = false;
+            console.log("Removed over filter")
+        }
+
+        $scope.removeBatsmanFilter = function() {
+            $scope.showBatsmanFilter = false;
+            $scope.$emit("battingFilter", true);
+        }
+
+        $scope.removeBowlerFilter = function() {
+            $scope.showBowlerFilter = false;
+            $scope.$emit("bowlingFilter", true);
+        }
+
+        $scope.removePartnershipFilter = function() {
+            $scope.showPartnershipFilter = false;
+            $scope.$broadcast("partnerFilter2", true);
+            //$scope.$digest()
+        }
+
+        $scope.removePitchFilter = function() {
+            $scope.showPitchFilter = false;
+            $scope.$broadcast("pitchFilter3", true);
+        }
+
+        $scope.removeStumpFilter = function() {
+            $scope.showStumpFilter = false;
+            $scope.$broadcast("stumpFilter3", true);
+        }
+
+        $scope.removeGroundFilter = function() {
+            $scope.showGroundFilter = false;
+            $scope.$broadcast("groundFilter3", true);
+        }
+
+        $scope.removeBatFilter = function() {
+            $scope.showBatFilter = false;
+            $scope.$broadcast("batFilter3", true);
+        }
+
+        $scope.removeZoneFilter = function() {
+            $scope.showZoneFilter = false;
+            $scope.$broadcast("zoneFilter3", true);
+        }
+        $timeout(function() {
+            var scroller = document.getElementById("maps");
+            scroller.scrollTop = scroller.scrollHeight;
+            console.log(scroller.scrollTop)
+        }, 0, false);
       }
   });
 })

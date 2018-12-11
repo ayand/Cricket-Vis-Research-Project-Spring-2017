@@ -7,5 +7,6 @@ angular.module('myApp', [
   'myApp.version',
   'rzModule',
   'angularMultiSlider',
-  'ngAnimate'
+  'ngAnimate',
+  'luegg.directives'
 ]);

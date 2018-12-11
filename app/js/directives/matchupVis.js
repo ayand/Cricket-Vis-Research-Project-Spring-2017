@@ -552,6 +552,10 @@ angular.module('myApp').directive('matchupVis', function() {
         var groundTopY = null;
         var groundBottomY = null;
 
+        var activeBrushes = function() {
+            return pitchLeftX != null || stumpLeftX != null || groundLeftX != null;
+        }
+
         var pitchBrushMove = function() {
           var e = d3.event.selection;
           if (e) {
@@ -574,13 +578,14 @@ angular.module('myApp').directive('matchupVis', function() {
                   "yName": "landing_y"
               })
               console.log("Emitting");
-              scope.$emit("clickedPlayer", null)
+              //scope.$emit("clickedPlayer", null)
               scope.$emit("currentBrush", 1)
             } else {
               pitchLeftX = null;
               pitchRightX = null;
               pitchTopY = null;
               pitchBottomY = null;
+              scope.$emit("noBrushes", "noBrushes")
             }
         }
 
@@ -606,13 +611,14 @@ angular.module('myApp').directive('matchupVis', function() {
                   "yName": "ended_y"
               })
               console.log("Emitting");
-              scope.$emit("clickedPlayer", null)
+              //scope.$emit("clickedPlayer", null)
               scope.$emit("currentBrush", 2)
             } else {
               stumpLeftX = null;
               stumpRightX = null;
               stumpTopY = null;
               stumpBottomY = null;
+              scope.$emit("brushEnded", "brushEnded")
             }
         }
 
@@ -638,13 +644,14 @@ angular.module('myApp').directive('matchupVis', function() {
                   "yName": "y"
               })
               console.log("EMITTING");
-              scope.$emit("clickedPlayer", null)
+              //scope.$emit("clickedPlayer", null)
               scope.$emit("currentBrush", 3)
             } else {
               groundLeftX = null;
               groundRightX = null;
               groundTopY = null;
               groundBottomY = null;
+              scope.$emit("brushEnded", "brushEnded")
             }
         }
 

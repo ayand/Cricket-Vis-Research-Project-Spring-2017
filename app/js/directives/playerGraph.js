@@ -367,6 +367,7 @@ angular.module('myApp').directive('playerGraph', function() {
                               return edge == relevantEdge ? "block" : "none";
                           })
                       scope.$emit("playerCombo", relevantEdge);
+                      scope.$emit("clearBrushes2", "clearBrush");
                       d3.selectAll(".playerNode")
                           .style("stroke", function(node) {
                               if (node.id == selectedPlayer) {
@@ -449,23 +450,50 @@ angular.module('myApp').directive('playerGraph', function() {
                 console.log(newVal)
                 if (newVal != null) {
                   temporaryPlayers = newVal;
+                  console.log(temporaryPlayers)
                   d3.selectAll(".edge").style("display", "none")
                   temporaryPlayer = null;
                   temporaryOpponents = [];
-                  scope.$emit("clickedPlayer", null)
-                  d3.selectAll(".playerNode").style("stroke", "none");
+                  //scope.$emit("clickedPlayer", null)
+                  //d3.selectAll(".playerNode").style("stroke", "none");
                   console.log(temporaryPlayers)
                   d3.selectAll(".playerNode").style("display", function(d) {
-                      var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
-                      var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
-                      return (condition1 || condition2) ? "block": "none";
+                      if (selectedPlayer == null) {
+                          var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                          var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                          return (condition1 || condition2) ? "block": "none";
+                      } else {
+                          /*if (scope.side == "Batting") {
+                              return selectedPlayer == d.id || temporaryPlayers["bowlers"].includes(d.id);
+                          } else {
+                              return selectedPlayer == d.id || temporaryPlayers["batsmen"].includes(d.id);
+                          }*/
+                          console.log("Alternating condition")
+                          return (temporaryPlayers["batsmen"].includes(d.id) || temporaryPlayers["bowlers"].includes(d.id)) ? "block" : "none"
+                      }
                   })
 
                   d3.selectAll(".playerName").style("display", function(d) {
-                      var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
-                      var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
-                      return (condition1 || condition2) ? "block": "none";
+                    if (selectedPlayer == null) {
+                        var condition1 = scope.side == "Batting" && temporaryPlayers["batsmen"].includes(d.id);
+                        var condition2 = scope.side == "Bowling" && temporaryPlayers["bowlers"].includes(d.id);
+                        return (condition1 || condition2) ? "block": "none";
+                    } else {
+                        /*if (scope.side == "Batting") {
+                            return selectedPlayer == d.id || temporaryPlayers["bowlers"].includes(d.id);
+                        } else {
+                            return selectedPlayer == d.id || temporaryPlayers["batsmen"].includes(d.id);
+                        }*/
+                        console.log("Alternating condition")
+                        return (temporaryPlayers["batsmen"].includes(d.id) || temporaryPlayers["bowlers"].includes(d.id)) ? "block" : "none"
+                    }
                   })
+
+                  if (selectedPlayer != null) {
+                    playerNodes.style("stroke", function(d) {
+                              return d.id == selectedPlayer ? "orange": "none"
+                          })
+                  }
                 } else {
                   temporaryPlayers = null;
                   d3.selectAll(".playerNode").style("display", "block")

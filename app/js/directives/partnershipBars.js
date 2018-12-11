@@ -1,12 +1,12 @@
 angular.module('myApp').directive('partnershipBars', function() {
-  var height = 315;
+  var height = 280;
 
   var convertDimension = function(d) {
       return ((d * height) / 350);
   }
 
   var width = convertDimension(560);
-  var margin = convertDimension(10);
+  var margin = convertDimension(7);
 
   return {
       restrict: 'E',
@@ -64,20 +64,6 @@ angular.module('myApp').directive('partnershipBars', function() {
             .attr("width", width)
             .attr("height", height)
 
-        canvas.append("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("fill", "white")
-            .style("stroke", "black")
-
-        /*canvas.append("rect")
-            .attr("x", margin)
-            .attr("y", margin)
-            .attr("width", width - (2 * margin))
-            .attr("height", height - (2 * margin))
-            .attr("fill", "white")
-            .style("stroke", "black")*/
-
         var rowHeight = (height - (2 * margin)) / scope.partnerships.length
         var barHeight = rowHeight / 2;
 
@@ -94,7 +80,6 @@ angular.module('myApp').directive('partnershipBars', function() {
             .append("g")
             .attr("class", "partnershipBar")
             .attr("transform", (d, i) => "translate(0," + (margin + (i * rowHeight)) + ")")
-            .on("mouseover", console.log)
             .style("cursor", "pointer")
 
         partnerships.append("text")

@@ -133,13 +133,8 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                   })
               }
             } else {
+              console.log("UNCLICKING PLAYER")
               $scope.previousPlayer = null;
-              /*$scope.displayedBalls = [];
-              $scope.showVizes = false;
-              $scope.showCombo = false;
-              $scope.showBatBalls = false;
-              $scope.showBowlBalls = false;*/
-              //$scope.showVizes = false;
             }
         })
 
@@ -246,7 +241,7 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         })
 
         $scope.$on("geoFilter", function(event, data) {
-          $scope.seePlayer = false;
+          //$scope.seePlayer = false;
           $scope.geoFilter = true;
           $scope.showCombo = false;
           $scope.showBatBalls = false;
@@ -261,7 +256,20 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
           }
           GameService.getBallsByRegion(data).then(function(result) {
               //console.log(result);
+              console.log("RESULT: " + result.length)
               $scope.displayedBalls = result;
+              if ($scope.currentPlayer != null) {
+                  console.log("A SELECTED PLAYER")
+                  if ($scope.selectedSide == "Batting") {
+                      $scope.displayedBalls = result.filter(d => (d.batsman == $scope.currentPlayer.id))
+                  } else {
+                      $scope.displayedBalls = result.filter(d => (d.bowler == $scope.currentPlayer.id))
+                  }
+              } else {
+                  $scope.displayedBalls = result;
+              }
+              console.log("DISPLAYED BALLS: " + $scope.displayedBalls.length)
+
 
               var displayedGames = Array.from(new Set($scope.displayedBalls.map(function(d) { return d.game; })));
               $scope.representedGames = games.filter(function(d) { return displayedGames.includes(d.match_id) });
@@ -299,7 +307,10 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
         })
 
         $scope.$watch("selectedSide", function(newVal, oldVal) {
+            console.log($scope.displayedPlayer);
+            console.log($scope.previousPlayer);
             if ($scope.displayedPlayer != null && $scope.previousPlayer != null && $scope.previousPlayer == $scope.displayedPlayer) {
+              console.log("Getting other side's balls")
               if (newVal == "Batting") {
 
                   GameService.getBallsByBatsman($scope.displayedPlayer.id).then(function(result) {
@@ -344,15 +355,6 @@ angular.module('myApp').config(function($stateProvider, $urlRouterProvider) {
                       $anchorScroll();
                   })
               }
-            }
-        })
-
-        $scope.$on("currentBrush", function(event, data) {
-            console.log("CURRENT BRUSH: " + data)
-            for (var i = 1; i <= 3; i++) {
-                if (i != data) {
-                    $scope.$broadcast(("clearBrush" + i), "clearBrush")
-                }
             }
         })
 

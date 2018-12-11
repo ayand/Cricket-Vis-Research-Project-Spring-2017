@@ -1,55 +1,56 @@
 <div class="row">
-  <div align="center" class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-    <!-- <h3>Color Key</h3> -->
-    <color-legend min1="rangeSlider1.minimumOver" max1="rangeSlider1.maximumOver" min2="rangeSlider2.minimumOver" max2="rangeSlider2.maximumOver" batsmen="currentBatsmen" bowlers="currentBowlers" inning="inning"></color-legend>
-  </div>
-  <div align="center" class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
       <h6>Views</h6>
-      <button ng-repeat="view in mapViews" ng-click="changeView(view)" class="btn" ng-class="view == mapView ? 'btn-success' : 'btn-default'">{{ view }}</button>
+      <div class="btn-group">
+        <button ng-repeat="view in mapViews" ng-click="changeView(view)" class="btn" ng-class="view == mapView ? 'btn-success' : 'btn-default'">{{ view }}</button>
+      </div>
+  </div>
+  <div align="center" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+      <h6>Filters</h6>
+      <p ng-hide="showOverFilter || showBatsmanFilter || showBowlerFilter || showPartnershipFilter || showPitchFilter || showGroundFilter || showStumpFilter || showBatFilter || showZoneFilter">No Active Filters</p>
+      <label ng-show="showOverFilter" class="btn btn-primary" ng-click="removeOverFilter()">
+        Overs
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showBatsmanFilter" class="btn btn-primary" ng-click="removeBatsmanFilter()">
+        Batsmen
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showBowlerFilter" class="btn btn-primary" ng-click="removeBowlerFilter()">
+        Bowlers
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showPartnershipFilter" class="btn btn-primary" ng-click="removePartnershipFilter()">
+        Partnerships
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showPitchFilter" class="btn btn-primary" ng-click="removePitchFilter()">
+        Pitch
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showStumpFilter" class="btn btn-primary" ng-click="removeStumpFilter()">
+        Stump
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showGroundFilter" class="btn btn-primary" ng-click="removeGroundFilter()">
+        Ground
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showBatFilter" class="btn btn-primary" ng-click="removeBatFilter()">
+        Batting Hand
+        <span aria-hidden="true">&times;</span>
+      </label>
+      <label ng-show="showZoneFilter" class="btn btn-primary" ng-click="removeZoneFilter()">
+        Zone
+        <span aria-hidden="true">&times;</span>
+      </label>
   </div>
 </div>
 <div>
   <br>
-  <div align="center">
-    <!--<label type="button" class="btn btn-primary" aria-label="Close" ng-show="overFilter" ng-click="removeOverFilter()">
-        Overs
-        <span aria-hidden="true">&times;</span>
-    </label>
-    <label type="button" class="btn btn-primary" aria-label="Close" ng-show="batsmanFilter" ng-click="removeBatsmanFilter()">
-        Batsmen
-        <span aria-hidden="true">&times;</span>
-    </label>
-    <label type="button" class="btn btn-primary" aria-label="Close" ng-show="bowlerFilter" ng-click="removeBowlerFilter()">
-        Bowlers
-        <span aria-hidden="true">&times;</span>
-    </label>
-    <label type="button" class="btn btn-primary" aria-label="Close" ng-show="handFilter" ng-click="removeHandFilter()">
-        Bat Hand
-        <span aria-hidden="true">&times;</span>
-    </label>
-    <label type="button" id="zoneFilter" class="btn btn-primary" aria-label="Close" style="visibility: hidden" ng-click="removeZoneFilter()">
-        Zones
-        <span aria-hidden="true">&times;</span>
-    </label>-->
-  </div>
   <br>
   <br>
 </div>
-<!--<div id="top" class="row">
-  <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-  </div>
-  <div align="center" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-    <h3 align="center">{{ "Inning " + inning}}</h3>
-  </div>
-  <div align="right" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-    <button
-        class="btn btn-small"
-        ng-click="changeCollapse('Player Stats')"
-        ng-class="currentPlayerView == view ? 'btn-default' : 'btn-success'">
-          Player Stats
-    </button>
-  </div>
-</div>-->
 <generate-ball-vis
     balls="inningBalls"
     batsmen="currentBatsmen"
@@ -58,18 +59,24 @@
     max="slider.maximumOver"
     dictionary="$parent.playerDict"
     map-view="mapView"></generate-ball-vis>
-<div class="row">
+<div id="maps" class="row" scroll-glue="glued">
   <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
       <h4>Pitch Map</h4>
-      <div id="pitch"></div>
+      <div id="pitch">
+          <svg width="270" height="270"></svg>
+      </div>
   </div>
   <div align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
       <h4>Stump Map</h4>
-      <div id="stumps"></div>
+      <div id="stumps">
+          <svg width="270" height="270"></svg>
+      </div>
   </div>
   <div style="border-left: 1px solid #bcbcbc; border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
       <h4>Ground Map</h4>
-      <div id="ground"></div>
+      <div id="ground">
+          <svg width="270" height="270"></svg>
+      </div>
   </div>
   <div align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
       <h4>Player Graph</h4>
@@ -83,3 +90,4 @@
       </bipartite-graph>
   </div>
 </div>
+<br>

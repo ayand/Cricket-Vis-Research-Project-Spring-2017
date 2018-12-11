@@ -1,5 +1,51 @@
 <div align="center">
   <h3>Batsman-Bowler Matchup</h3>
+  <div ng-show="showVizes">
+      <div class="row">
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <img ng-show="showCombo" align="right" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="50" alt="batsmanImage"/><br>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <h4 ng-show="showCombo">{{ playerDict[selectedBowler.toString()].name + " bowled " + displayedBalls.length + " " + (displayedBalls.length != 1 ? "balls" : "ball") + " to " + playerDict[selectedBatsman.toString()].name }}</h4>
+            <h4 ng-show="showBatBalls">{{ displayedPlayer.name }} hit {{ displayedBalls.length }} balls.</h4>
+            <h4 ng-show="showBowlBalls">{{ displayedPlayer.name }} bowled {{ displayedBalls.length }} balls.</h4>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <img ng-show="showCombo" align="left" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="50" alt="bowlerImage"/><br>
+          </div>
+      </div>
+
+  </div>
+  <br>
+  <div align="center" class="row" ng-show="showBatBalls || showBowlBalls || showCombo">
+      <h4>Games</h4>
+      <div class="btn-group">
+        <label uib-tooltip="{{ game.team1_name + ' vs. ' + game.team2_name }}" class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
+      </div>
+  </div>
+  <br>
+  <div class="row">
+    <matchup-vis balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame">
+    </matchup-vis>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <h4>Pitch Map</h4>
+        <div id="pitchMap"></div>
+        <!--<pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>-->
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <h4>Stump Map</h4>
+        <div id="stumpMap"></div>
+        <!--<stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>-->
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <h4>Ground Map</h4>
+        <div id="groundMap"></div>
+        <!--<ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>-->
+    </div>
+    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <vertical-color-legend></vertical-color-legend>
+    </div>
+  </div>
   <div class="row">
       <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
         <div style="width:500px">
@@ -99,51 +145,5 @@
             <h5 ng-show="previousPlayer != null">Right click on another player for interactions</h5>
         </div>
       </div>
-  </div>
-  <div ng-show="showVizes">
-      <div class="row">
-          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img ng-show="showCombo" align="right" ng-src="{{ images[playerDict[selectedBowler.toString()]['name']] }}" height="60" alt="batsmanImage"/><br>
-          </div>
-          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <h4 ng-show="showCombo">{{ playerDict[selectedBowler.toString()].name + " bowled " + displayedBalls.length + " " + (displayedBalls.length != 1 ? "balls" : "ball") + " to " + playerDict[selectedBatsman.toString()].name }}</h4>
-            <h4 ng-show="showBatBalls">{{ displayedPlayer.name }} hit {{ displayedBalls.length }} balls.</h4>
-            <h4 ng-show="showBowlBalls">{{ displayedPlayer.name }} bowled {{ displayedBalls.length }} balls.</h4>
-          </div>
-          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-            <img ng-show="showCombo" align="left" ng-src="{{ images[playerDict[selectedBatsman.toString()]['name']] }}" height="60" alt="bowlerImage"/><br>
-          </div>
-      </div>
-
-  </div>
-  <br>
-  <div align="center" class="row" ng-show="showBatBalls || showBowlBalls || showCombo">
-      <h4>Games</h4>
-      <div class="btn-group">
-        <label uib-tooltip="{{ game.team1_name + ' vs. ' + game.team2_name }}" class="btn btn-default" ng-repeat="game in representedGames" ng-mouseover="seeGame(game)" ng-mouseleave="seeGame(null)">{{ game.date.split(" ")[0] }}</label>
-      </div>
-  </div>
-  <br>
-  <div class="row">
-    <matchup-vis balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame">
-    </matchup-vis>
-    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-        <h4>Pitch Map</h4>
-        <div id="pitchMap"></div>
-        <!--<pitch-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></pitch-matchup>-->
-    </div>
-    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-        <h4>Stump Map</h4>
-        <div id="stumpMap"></div>
-        <!--<stump-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></stump-matchup>-->
-    </div>
-    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-        <h4>Ground Map</h4>
-        <div id="groundMap"></div>
-        <!--<ground-matchup balls="displayedBalls" dictionary="playerDict" games="representedGames" game="currentGame"></ground-matchup>-->
-    </div>
-    <div style="border-right: 1px solid #bcbcbc" align="center" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-        <vertical-color-legend></vertical-color-legend>
-    </div>
   </div>
 </div>

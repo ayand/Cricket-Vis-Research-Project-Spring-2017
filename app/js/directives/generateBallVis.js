@@ -63,20 +63,30 @@ angular.module('myApp').directive('generateBallVis', function() {
               "topY": startingYs[j],
               "rightX": startingXs[i] + 1.525,
               "bottomY": startingYs[j] + 2.515,
-              "score": 0,
+              "balls_landed": 0,
+              "runs_scored": 0,
               "area": index
           });
           index += 1;
       }
   }
-  var pitchMapScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
+  var pitchMapBallScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
       "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"])
 
-  var stumpMapScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
+  var pitchMapRunScale = d3.scaleQuantile().range(["#CCCCCC", "#B0BEC7",
+      "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
+
+  var stumpMapBallScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
       "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"])
 
-  var groundMapScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
+  var stumpMapRunScale = d3.scaleQuantile().range(["#CCCCCC", "#B0BEC7",
+      "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
+
+  var groundMapBallScale = d3.scaleQuantile().range(["#FFEDA0", "#FED976",
       "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"])
+
+  var groundMapRunScale = d3.scaleQuantile().range(["#CCCCCC", "#B0BEC7",
+      "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
 
   var stumpAreas = [];
   index = 0;
@@ -87,7 +97,8 @@ angular.module('myApp').directive('generateBallVis', function() {
               "topY": j,
               "rightX": i + 0.75,
               "bottomY": j - 0.75,
-              "score": 0,
+              "balls_landed": 0,
+              "runs_scored": 0,
               "area": index
           });
           index += 1;
@@ -103,52 +114,104 @@ angular.module('myApp').directive('generateBallVis', function() {
 
   for (var i = 0; i < ringNumber; i++) {
       var ringAreas = [
-        { "zone": 1, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 2, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 3, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 4, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 5, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 6, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 7, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
-        { "zone": 8, "score": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 1, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 2, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 3, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 4, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 5, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 6, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 7, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
+        { "zone": 8, "balls_landed": 0, "runs_scored": 0, "amount": 1, "outerRadius": (i + 1) * dividedRadius },
       ];
 
       groundAreas.push(ringAreas);
   }
 
   var changeHeatMap = function() {
-      var pitchMin = d3.min(pitchAreas.filter(d => d["score"] != 0), d => d["score"])
-      var pitchMax = d3.max(pitchAreas.filter(d => d["score"] != 0), d => d["score"])
-      pitchMapScale.domain([pitchMin, pitchMax])
+      var pitchMin = d3.min(pitchAreas.filter(d => d["balls_landed"] != 0), d => d["balls_landed"])
+      var pitchMax = d3.max(pitchAreas.filter(d => d["balls_landed"] != 0), d => d["balls_landed"])
+      pitchMapBallScale.domain([pitchMin, pitchMax])
 
-      var stumpMin = d3.min(stumpAreas.filter(d => d["score"] != 0), d => d["score"])
-      var stumpMax = d3.max(stumpAreas.filter(d => d["score"] != 0), d => d["score"])
-      stumpMapScale.domain([stumpMin, stumpMax]);
+      pitchMin = d3.min(pitchAreas, d => d["runs_scored"])
+      pitchMax = d3.max(pitchAreas, d => d["runs_scored"])
+      if (pitchMin == 0 && pitchMax == 0) {
+          pitchMapRunScale.range(["#CCCCCC"])
+      } else {
+          pitchMapRunScale.range(["#CCCCCC", "#B0BEC7", "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
+      }
+      pitchMapRunScale.domain([pitchMin, pitchMax])
+
+      var stumpMin = d3.min(stumpAreas.filter(d => d["balls_landed"] != 0), d => d["balls_landed"])
+      var stumpMax = d3.max(stumpAreas.filter(d => d["balls_landed"] != 0), d => d["balls_landed"])
+      stumpMapBallScale.domain([stumpMin, stumpMax]);
+
+      stumpMin = d3.min(stumpAreas, d => d["runs_scored"])
+      stumpMax = d3.max(stumpAreas, d => d["runs_scored"])
+      if (stumpMin == 0 && stumpMax == 0) {
+          stumpMapRunScale.range(["#CCCCCC"])
+      } else {
+          stumpMapRunScale.range(["#CCCCCC", "#B0BEC7", "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
+      }
+      stumpMapRunScale.domain([stumpMin, stumpMax])
 
       var groundScores = [];
       groundAreas.forEach(function(zones) {
           zones.forEach(function(zone) {
-              if (zone.score != 0) {
-                  groundScores.push(zone.score);
+              if (zone.balls_landed != 0) {
+                  groundScores.push(zone.balls_landed);
               }
           })
       })
 
       var groundMin = d3.min(groundScores);
       var groundMax = d3.max(groundScores);
-      groundMapScale.domain([groundMin, groundMax])
+      if (groundMin == 0 && groundMax == 0) {
+          groundMapRunScale.range(["#CCCCCC"])
+      } else {
+          groundMapRunScale.range(["#CCCCCC", "#B0BEC7", "#94AFC3", "#78A1BE", "#5C93BA", "#4085B5", "#2476B1", "#0868AC"])
+      }
+      groundMapBallScale.domain([groundMin, groundMax])
 
-      d3.selectAll(".pitchHeatTile")
-          .attr("fill", d => d["score"] == 0 ? "none" : pitchMapScale(d["score"]))
-          .style("stroke", d => d["score"] == 0 ? "none" : "gray")
+      groundScores = [];
+      groundAreas.forEach(function(zones) {
+          zones.forEach(function(zone) {
+              groundScores.push(zone.runs_scored);
+          })
+      })
 
-      d3.selectAll(".stumpHeatTile")
-          .attr("fill", d => d["score"] == 0 ? "none" : stumpMapScale(d["score"]))
-          .style("stroke", d => d["score"] == 0 ? "none" : "gray")
+      groundMin = d3.min(groundScores);
+      groundMax = d3.max(groundScores);
+      groundMapRunScale.domain([groundMin, groundMax])
 
-      d3.selectAll(".ringPath")
-          .attr("fill", d => d.data.score == 0 ? "none" : groundMapScale(d.data.score))
-          .style("stroke", d => d.data.score == 0 ? "none" : "gray")
+      d3.selectAll(".pitchHeatBallTile")
+          .attr("fill", d => d["balls_landed"] == 0 ? "none" : pitchMapBallScale(d["balls_landed"]))
+          .style("stroke", "gray")
+          .style("display", d => d["balls_landed"] == 0 ? "none" : "block")
+
+      d3.selectAll(".pitchHeatRunTile")
+          .attr("fill", d => pitchMapRunScale(d["runs_scored"]))
+          .style("stroke", "gray")
+          .style("display", d => d["balls_landed"] == 0 ? "none" : "block")
+
+      d3.selectAll(".stumpHeatBallTile")
+          .attr("fill", d => d["balls_landed"] == 0 ? "none" : stumpMapBallScale(d["balls_landed"]))
+          .style("stroke", "gray")
+          .style("display", d => d["balls_landed"] == 0 ? "none" : "block")
+
+      d3.selectAll(".stumpHeatRunTile")
+          .attr("fill", d => stumpMapRunScale(d["runs_scored"]))
+          .style("stroke", "gray")
+          .style("display", d => d["balls_landed"] == 0 ? "none" : "block")
+
+      d3.selectAll(".ringBallPath")
+          .attr("fill", d => d.data.balls_landed == 0 ? "none" : groundMapBallScale(d.data.balls_landed))
+          .style("stroke", "gray")
+          .style("display", d => d.data.balls_landed == 0 ? "none" : "block")
+
+      d3.selectAll(".ringRunPath")
+          .attr("fill", d => groundMapRunScale(d.data.runs_scored))
+          .style("stroke", "gray")
+          .style("display", d => d.data.balls_landed == 0 ? "none" : "block")
   }
 
 
@@ -168,20 +231,11 @@ angular.module('myApp').directive('generateBallVis', function() {
         var selectedZone = 0;
         var zoneColors = [];
 
-        var pitchVis = d3.select("#pitch")
-          .append("svg")
-            .attr("width", svgDimension)
-            .attr("height", svgDimension)
+        var pitchVis = d3.select("#pitch").select("svg")
 
-        var stumpVis = d3.select("#stumps")
-          .append("svg")
-            .attr("width", svgDimension)
-            .attr("height", svgDimension);
+        var stumpVis = d3.select("#stumps").select("svg");
 
-        var groundVis = d3.select("#ground")
-          .append("svg")
-            .attr("width", svgDimension)
-            .attr("height", svgDimension);
+        var groundVis = d3.select("#ground").select("svg");
 
         var tooltipText = function(d) {
             var overNumber = Math.floor(d.ovr) + 1;
@@ -451,7 +505,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .attr("y", (svgDimension / 2) - convertDimension(37.6))
                 .attr("fill", "#B07942");
 
-            var groundHeatMapArea = ground.append("g")
+            var groundHeatBallArea = ground.append("g")
+            var groundHeatRunArea = ground.append("g")
 
                 var singleThing = [{ "amount": 1 }]
 
@@ -586,16 +641,19 @@ angular.module('myApp').directive('generateBallVis', function() {
 
         var recalculateHeatMaps = function() {
             pitchAreas.forEach(function(d) {
-                d["score"] = 0;
+                d["balls_landed"] = 0;
+                d["runs_scored"] = 0;
             })
             validPitchBalls.filter(d => isValidBall(d) && d["landing_y"] >= 0).forEach(function(d) {
               var column = d["landing_x"] < 0 ? 0 : 8;
               var row = Math.floor(d["landing_y"] / 2.515);
-              pitchAreas[column + row]["score"] += 1
+              pitchAreas[column + row]["balls_landed"] += 1
+              pitchAreas[column + row]["runs_scored"] += d["runs_batter"]
             })
 
             stumpAreas.forEach(function(d) {
-                d["score"] = 0;
+                d["balls_landed"] = 0;
+                d["runs_scored"] = 0;
             })
             validStumpBalls.filter(function(d) {
                 var condition1 = isValidBall(d);
@@ -605,13 +663,14 @@ angular.module('myApp').directive('generateBallVis', function() {
             }).forEach(function(d) {
                 var column = Math.floor((d["ended_x"] + 1.5) / 0.75) * 3;
                 var row = 2 - Math.floor(d["ended_y"] / 0.75);
-
-                stumpAreas[column + row]["score"] += 1
+                stumpAreas[column + row]["balls_landed"] += 1
+                stumpAreas[column + row]["runs_scored"] += d["runs_batter"]
             })
 
             groundAreas.forEach(function(zones) {
                 zones.forEach(function(zone) {
-                    zone.score = 0;
+                    zone.balls_landed = 0;
+                    zone.runs_scored = 0;
                 })
             })
 
@@ -624,7 +683,8 @@ angular.module('myApp').directive('generateBallVis', function() {
                     level = ringNumber - 1;
                 }
                 var sector = correctZone(d.z) - 1;
-                groundAreas[level][sector].score += 1;
+                groundAreas[level][sector].balls_landed += 1;
+                groundAreas[level][sector].runs_scored += d["runs_batter"]
             })
 
             changeHeatMap();
@@ -790,6 +850,11 @@ angular.module('myApp').directive('generateBallVis', function() {
             topPitchY = -1;
             bottomPitchY = -1;
             brushHighlight();
+            if (leftPitchX == -1) {
+                scope.$emit("pitchFilter", false);
+            }
+          } else {
+              scope.$emit("pitchFilter", true);
           }
         }
 
@@ -812,8 +877,12 @@ angular.module('myApp').directive('generateBallVis', function() {
             bottomStumpY = -1;
             brushHighlight();
             console.log("Brush canceled")
+            if (leftStumpX == -1) {
+                scope.$emit("stumpFilter", false);
+            }
           } else {
               console.log("Brush still in effect")
+              scope.$emit("stumpFilter", true);
           }
         }
 
@@ -845,7 +914,14 @@ angular.module('myApp').directive('generateBallVis', function() {
                   }
               });
 
+          if (lassoedItems.length > 0) {
+              scope.$emit("groundFilter", true);
+          }
+
           brushHighlight();
+          if (lassoedItems.length == 0) {
+              scope.$emit("groundFilter", false);
+          }
         }
 
         var changeBallVisibility = function() {
@@ -917,33 +993,52 @@ angular.module('myApp').directive('generateBallVis', function() {
             return d["landing_x"] != null && d["landing_y"] != null;
         });
 
+        var wicketBalls = validPitchBalls.filter(d => isWicketBall(d));
+
         var pitchBrushArea = pitch.append("g")
             .attr("class", "brush")
             .call(pitchBrush);
 
         plotPoints(pitchBrushArea, validPitchBalls, pitchX, pitchY, "landing_x", "landing_y")
 
-        var pitchHeatMapArea = pitch.append("g")
+        var pitchHeatBallArea = pitch.append("g")
 
-            var pitchAreaRect = pitchHeatMapArea.selectAll(".pitchHeatTile")
-                .data(pitchAreas, d => d["index"])
-                .enter()
-                .append("rect")
-                .attr("class", "pitchHeatTile")
-                .attr("x", d => pitchX(d["leftX"]))
-                .attr("y", d => pitchY(d["topY"]))
-                .attr("width", d => (pitchX(d["rightX"]) - pitchX(d["leftX"])))
-                .attr("height", d => (pitchY(d["bottomY"]) - pitchY(d["topY"])))
-                .attr("fill", "blue")
-                .style("stroke", "gray")
-                .style("opacity", 0.65)
-                .on("mouseover", function(d, i)  {
-                });
+        var pitchAreaRect = pitchHeatBallArea.selectAll(".pitchHeatBallTile")
+            .data(pitchAreas, d => d["index"])
+            .enter()
+            .append("rect")
+            .attr("class", "pitchHeatBallTile")
+            .attr("x", d => pitchX(d["leftX"]))
+            .attr("y", d => pitchY(d["topY"]))
+            .attr("width", d => (pitchX(d["rightX"]) - pitchX(d["leftX"])))
+            .attr("height", d => (pitchY(d["bottomY"]) - pitchY(d["topY"])))
+            .attr("fill", "blue")
+            .style("stroke", "gray")
+            .style("opacity", 0.65)
+
+        var pitchHeatRunArea = pitch.append("g")
+
+        var pitchAreaRect = pitchHeatRunArea.selectAll(".pitchHeatRunTile")
+            .data(pitchAreas, d => d["index"])
+            .enter()
+            .append("rect")
+            .attr("class", "pitchHeatRunTile")
+            .attr("x", d => pitchX(d["leftX"]))
+            .attr("y", d => pitchY(d["topY"]))
+            .attr("width", d => (pitchX(d["rightX"]) - pitchX(d["leftX"])))
+            .attr("height", d => (pitchY(d["bottomY"]) - pitchY(d["topY"])))
+            .attr("fill", "blue")
+            .style("stroke", "gray")
+            .style("opacity", 0.65)
+
+        plotPoints(pitchHeatRunArea, wicketBalls, pitchX, pitchY, "landing_x", "landing_y")
 
             validStumpBalls = scope.balls.filter(function(d) {
                 return d["ended_x"] != null && d["ended_y"] != null
                     && d["ended_x"] >= -2 && d["ended_x"] <= 2 && d["ended_y"] <= 4;
             });
+
+            wicketBalls = validStumpBalls.filter(d => isWicketBall(d));
 
             var stumpBrushArea = stumpWindow.append("g")
                 .attr("class", "brush")
@@ -951,22 +1046,37 @@ angular.module('myApp').directive('generateBallVis', function() {
 
             plotPoints(stumpBrushArea, validStumpBalls, stumpX, stumpY, "ended_x", "ended_y")
 
-                var stumpHeatmapArea = stumpWindow.append("g")
+            var stumpHeatBallArea = stumpWindow.append("g")
 
-                var stumpAreaRect = stumpHeatmapArea.selectAll(".stumpHeatTile")
-                    .data(stumpAreas, d => d["index"])
-                    .enter()
-                    .append("rect")
-                    .attr("class", "stumpHeatTile")
-                    .attr("x", d => stumpX(d["leftX"]))
-                    .attr("y", d => stumpY(d["topY"]))
-                    .attr("width", d => (stumpX(d["rightX"]) - stumpX(d["leftX"])))
-                    .attr("height", d => (stumpY(d["bottomY"]) - stumpY(d["topY"])))
-                    .attr("fill", "blue")
-                    .style("stroke", "gray")
-                    .style("opacity", 0.65)
-                    .on("mouseover", function(d)  {
-                    });
+            var stumpAreaRect = stumpHeatBallArea.selectAll(".stumpHeatBallTile")
+                .data(stumpAreas, d => d["index"])
+                .enter()
+                .append("rect")
+                .attr("class", "stumpHeatBallTile")
+                .attr("x", d => stumpX(d["leftX"]))
+                .attr("y", d => stumpY(d["topY"]))
+                .attr("width", d => (stumpX(d["rightX"]) - stumpX(d["leftX"])))
+                .attr("height", d => (stumpY(d["bottomY"]) - stumpY(d["topY"])))
+                .attr("fill", "blue")
+                .style("stroke", "gray")
+                .style("opacity", 0.65)
+
+            var stumpHeatRunArea = stumpWindow.append("g")
+
+            var stumpAreaRect = stumpHeatRunArea.selectAll(".stumpHeatRunTile")
+                .data(stumpAreas, d => d["index"])
+                .enter()
+                .append("rect")
+                .attr("class", "stumpHeatRunTile")
+                .attr("x", d => stumpX(d["leftX"]))
+                .attr("y", d => stumpY(d["topY"]))
+                .attr("width", d => (stumpX(d["rightX"]) - stumpX(d["leftX"])))
+                .attr("height", d => (stumpY(d["bottomY"]) - stumpY(d["topY"])))
+                .attr("fill", "blue")
+                .style("stroke", "gray")
+                .style("opacity", 0.65)
+                .on("mouseover", function(d)  {
+                });
 
                     var leftBat = stumpWindow.append("g")
                         .attr("class", "left-bat")
@@ -1033,12 +1143,12 @@ angular.module('myApp').directive('generateBallVis', function() {
                                 selectedHand = "left"
                                 leftBat.style("opacity", 1);
                                 rightBat.style("opacity", 0.1);
-                                //scope.$emit("handFilter", true);
+                                scope.$emit("batFilter", true);
                             } else {
                                 selectedHand = null;
                                 leftBat.style("opacity", 1);
                                 rightBat.style("opacity", 1);
-                                //scope.$emit("handFilter", false);
+                                scope.$emit("batFilter", false);
                             }
 
                             var validBatsmen = new Set(scope.balls.filter(function(d) {
@@ -1060,12 +1170,12 @@ angular.module('myApp').directive('generateBallVis', function() {
                                 selectedHand = "right"
                                 rightBat.style("opacity", 1);
                                 leftBat.style("opacity", 0.1);
-                                //scope.$emit("handFilter", true);
+                                scope.$emit("batFilter", true);
                             } else {
                                 selectedHand = null;
                                 leftBat.style("opacity", 1);
                                 rightBat.style("opacity", 1);
-                                //scope.$emit("handFilter", false);
+                                scope.$emit("batFilter", false);
                             }
 
                             var validBatsmen = new Set(scope.balls.filter(function(d) {
@@ -1082,7 +1192,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                             recalculateHeatMaps();
                         })
 
-                    stumpHeatmapArea.append("rect")
+                    stumpHeatBallArea.append("rect")
                         .attr("height", convertDimension(137.46))
                         .attr("width", convertDimension(7.366))
                         .attr("x", ((svgDimension / 2) - convertDimension(3.683)))
@@ -1091,7 +1201,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         .attr("ry", convertDimension(4))
                         .attr("fill", "#FAE3A1");
 
-                    stumpHeatmapArea.append("rect")
+                    stumpHeatBallArea.append("rect")
                         .attr("height", convertDimension(137.46))
                         .attr("width", convertDimension(7.366))
                         .attr("x", ((svgDimension / 2) - convertDimension(22.1366666667)))
@@ -1100,7 +1210,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         .attr("ry", convertDimension(4))
                         .attr("fill", "#FAE3A1");
 
-                    stumpHeatmapArea.append("rect")
+                    stumpHeatBallArea.append("rect")
                         .attr("height", convertDimension(137.46))
                         .attr("width", convertDimension(7.366))
                         .attr("x", ((svgDimension / 2) + convertDimension(14.7706666667)))
@@ -1109,7 +1219,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         .attr("ry", convertDimension(4))
                         .attr("fill", "#FAE3A1");
 
-                    stumpHeatmapArea.append("rect")
+                    stumpHeatBallArea.append("rect")
                         .attr("width", convertDimension(20))
                         .attr("height", convertDimension(4))
                         .attr("x", (svgDimension / 2))
@@ -1118,7 +1228,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                         .attr("ry", convertDimension(3))
                         .attr("fill", "#683F16");
 
-                    stumpHeatmapArea.append("rect")
+                    stumpHeatBallArea.append("rect")
                         .attr("width", convertDimension(20))
                         .attr("height", convertDimension(4))
                         .attr("x", ((svgDimension / 2) - convertDimension(20)))
@@ -1127,9 +1237,58 @@ angular.module('myApp').directive('generateBallVis', function() {
                         .attr("ry", convertDimension(3))
                         .attr("fill", "#683F16");
 
+                        stumpHeatRunArea.append("rect")
+                            .attr("height", convertDimension(137.46))
+                            .attr("width", convertDimension(7.366))
+                            .attr("x", ((svgDimension / 2) - convertDimension(3.683)))
+                            .attr("y", (svgDimension - convertDimension(137.46)))
+                            .attr("rx", convertDimension(4))
+                            .attr("ry", convertDimension(4))
+                            .attr("fill", "#FAE3A1");
+
+                        stumpHeatRunArea.append("rect")
+                            .attr("height", convertDimension(137.46))
+                            .attr("width", convertDimension(7.366))
+                            .attr("x", ((svgDimension / 2) - convertDimension(22.1366666667)))
+                            .attr("y", (svgDimension - convertDimension(137.46)))
+                            .attr("rx", convertDimension(4))
+                            .attr("ry", convertDimension(4))
+                            .attr("fill", "#FAE3A1");
+
+                        stumpHeatRunArea.append("rect")
+                            .attr("height", convertDimension(137.46))
+                            .attr("width", convertDimension(7.366))
+                            .attr("x", ((svgDimension / 2) + convertDimension(14.7706666667)))
+                            .attr("y", (svgDimension - convertDimension(137.46)))
+                            .attr("rx", convertDimension(4))
+                            .attr("ry", convertDimension(4))
+                            .attr("fill", "#FAE3A1");
+
+                        stumpHeatRunArea.append("rect")
+                            .attr("width", convertDimension(20))
+                            .attr("height", convertDimension(4))
+                            .attr("x", (svgDimension / 2))
+                            .attr("y", (svgDimension - convertDimension(138.793333333)))
+                            .attr("rx", convertDimension(3))
+                            .attr("ry", convertDimension(3))
+                            .attr("fill", "#683F16");
+
+                        stumpHeatRunArea.append("rect")
+                            .attr("width", convertDimension(20))
+                            .attr("height", convertDimension(4))
+                            .attr("x", ((svgDimension / 2) - convertDimension(20)))
+                            .attr("y", (svgDimension - convertDimension(138.793333333)))
+                            .attr("rx", convertDimension(3))
+                            .attr("ry", convertDimension(3))
+                            .attr("fill", "#683F16");
+
+                plotPoints(stumpHeatRunArea, wicketBalls, stumpX, stumpY, "ended_x", "ended_y")
+
                 validGroundBalls = scope.balls.filter(function(d) {
                     return d["x"] != null && d["y"] != null;
                 });
+
+                wicketBalls = validGroundBalls.filter(d => isWicketBall(d))
 
                 var groundBalls = plotPoints(groundLassoArea, validGroundBalls, groundX, groundY, "x", "y")
 
@@ -1162,11 +1321,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                 .on("draw", lasso_draw)
                 .on("end", lasso_end);
 
-
-
             groundLassoArea.call(lasso);
-
-            var groundHeatMapArea = groundVis.append("g")
 
             for (var i = 0; i < ringNumber; i++) {
 
@@ -1179,7 +1334,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                 var className = "groundRing" + i;
 
-                var groundRingArc = groundHeatMapArea.selectAll("." + className)
+                var groundRingArc = groundHeatBallArea.selectAll("." + className)
                     .data(zoneDonut(groundAreas[i]))
                     .enter()
                     .append("g")
@@ -1187,7 +1342,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                     .attr("transform", "translate("+[(svgDimension / 2), (svgDimension / 2)]+")")
 
                 groundRingArc.append("path")
-                    .attr("class", "ringPath")
+                    .attr("class", "ringBallPath")
                     .attr("fill", "white")
                     .style("stroke", "#CCCCCC")
                     .style("opacity", 0.8)
@@ -1195,12 +1350,30 @@ angular.module('myApp').directive('generateBallVis', function() {
                     .on("mouseover", function(d) {
                         console.log(d.data);
                     })
+
+                var groundRingArc = groundHeatRunArea.selectAll("." + className)
+                    .data(zoneDonut(groundAreas[i]))
+                    .enter()
+                    .append("g")
+                    .attr("class", className)
+                    .attr("transform", "translate("+[(svgDimension / 2), (svgDimension / 2)]+")")
+
+                groundRingArc.append("path")
+                    .attr("class", "ringRunPath")
+                    .attr("fill", "white")
+                    .style("stroke", "#CCCCCC")
+                    .style("opacity", 0.8)
+                    .attr("d", ringArc)
+                    .on("mouseover", console.log)
             }
+
+            plotPoints(groundHeatRunArea, wicketBalls, groundX, groundY, "x", "y")
 
             d3.selectAll(".zone-path").on("click", function(d, index) {
                 console.log(correctZone(d.data.zone))
                 if (selectedZone == d.data.zone) {
                     selectedZone = 0;
+                    scope.$emit("zoneFilter", false);
                     d3.select("#zoneFilter").style("visibility", "hidden")
                     d3.selectAll(".zone-path")
                         .attr("fill", function(path, i) {
@@ -1227,7 +1400,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                       });
                     }
                     selectedZone = d.data.zone;
-                    d3.select("#zoneFilter").style("visibility", "visible")
+                    scope.$emit("zoneFilter", true);
                     d3.selectAll(".zone-path")
                         .attr("fill", function(path, i) {
                             if (selectedZone == path.data.zone) {
@@ -1364,6 +1537,7 @@ angular.module('myApp').directive('generateBallVis', function() {
             });
 
             var overChange = function(min, max) {
+              //scope.$emit("partnerFilter", false)
               d3.selectAll(".partnership").style("stroke-width", "1px")
                   .style("stroke", "black")
               d3.selectAll(".partnershipBar").style("opacity", 1)
@@ -1429,6 +1603,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                   d3.selectAll(".activePlayer")
                       .on("mouseover", function(d) {
+                          console.log("Active player")
                           tempPlayer = d;
                           d3.selectAll(".edge")
                               .style("opacity", function(edge) {
@@ -1443,13 +1618,17 @@ angular.module('myApp').directive('generateBallVis', function() {
                           brushHighlight();
                       })
 
-                  d3.selectAll(".inactivePlayer")
+                  /*d3.selectAll(".inactivePlayer")
                       .on("mouseover", function(d) {
-                          return;
+                          tempPlayer = null;
+                          brushHighlight();
                       })
                       .on("mouseout", function(d) {
-                          return;
-                      })
+                        tempPlayer = null;
+                        d3.selectAll(".edge")
+                            .style("opacity", 1)
+                        brushHighlight();
+                      })*/
             }
 
             scope.$watch('min', function(newMin, oldMin) {
@@ -1463,6 +1642,7 @@ angular.module('myApp').directive('generateBallVis', function() {
             d3.selectAll(".partnership")
                 .on("click", function(d) {
                     if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
+                        scope.$emit("partnerFilter", false);
                         d3.selectAll(".partnership").style("stroke-width", "1px")
                             .style("stroke", "black")
                         d3.selectAll(".partnershipBar").style("opacity", 1)
@@ -1473,7 +1653,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                         brushHighlight();
                     } else {
-
+                        scope.$emit("partnerFilter", true);
                         d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
                             .style("stroke", e => (d == e) ? "gold" : "black")
                         d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
@@ -1490,6 +1670,7 @@ angular.module('myApp').directive('generateBallVis', function() {
                 d3.selectAll(".partnershipBar")
                     .on("click", function(d) {
                         if (batsman1 == d.batsman_1 && batsman2 == d.batsman_2) {
+                            scope.$emit("partnerFilter", false);
                             d3.selectAll(".partnership").style("stroke-width", "1px")
                                 .style("stroke", "black")
                             d3.selectAll(".partnershipBar").style("opacity", 1)
@@ -1500,7 +1681,7 @@ angular.module('myApp').directive('generateBallVis', function() {
 
                             brushHighlight();
                         } else {
-
+                            scope.$emit("partnerFilter", true);
                             d3.selectAll(".partnership").style("stroke-width", e => (d == e) ? "4px" : "1px")
                                 .style("stroke", e => (d == e) ? "gold" : "black")
                             d3.selectAll(".partnershipBar").style("opacity", e => (d == e) ? 1 : 0.2)
@@ -1514,17 +1695,23 @@ angular.module('myApp').directive('generateBallVis', function() {
                     })
 
             scope.$watch('mapView', function(newView, oldView) {
-                pitchHeatMapArea.style("display", newView == "Balls" ? "none" : "block")
+                pitchHeatBallArea.style("display", newView == "Heatmap - Balls" ? "block" : "none")
                 pitchBrushArea.style("display", newView == "Balls" ? "block" : "none")
-                stumpHeatmapArea.style("display", newView == "Balls" ? "none" : "block")
+                pitchHeatRunArea.style("display", newView == "Heatmap - Runs" ? "block" : "none")
+
+                stumpHeatBallArea.style("display", newView == "Heatmap - Balls" ? "block" : "none")
                 stumpBrushArea.style("display", newView == "Balls" ? "block" : "none")
+                stumpHeatRunArea.style("display", newView == "Heatmap - Runs" ? "block" : "none")
+
+                groundHeatBallArea.style("display", newView == "Heatmap - Balls" ? "block" : "none")
                 groundLassoArea.style("display", newView == "Balls" ? "block" : "none")
-                groundHeatMapArea.style("display", newView == "Balls" ? "none" : "block")
+                groundHeatRunArea.style("display", newView == "Heatmap - Runs" ? "block" : "none")
             })
 
-            scope.$on("handFilter", function(event, data) {
-                hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
+            scope.$on("batFilter3", function(event, data) {
+
                 selectedHand = null;
+                hands = Array.from(new Set(scope.balls.filter(d => isValidBall(d)).map(d => d.batsman).map(d => scope.dictionary[d.toString()]["hand"])))
                 leftBat.style("display", "none");
                 rightBat.style("display", "none");
                 leftBat.style("opacity", 1);
@@ -1539,11 +1726,60 @@ angular.module('myApp').directive('generateBallVis', function() {
                   leftBat.style("display", "block");
                   rightBat.style("display", "block");
                 }
+                brushHighlight();
             })
 
-            scope.$on("zoneFilter", function(event, data) {
+            scope.$on("partnerFilter2", function(event, data) {
+              d3.selectAll(".partnership").style("stroke-width", "1px")
+                  .style("stroke", "black")
+              d3.selectAll(".partnershipBar").style("opacity", 1)
+              batsman1 = null;
+              batsman2 = null;
+
+              changeBallVisibility();
+
+              brushHighlight();
+              recalculateHeatMaps();
+            })
+
+            scope.$on("pitchFilter3", function(event, data) {
+                if (leftPitchX != -1) {
+                    pitchBrushArea.call(pitchBrush.move, null);
+                    pitchBrushArea.call(pitchBrush);
+                }
+
+
+                leftPitchX = -1;
+
+                brushHighlight();
+                recalculateHeatMaps();
+            })
+
+            scope.$on("stumpFilter3", function(event, data) {
+
+                if (leftStumpX != -1) {
+                    stumpBrushArea.call(stumpBrush.move, null);
+                    stumpBrushArea.call(stumpBrush);
+                }
+                leftStumpX = -1;
+                brushHighlight();
+                recalculateHeatMaps();
+            })
+
+            scope.$on("groundFilter3", function(event, data) {
+
+                if (lassoedItems.length == 0) {
+                    groundLassoArea.on(".dragstart", null)
+                    groundLassoArea.on(".drag", null)
+                    groundLassoArea.on(".dragend", null)
+                }
+                lassoedItems = [];
+                brushHighlight();
+                recalculateHeatMaps();
+            })
+
+            scope.$on("zoneFilter3", function(event, data) {
               selectedZone = 0;
-              //d3.select("#zoneFilter").style("visibility", "hidden")
               d3.selectAll(".zone-path")
                   .attr("fill", function(path, i) {
                       return zoneColors[i];
@@ -1557,9 +1793,10 @@ angular.module('myApp').directive('generateBallVis', function() {
                       return d.batsman;
                   }))
 
-                  scope.$emit('batsmen', validBatsmen);
+                  //scope.$emit('batsmen', validBatsmen);
 
                   brushHighlight();
+                  recalculateHeatMaps();
             })
       }
   }

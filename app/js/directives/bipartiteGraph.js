@@ -185,6 +185,8 @@ angular.module('myApp').directive('bipartiteGraph', function() {
               var bowlers = Array.from(new Set(filteredBalls.map(function(d) {
                   return d.bowler;
               })));
+              console.log(batsmen.length);
+              
 
               var interactionDict = {}
 

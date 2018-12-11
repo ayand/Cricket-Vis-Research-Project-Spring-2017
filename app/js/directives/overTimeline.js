@@ -1,5 +1,5 @@
 angular.module('myApp').directive('overTimeline', function() {
-  var height = 280;
+  var height = 250;
 
   var convertDimension = function(d) {
       return ((d * height) / 475)
