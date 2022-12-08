@@ -32,6 +32,6 @@
   },
   "dependencies": {
     "bower": "^1.7.2",
-    "express": "^4.13.3"
+    "express": "^4.17.3"
   }
 }
